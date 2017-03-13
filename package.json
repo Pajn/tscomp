@@ -1,14 +1,29 @@
 {
-  "name": "react-scripts",
-  "version": "0.9.4",
+  "name": "tscomp",
+  "version": "0.10.0-dev",
   "description": "Configuration and scripts for Create React App.",
-  "repository": "facebookincubator/create-react-app",
+  "repository": "beanloop/tscomp",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=4"
   },
   "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
+    "url": "https://github.com/beanloop/tscomp/issues"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "create-react-app": "tasks/cra.sh",
+    "e2e": "tasks/e2e-simple.sh",
+    "start": "node scripts/start.js",
+    "test": "node scripts/test.js --env=jsdom",
+    "format": "prettier --trailing-comma es5 --single-quote --write '!(node_modules)/**/*.js'",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --trailing-comma es5 --single-quote --write",
+      "git add"
+    ]
   },
   "files": [
     "babelrc",
@@ -20,7 +35,7 @@
     "utils"
   ],
   "bin": {
-    "react-scripts": "./bin/react-scripts.js"
+    "tscomp": "./bin/react-scripts.js"
   },
   "dependencies": {
     "autoprefixer": "6.7.5",
@@ -32,6 +47,7 @@
     "babel-runtime": "^6.20.0",
     "case-sensitive-paths-webpack-plugin": "1.1.4",
     "chalk": "1.1.3",
+    "commander": "^2.9.0",
     "connect-history-api-fallback": "1.3.0",
     "cross-spawn": "4.0.2",
     "css-loader": "0.26.2",
@@ -49,19 +65,26 @@
     "fs-extra": "0.30.0",
     "html-webpack-plugin": "2.28.0",
     "http-proxy-middleware": "0.17.3",
+    "hyperquest": "^2.1.2",
     "jest": "18.1.0",
     "object-assign": "4.1.1",
     "postcss-loader": "1.3.3",
     "promise": "7.1.1",
     "react-dev-utils": "^0.5.2",
+    "semver": "^5.3.0",
     "style-loader": "0.13.2",
+    "tar-pack": "^3.4.0",
+    "tmp": "0.0.31",
     "url-loader": "0.5.8",
+    "validate-npm-package-name": "^3.0.0",
     "webpack": "2.2.1",
     "webpack-dev-server": "2.4.1",
     "webpack-manifest-plugin": "1.1.0",
     "whatwg-fetch": "2.0.2"
   },
   "devDependencies": {
+    "lint-staged": "^3.3.2",
+    "prettier": "^0.22.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0"
   },

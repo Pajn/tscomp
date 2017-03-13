@@ -431,9 +431,9 @@ Then in `package.json`, add the following lines to `scripts`:
    "scripts": {
 +    "build-css": "node-sass src/ -o src/",
 +    "watch-css": "npm run build-css && node-sass src/ -o src/ --watch --recursive",
-     "start": "react-scripts start",
-     "build": "react-scripts build",
-     "test": "react-scripts test --env=jsdom",
+     "start": "tscomp start",
+     "build": "tscomp build",
+     "test": "tscomp test --env=jsdom",
 ```
 
 >Note: To use a different preprocessor, replace `build-css` and `watch-css` commands according to your preprocessor’s documentation.
@@ -456,13 +456,13 @@ Then we can change `start` and `build` scripts to include the CSS preprocessor c
    "scripts": {
      "build-css": "node-sass src/ -o src/",
      "watch-css": "npm run build-css && node-sass src/ -o src/ --watch --recursive",
--    "start": "react-scripts start",
--    "build": "react-scripts build",
-+    "start-js": "react-scripts start",
+-    "start": "tscomp start",
+-    "build": "tscomp build",
++    "start-js": "tscomp start",
 +    "start": "npm-run-all -p watch-css start-js",
-+    "build": "npm run build-css && react-scripts build",
-     "test": "react-scripts test --env=jsdom",
-     "eject": "react-scripts eject"
++    "build": "npm run build-css && tscomp build",
+     "test": "tscomp test --env=jsdom",
+     "eject": "tscomp eject"
    }
 ```
 
