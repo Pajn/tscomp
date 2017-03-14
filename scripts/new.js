@@ -1,3 +1,4 @@
+// @remove-file-on-eject
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -33,7 +34,7 @@ const program = commander
   .option('--verbose', 'print additional logs')
   .option(
     '--scripts-version <alternative-package>',
-    'use a non-standard version of react-scripts'
+    'use a non-standard version of tscomp'
   )
   .allowUnknownOption()
   .on('--help', () => {
@@ -44,10 +45,10 @@ const program = commander
     );
     console.log(`      - a specific npm version: ${chalk.green('0.8.2')}`);
     console.log(
-      `      - a custom fork published on npm: ${chalk.green('my-react-scripts')}`
+      `      - a custom fork published on npm: ${chalk.green('my-tscomp')}`
     );
     console.log(
-      `      - a .tgz archive: ${chalk.green('https://mysite.com/my-react-scripts-0.8.2.tgz')}`
+      `      - a .tgz archive: ${chalk.green('https://mysite.com/my-tscomp-0.8.2.tgz')}`
     );
     console.log(
       `    It is not needed unless you specifically want to use a fork.`
@@ -184,7 +185,8 @@ function install(useYarn, dependencies, verbose, isOnline) {
 
 function run(root, appName, version, verbose, originalDirectory, template) {
   const packageToInstall = getInstallPackage(version);
-  const allDependencies = ['react', 'react-dom', packageToInstall];
+  const browserDependencies = ['react', 'react-dom', '@types/react', '@types/react-dom', '@types/webpack'];
+  const allDependencies = ['@types/jest', packageToInstall, ...browserDependencies];
 
   console.log('Installing packages. This might take a couple minutes.');
 
@@ -209,7 +211,7 @@ function run(root, appName, version, verbose, originalDirectory, template) {
     .then(packageName => {
       checkNodeVersion(packageName);
 
-      // Since react-scripts has been installed with --save
+      // Since tscomp has been installed with --save
       // we need to move it into devDependencies and rewrite package.json
       // also ensure react dependencies have caret version range
       fixDependencies(packageName);
@@ -272,13 +274,15 @@ function run(root, appName, version, verbose, originalDirectory, template) {
 }
 
 function getInstallPackage(version) {
-  let packageToInstall = 'react-scripts';
+  let packageToInstall = 'tscomp';
   const validSemver = semver.valid(version);
   if (validSemver) {
     packageToInstall += `@${validSemver}`;
   } else if (version) {
     // for tar.gz or alternative paths
     packageToInstall = version;
+  } else {
+    packageToInstall += '@dev'
   }
   return packageToInstall;
 }
@@ -340,7 +344,7 @@ function getPackageName(installPackage) {
         return packageName;
       })
       .catch(err => {
-        // The package name could be with or without semver version, e.g. react-scripts-0.2.0-alpha.1.tgz
+        // The package name could be with or without semver version, e.g. tscomp-0.2.0-alpha.1.tgz
         // However, this function returns package name only without semver version.
         console.log(
           `Could not extract the package name from the archive: ${err.message}`
@@ -355,8 +359,8 @@ function getPackageName(installPackage) {
       });
   } else if (installPackage.indexOf('git+') === 0) {
     // Pull package name out of git urls e.g:
-    // git+https://github.com/mycompany/react-scripts.git
-    // git+ssh://github.com/mycompany/react-scripts.git#v1.2.3
+    // git+https://github.com/mycompany/tscomp.git
+    // git+ssh://github.com/mycompany/tscomp.git#v1.2.3
     return Promise.resolve(installPackage.match(/([^\/]+)\.git(#.*)?$/)[1]);
   } else if (installPackage.indexOf('@') > 0) {
     // Do not match @scope/ when stripping off @version or @tag
@@ -427,7 +431,7 @@ function checkAppName(appName) {
 
   // TODO: there should be a single place that holds the dependencies
   const dependencies = ['react', 'react-dom'];
-  const devDependencies = ['react-scripts'];
+  const devDependencies = ['tscomp'];
   const allDependencies = dependencies.concat(devDependencies).sort();
   if (allDependencies.indexOf(appName) >= 0) {
     console.error(

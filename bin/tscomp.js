@@ -45,7 +45,7 @@ switch (script) {
     break;
   default:
     console.log('Unknown script "' + script + '".');
-    console.log('Perhaps you need to update react-scripts?');
+    console.log('Perhaps you need to update tscomp?');
     console.log(
       'See: https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#updating-to-new-releases'
     );

@@ -19,11 +19,6 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
-// @remove-on-eject-begin
-// `path` is not used after eject - see https://github.com/facebookincubator/create-react-app/issues/1174
-const path = require('path');
-// @remove-on-eject-end
-
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
@@ -65,7 +60,7 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: 'source-map',
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: [require.resolve('react-scripts/config/polyfills'), paths.appIndexJs],
   output: {
     // The build folder.
     path: paths.appBuild,
@@ -88,7 +83,7 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', '.jsx'],
+    extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -97,7 +92,7 @@ module.exports = {
   },
   // @remove-on-eject-begin
   // Resolve loaders (webpack plugins for CSS, images, transpilation) from the
-  // directory of `react-scripts` itself rather than the project directory.
+  // directory of `tscomp` itself rather than the project directory.
   resolveLoader: {
     modules: [
       paths.ownNodeModules,
@@ -110,27 +105,6 @@ module.exports = {
     rules: [
       // Disable require.ensure as it's not a standard language feature.
       { parser: { requireEnsure: false } },
-      // First, run the linter.
-      // It's important to do this before Babel processes the JS.
-      {
-        test: /\.(js|jsx)$/,
-        enforce: 'pre',
-        use: [
-          {
-            // @remove-on-eject-begin
-            // Point ESLint to our predefined config.
-            options: {
-              // TODO: consider separate config for production,
-              // e.g. to enable no-console and no-debugger only in production.
-              configFile: path.join(__dirname, '../eslintrc'),
-              useEslintrc: false,
-            },
-            // @remove-on-eject-end
-            loader: 'eslint-loader',
-          },
-        ],
-        include: paths.appSrc,
-      },
       // ** ADDING/UPDATING LOADERS **
       // The "url" loader handles all assets unless explicitly excluded.
       // The `exclude` list *must* be updated with every change to loader extensions.
@@ -143,6 +117,7 @@ module.exports = {
         exclude: [
           /\.html$/,
           /\.(js|jsx)$/,
+          /\.(ts|tsx)$/,
           /\.css$/,
           /\.json$/,
           /\.bmp$/,
@@ -176,6 +151,23 @@ module.exports = {
           presets: [require.resolve('babel-preset-react-app')],
         },
         // @remove-on-eject-end
+      },
+      // Process TS with TypeScript Babel.
+      {
+        test: /\.(ts|tsx)$/,
+        include: paths.appSrc,
+        use: [
+          {
+            loader: 'babel-loader',
+            // @remove-on-eject-begin
+            options: {
+              babelrc: false,
+              presets: [require.resolve('babel-preset-react-app')],
+            },
+            // @remove-on-eject-end
+          },
+          'ts-loader',
+        ],
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.

@@ -14,6 +14,19 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
+const extensions = ['', '.tsx', '.ts', '.js', '.jsx']
+
+function findFileExtension(path) {
+  for (let i = 0; i < extensions.length; i++) {
+    const extension = extensions[i]
+    if (fs.existsSync(path + extension)) {
+      return path + extension
+    }
+  }
+
+  return path + '.ts'
+}
+
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
@@ -77,8 +90,9 @@ module.exports = {
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('src/index.js'),
+  appIndexJs: findFileExtension(resolveApp('src/index')),
   appPackageJson: resolveApp('package.json'),
+  appTsConfig: resolveApp('tsconfig.json'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -93,14 +107,15 @@ function resolveOwn(relativePath) {
   return path.resolve(__dirname, '..', relativePath);
 }
 
-// config before eject: we're in ./node_modules/react-scripts/config/
+// config before eject: we're in ./node_modules/tscomp/config/
 module.exports = {
   appPath: resolveApp('.'),
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('src/index.js'),
+  appIndexJs: findFileExtension(resolveApp('src/index')),
   appPackageJson: resolveApp('package.json'),
+  appTsConfig: resolveApp('tsconfig.json'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -118,18 +133,20 @@ const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
 const reactScriptsLinked = fs.existsSync(reactScriptsPath) &&
   fs.lstatSync(reactScriptsPath).isSymbolicLink();
 
-// config before publish: we're in ./packages/react-scripts/config/
+// config before publish: we're in ./tscomp/config/
 if (
   !reactScriptsLinked &&
-  __dirname.indexOf(path.join('packages', 'react-scripts', 'config')) !== -1
+  __dirname.indexOf(path.join('tscomp', 'config')) !== -1 &&
+  __dirname.indexOf(path.join('node_modules', 'tscomp', 'config')) === -1
 ) {
   module.exports = {
     appPath: resolveApp('.'),
-    appBuild: resolveOwn('../../build'),
+    appBuild: resolveOwn('build'),
     appPublic: resolveOwn('template/public'),
     appHtml: resolveOwn('template/public/index.html'),
-    appIndexJs: resolveOwn('template/src/index.js'),
+    appIndexJs: findFileExtension(resolveOwn('template/src/index')),
     appPackageJson: resolveOwn('package.json'),
+    appTsConfig: resolveOwn('template/tsconfig.json'),
     appSrc: resolveOwn('template/src'),
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveOwn('template/src/setupTests.js'),

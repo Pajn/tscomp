@@ -103,9 +103,6 @@ prompt(
   const babelConfig = JSON.parse(
     fs.readFileSync(path.join(ownPath, '.babelrc'), 'utf8')
   );
-  const eslintConfig = JSON.parse(
-    fs.readFileSync(path.join(ownPath, '.eslintrc'), 'utf8')
-  );
 
   console.log(cyan('Updating the dependencies'));
   const ownPackageName = ownPackage.name;
@@ -156,10 +153,6 @@ prompt(
   console.log(`  Adding ${cyan('Babel')} preset`);
   appPackage.babel = babelConfig;
 
-  // Add ESlint config
-  console.log(`  Adding ${cyan('ESLint')} configuration`);
-  appPackage.eslintConfig = eslintConfig;
-
   fs.writeFileSync(
     path.join(appPath, 'package.json'),
     JSON.stringify(appPackage, null, 2) + '\n'
@@ -169,7 +162,7 @@ prompt(
   // "Don't destroy what isn't ours"
   if (ownPath.indexOf(appPath) === 0) {
     try {
-      // remove react-scripts and react-scripts binaries from app node_modules
+      // remove tscomp and tscomp binaries from app node_modules
       Object.keys(ownPackage.bin).forEach(binKey => {
         fs.removeSync(path.join(appPath, 'node_modules', '.bin', binKey));
       });
@@ -189,7 +182,7 @@ prompt(
   console.log(green('Ejected successfully!'));
   console.log();
 
-  console.log(green('Please consider sharing why you ejected in this survey:'));
-  console.log(green('  http://goo.gl/forms/Bi6CZjk1EqsdelXk1'));
+  // console.log(green('Please consider sharing why you ejected in this survey:'));
+  // console.log(green('  http://goo.gl/forms/Bi6CZjk1EqsdelXk1'));
   console.log();
 });

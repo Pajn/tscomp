@@ -105,21 +105,21 @@ fi
 # ******************************************************************************
 
 # Test local build command
-# npm run build
-# # Check for expected output
-# exists build/*.html
-# exists build/static/js/*.js
-# exists build/static/css/*.css
-# exists build/static/media/*.svg
-# exists build/favicon.ico
+npm run build
+# Check for expected output
+exists build/*.html
+exists build/static/js/*.js
+exists build/static/css/*.css
+exists build/static/media/*.svg
+exists build/favicon.ico
 
-# # Run tests with CI flag
-# CI=true npm test
-# # Uncomment when snapshot testing is enabled by default:
-# # exists template/src/__snapshots__/App.test.js.snap
+# Run tests with CI flag
+CI=true npm test
+# Uncomment when snapshot testing is enabled by default:
+# exists template/src/__snapshots__/App.test.js.snap
 
-# # Test local start command
-# npm start -- --smoke-test
+# Test local start command
+npm start -- --smoke-test
 
 # ******************************************************************************
 # Next, pack react-scripts and create-react-app so we can verify they work.
