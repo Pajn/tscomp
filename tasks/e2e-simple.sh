@@ -22,6 +22,7 @@ temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
 function cleanup {
   echo 'Cleaning up.'
   cd "$root_path"
+  rm "$cli_path"
   # Uncomment when snapshot testing is enabled by default:
   # rm ./packages/react-scripts/template/src/__snapshots__/App.test.js.snap
   rm -rf "$temp_cli_path" $temp_app_path
@@ -41,8 +42,8 @@ function handle_exit {
   exit
 }
 
-function create_react_app {
-  node "$temp_cli_path"/node_modules/tscomp/bin/react-scripts.js "$@"
+function tscomp {
+  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js "$@"
 }
 
 # Check for the existence of one or more files.
@@ -80,7 +81,7 @@ npm install
 if [[ `node --version | sed -e 's/^v//' -e 's/\..*//g'` -lt 4 ]]
 then
   cd $temp_app_path
-  err_output=`node "$root_path"/bin/react-scripts.js test-node-version 2>&1 > /dev/null || echo ''`
+  err_output=`node "$root_path"/bin/tscomp.js test-node-version 2>&1 > /dev/null || echo ''`
   [[ $err_output =~ You\ are\ running\ Node ]] && exit 0 || exit 1
 fi
 
@@ -100,51 +101,34 @@ fi
 ./node_modules/.bin/eslint --max-warnings 0 .
 
 # ******************************************************************************
-# First, test the create-react-app development environment.
+# First, test the tscomp development environment.
 # This does not affect our users but makes sure we can develop it.
 # ******************************************************************************
 
-# Test local build command
-npm run build
-# Check for expected output
-exists build/*.html
-exists build/static/js/*.js
-exists build/static/css/*.css
-exists build/static/media/*.svg
-exists build/favicon.ico
+# # Test local build command
+# npm run build
+# # Check for expected output
+# exists build/*.html
+# exists build/static/js/*.js
+# exists build/static/css/*.css
+# exists build/static/media/*.svg
+# exists build/favicon.ico
 
-# Run tests with CI flag
-CI=true npm test
-# Uncomment when snapshot testing is enabled by default:
-# exists template/src/__snapshots__/App.test.js.snap
+# # Run tests with CI flag
+# CI=true npm test
+# # Uncomment when snapshot testing is enabled by default:
+# # exists template/src/__snapshots__/App.test.js.snap
 
-# Test local start command
-npm start -- --smoke-test
+# # Test local start command
+# npm start -- --smoke-test
 
 # ******************************************************************************
-# Next, pack react-scripts and create-react-app so we can verify they work.
+# Next, pack tscomp so we can verify that it work.
 # ******************************************************************************
 
 # Pack CLI
 # cd "$root_path"/packages/create-react-app
 cli_path=$PWD/`npm pack`
-
-# Go to react-scripts
-# cd "$root_path"/packages/react-scripts
-
-# Save package.json because we're going to touch it
-# cp package.json package.json.orig
-
-# Replace own dependencies (those in the `packages` dir) with the local paths
-# of those packages.
-# node "$root_path"/tasks/replace-own-deps.js
-
-# Finally, pack react-scripts
-# scripts_path="$root_path"/packages/react-scripts/`npm pack`
-
-# Restore package.json
-# rm package.json
-# mv package.json.orig package.json
 
 # ******************************************************************************
 # Now that we have packed them, create a clean app folder and install them.
@@ -160,12 +144,20 @@ npm init --yes
 # Now we can install the CLI from the local package.
 npm install "$cli_path"
 
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+# Test the browser template
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+
 # Install the app in a temporary location
 cd $temp_app_path
-create_react_app new --scripts-version="$cli_path" test-app
+tscomp new browser --scripts-version="$cli_path" test-browser-app
 
 # ******************************************************************************
-# Now that we used create-react-app to create an app depending on react-scripts,
+# Now that we used tscomp to create an app,
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
 
@@ -219,7 +211,7 @@ function verify_env_url {
 }
 
 # Enter the app directory
-cd test-app
+cd test-browser-app
 
 # Test the build
 npm run build
@@ -249,10 +241,6 @@ verify_env_url
 echo yes | npm run eject
 
 # ...but still link to the local packages
-# npm link "$root_path"/packages/babel-preset-react-app
-# npm link "$root_path"/packages/eslint-config-react-app
-# npm link "$root_path"/packages/react-dev-utils
-# npm link "$root_path"/packages/react-scripts
 npm link "$root_path"
 
 # Test the build
@@ -264,11 +252,8 @@ exists build/static/css/*.css
 exists build/static/media/*.svg
 exists build/favicon.ico
 
-# Run tests, overring the watch option to disable it.
-# `CI=true npm test` won't work here because `npm test` becomes just `jest`.
-# We should either teach Jest to respect CI env variable, or make
-# `scripts/test.js` survive ejection (right now it doesn't).
-npm test -- --watch=no
+# Run tests
+CI=true npm test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
@@ -277,6 +262,116 @@ npm start -- --smoke-test
 
 # Test environment handling
 verify_env_url
+
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+# Test the server template
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+
+# Install the app in a temporary location
+cd $temp_app_path
+tscomp new server --scripts-version="$cli_path" test-server-app
+
+# ******************************************************************************
+# Now that we used tscomp to create an app,
+# let's make sure all npm scripts are in the working state.
+# ******************************************************************************
+
+# Enter the app directory
+cd test-server-app
+
+# Test the build
+npm run build
+# Check for expected output
+exists build/index.js
+
+# Run tests with CI flag
+CI=true npm test
+# Uncomment when snapshot testing is enabled by default:
+# exists src/__snapshots__/App.test.js.snap
+
+# Test the server
+output=`npm start -- --smoke-test`
+[[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
+
+# ******************************************************************************
+# Finally, let's check that everything still works after ejecting.
+# ******************************************************************************
+
+# Eject...
+echo yes | npm run eject
+
+# ...but still link to the local packages
+npm link "$root_path"
+
+# Test the build
+npm run build
+# Check for expected output
+exists build/index.js
+
+# Run tests
+CI=true npm test
+# Uncomment when snapshot testing is enabled by default:
+# exists src/__snapshots__/App.test.js.snap
+
+# Test the server
+output=`npm start -- --smoke-test`
+[[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
+
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+# Test the library template
+# ******************************************************************************
+# ******************************************************************************
+# ******************************************************************************
+
+# Install the app in a temporary location
+cd $temp_app_path
+tscomp new lib --scripts-version="$cli_path" test-library
+
+# ******************************************************************************
+# Now that we used tscomp to create a library,
+# let's make sure all npm scripts are in the working state.
+# ******************************************************************************
+
+# Enter the app directory
+cd test-library
+
+# Test the build
+npm run build
+# Check for expected output
+exists build/index.js
+exists build/index.d.ts
+
+# Run tests with CI flag
+CI=true npm test
+# Uncomment when snapshot testing is enabled by default:
+# exists src/__snapshots__/App.test.js.snap
+
+# ******************************************************************************
+# Finally, let's check that everything still works after ejecting.
+# ******************************************************************************
+
+# Eject...
+echo yes | npm run eject
+
+# ...but still link to the local packages
+npm link "$root_path"
+
+# Test the build
+npm run build
+# Check for expected output
+exists build/index.js
+exists build/index.d.ts
+
+# Run tests
+CI=true npm test
+# Uncomment when snapshot testing is enabled by default:
+# exists src/__snapshots__/App.test.js.snap
 
 # Cleanup
 cleanup

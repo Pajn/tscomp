@@ -17,10 +17,12 @@ const chalk = require('chalk');
 module.exports = function(
   appPath,
   appName,
+  projectType,
   verbose,
   originalDirectory,
   template
 ) {
+  console.log('projectType init', projectType)
   const ownPackageName = require(path.join(
     __dirname,
     '..',
@@ -34,13 +36,31 @@ module.exports = function(
   appPackage.dependencies = appPackage.dependencies || {};
   appPackage.devDependencies = appPackage.devDependencies || {};
 
+  // Setup tscomp options
+  appPackage.tscomp = {
+    mode: projectType,
+  }
+
   // Setup the script rules
   appPackage.scripts = {
-    start: 'tscomp start',
     build: 'tscomp build',
-    test: 'tscomp test --env=jsdom',
+    test: 'tscomp test',
     eject: 'tscomp eject',
   };
+  if (projectType === 'browser') {
+    appPackage.scripts.start = 'tscomp start'
+    appPackage.scripts.test = 'tscomp test --env=jsdom'
+  }
+  else if (projectType === 'server') {
+    appPackage.scripts.start = 'tscomp start'
+    appPackage.scripts.watch = 'tscomp watch'
+  }
+  else if (projectType === 'lib') {
+    appPackage.scripts.watch = 'tscomp watch'
+
+    appPackage.main = './build/index.js'
+    appPackage.typings = './build/index.d.ts'
+  }
 
   fs.writeFileSync(
     path.join(appPath, 'package.json'),
@@ -58,7 +78,7 @@ module.exports = function(
   // Copy the files for the user
   const templatePath = template
     ? path.resolve(originalDirectory, template)
-    : path.join(ownPath, 'template');
+    : path.join(ownPath, 'templates', projectType);
   if (fs.existsSync(templatePath)) {
     fs.copySync(templatePath, appPath);
   } else {
@@ -118,7 +138,7 @@ module.exports = function(
   // Install react and react-dom for backward compatibility with old CRA cli
   // which doesn't install react and react-dom along with tscomp
   // or template is presetend (via --internal-testing-template)
-  if (!isReactInstalled(appPackage) || template) {
+  if (projectType === 'browser' && (!isReactInstalled(appPackage) || template)) {
     console.log(`Installing react and react-dom using ${command}...`);
     console.log();
 

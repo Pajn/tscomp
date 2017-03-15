@@ -24,7 +24,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
     moduleFileExtensions: ['jsx', 'js', 'json', 'ts', 'tsx'],
-    setupFiles: [require.resolve('react-scripts/config/polyfills.js')],
+    setupFiles: [resolve('config/polyfills.js')],
     setupTestFrameworkScriptFile: setupTestsFile,
     testPathIgnorePatterns: [
       '<rootDir>[/\\\\](build|docs|node_modules|scripts)[/\\\\]',

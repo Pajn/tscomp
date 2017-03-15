@@ -20,6 +20,7 @@ switch (script) {
   case 'new':
   case 'start':
   case 'test':
+  case 'watch':
     var result = spawn.sync(
       'node',
       [require.resolve('../scripts/' + script)].concat(args),

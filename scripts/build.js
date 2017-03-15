@@ -24,19 +24,22 @@ const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 const webpack = require('webpack');
+const gulp = require('../config/gulp');
 const config = require('../config/webpack.config.prod');
 const paths = require('../config/paths');
-const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
+
+const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
+const getMode = require('./utils/common').getMode;
+const printErrors = require('./utils/common').printErrors;
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
+const mode = getMode(paths.appPackageJson)
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-  process.exit(1);
-}
+checkRequiredFiles(mode, paths)
 
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
@@ -45,25 +48,28 @@ measureFileSizesBeforeBuild(paths.appBuild).then(previousFileSizes => {
   // if you're in it, you don't end up in Trash
   fs.emptyDirSync(paths.appBuild);
 
-  // Start the webpack build
-  build(previousFileSizes);
+  if (mode === 'browser') {
+    // Start the webpack build
+    buildWebpack(previousFileSizes);
+  }
+  else {
+    gulp.build(paths.appPath, err => {
+      if (err) {
+        printErrors('Failed to compile.', [err]);
+        process.exit(1);
+      }
+      else {
+        console.log(chalk.green('Compiled successfully.'));
+      }
+    })
+  }
 
   // Merge with the public folder
   copyPublicFolder();
 });
 
-// Print out errors
-function printErrors(summary, errors) {
-  console.log(chalk.red(summary));
-  console.log();
-  errors.forEach(err => {
-    console.log(err.message || err);
-    console.log();
-  });
-}
-
 // Create the production build and print the deployment instructions.
-function build(previousFileSizes) {
+function buildWebpack(previousFileSizes) {
   console.log('Creating an optimized production build...');
 
   let compiler;
@@ -197,8 +203,10 @@ function build(previousFileSizes) {
 }
 
 function copyPublicFolder() {
-  fs.copySync(paths.appPublic, paths.appBuild, {
-    dereference: true,
-    filter: file => file !== paths.appHtml,
-  });
+  if (fs.existsSync(paths.appPublic)) {
+    fs.copySync(paths.appPublic, paths.appBuild, {
+      dereference: true,
+      filter: file => file !== paths.appHtml,
+    });
+  }
 }

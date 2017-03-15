@@ -22,13 +22,21 @@ const tmp = require('tmp');
 const unpack = require('tar-pack').unpack;
 const hyperquest = require('hyperquest');
 
+let projectType;
 let projectName;
+
+let typeNames = {
+  browser: 'React app',
+  server: 'server app',
+  lib: 'library package',
+}
 
 const program = commander
   .version(require('../package.json').version)
-  .arguments('<project-directory>')
-  .usage(`${chalk.green('<project-directory>')} [options]`)
-  .action(name => {
+  .arguments('<type> <project-directory>')
+  .usage(`${chalk.green('<type> <project-directory>')} [options]`)
+  .action((type, name) => {
+    projectType = type;
     projectName = name;
   })
   .option('--verbose', 'print additional logs')
@@ -38,7 +46,14 @@ const program = commander
   )
   .allowUnknownOption()
   .on('--help', () => {
-    console.log(`    Only ${chalk.green('<project-directory>')} is required.`);
+    console.log(`    Only ${chalk.green('<type> <project-directory>')} is required.`);
+    console.log();
+    console.log(
+      `    ${chalk.cyan('<type>')} can be one of:`
+    );
+    console.log(`      - browser: A react browser app`);
+    console.log(`      - server: A server app`);
+    console.log(`      - lib: A package that can be used in either a browser or server app`);
     console.log();
     console.log(
       `    A custom ${chalk.cyan('--scripts-version')} can be one of:`
@@ -58,20 +73,46 @@ const program = commander
       `    If you have any problems, do not hesitate to file an issue:`
     );
     console.log(
-      `      ${chalk.cyan('https://github.com/facebookincubator/create-react-app/issues/new')}`
+      `      ${chalk.cyan('https://github.com/beanloop/tscomp/issues/new')}`
     );
     console.log();
   })
   .parse(process.argv);
 
-if (typeof projectName === 'undefined') {
-  console.error('Please specify the project directory:');
+if (typeof projectType === 'undefined') {
+  console.error('Please specify the project type:');
   console.log(
-    `  ${chalk.cyan(program.name())} ${chalk.green('<project-directory>')}`
+    `  ${chalk.cyan(program.name())} ${chalk.green('<type> <project-directory>')}`
   );
   console.log();
   console.log('For example:');
-  console.log(`  ${chalk.cyan(program.name())} ${chalk.green('my-react-app')}`);
+  console.log(`  ${chalk.cyan(program.name())} ${chalk.green('browser my-react-app')}`);
+  console.log();
+  console.log(
+    `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
+  );
+  process.exit(1);
+}
+else if (['browser', 'server', 'lib'].indexOf(projectType) === -1) {
+  console.error('Unknown project type: ' + projectType);
+  console.log();
+  console.log('Must be one of:');
+  console.log(`  ${chalk.green('browser server')} and ${chalk.green('lib')}`);
+  console.log();
+  console.log(
+    `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
+  );
+  process.exit(1);
+}
+
+if (typeof projectName === 'undefined') {
+  console.error('Please specify the project directory:');
+  console.log(
+    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('<project-directory>')}`
+  );
+  console.log();
+  console.log('For example:');
+  console.log(`  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('my-react-app')}`);
   console.log();
   console.log(
     `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
@@ -116,7 +157,7 @@ function createApp(name, verbose, version, template) {
     process.exit(1);
   }
 
-  console.log(`Creating a new React app in ${chalk.green(root)}.`);
+  console.log(`Creating a new ${typeNames[projectType]} in ${chalk.green(root)}.`);
   console.log();
 
   const packageJson = {
@@ -185,8 +226,22 @@ function install(useYarn, dependencies, verbose, isOnline) {
 
 function run(root, appName, version, verbose, originalDirectory, template) {
   const packageToInstall = getInstallPackage(version);
-  const browserDependencies = ['react', 'react-dom', '@types/react', '@types/react-dom', '@types/webpack'];
-  const allDependencies = ['@types/jest', packageToInstall, ...browserDependencies];
+  let allDependencies = ['@types/jest', packageToInstall];
+  if (projectType === 'browser') {
+    allDependencies = allDependencies.concat([
+      'react', 'react-dom', '@types/react', '@types/react-dom', '@types/webpack',
+    ])
+  }
+  else if (projectType === 'server') {
+    allDependencies = allDependencies.concat([
+      '@types/node',
+    ])
+  }
+  else if (projectType === 'lib') {
+    allDependencies = allDependencies.concat([
+      '@types/webpack',
+    ])
+  }
 
   console.log('Installing packages. This might take a couple minutes.');
 
@@ -200,7 +255,7 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       const isOnline = info.isOnline;
       const packageName = info.packageName;
       console.log(
-        `Installing ${chalk.cyan('react')}, ${chalk.cyan('react-dom')}, and ${chalk.cyan(packageName)}...`
+        `Installing ${allDependencies.map(name => chalk.cyan(name)).join(', ')}, and ${chalk.cyan(packageName)}...`
       );
       console.log();
 
@@ -224,7 +279,7 @@ function run(root, appName, version, verbose, originalDirectory, template) {
         'init.js'
       );
       const init = require(scriptsPath);
-      init(root, appName, verbose, originalDirectory, template);
+      init(root, appName, projectType, verbose, originalDirectory, template);
     })
     .catch(reason => {
       console.log();
@@ -486,8 +541,10 @@ function fixDependencies(packageName) {
   packageJson.devDependencies[packageName] = packageVersion;
   delete packageJson.dependencies[packageName];
 
-  makeCaretRange(packageJson.dependencies, 'react');
-  makeCaretRange(packageJson.dependencies, 'react-dom');
+  if (projectType === 'browser') {
+    makeCaretRange(packageJson.dependencies, 'react');
+    makeCaretRange(packageJson.dependencies, 'react-dom');
+  }
 
   fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2));
 }
