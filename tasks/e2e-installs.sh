@@ -46,8 +46,8 @@ function exists {
   done
 }
 
-function create_react_app {
-  node "$temp_cli_path"/node_modules/tscomp/bin/react-scripts.js $*
+function tscomp {
+  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js $*
 }
 
 # Exit the script with a helpful error message when any error is encountered
@@ -73,7 +73,7 @@ then
 fi
 
 # ******************************************************************************
-# First, pack and install create-react-app.
+# First, pack and install tscomp.
 # ******************************************************************************
 
 # Pack CLI
@@ -93,22 +93,22 @@ cd "$temp_app_path"
 mkdir test-app-nested-paths-t1
 cd test-app-nested-paths-t1
 mkdir -p test-app-nested-paths-t1/aa/bb/cc/dd
-create_react_app new test-app-nested-paths-t1/aa/bb/cc/dd
+tscomp new lib test-app-nested-paths-t1/aa/bb/cc/dd
 cd test-app-nested-paths-t1/aa/bb/cc/dd
-npm start -- --smoke-test
+CI=true npm test
 
 #Testing a path that does not exist
 cd "$temp_app_path"
-create_react_app new test-app-nested-paths-t2/aa/bb/cc/dd
+tscomp new lib test-app-nested-paths-t2/aa/bb/cc/dd
 cd test-app-nested-paths-t2/aa/bb/cc/dd
-npm start -- --smoke-test
+CI=true npm test
 
 #Testing a path that is half exists
 cd "$temp_app_path"
 mkdir -p test-app-nested-paths-t3/aa
-create_react_app new test-app-nested-paths-t3/aa/bb/cc/dd
+tscomp new lib test-app-nested-paths-t3/aa/bb/cc/dd
 cd test-app-nested-paths-t3/aa/bb/cc/dd
-npm start -- --smoke-test
+CI=true npm test
 
 # Cleanup
 cleanup
