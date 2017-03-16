@@ -41,8 +41,8 @@ function handle_exit {
   exit
 }
 
-function create_react_app {
-  node "$temp_cli_path"/node_modules/tscomp/bin/react-scripts.js "$@"
+function tscomp {
+  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js "$@"
 }
 
 # Check for the existence of one or more files.
@@ -75,29 +75,12 @@ then
 fi
 
 # ******************************************************************************
-# First, pack react-scripts and create-react-app so we can use them.
+# First, pack tscomp so we can use it.
 # ******************************************************************************
 
 # Pack CLI
 cd "$root_path"
 cli_path=$PWD/`npm pack`
-
-# Go to react-scripts
-# cd "$root_path"/packages/react-scripts
-
-# Save package.json because we're going to touch it
-cp package.json package.json.orig
-
-# Replace own dependencies (those in the `packages` dir) with the local paths
-# of those packages.
-# node "$root_path"/tasks/replace-own-deps.js
-
-# Finally, pack react-scripts
-# scripts_path="$root_path"/packages/react-scripts/`npm pack`
-
-# Restore package.json
-rm package.json
-mv package.json.orig package.json
 
 # ******************************************************************************
 # Now that we have packed them, create a clean app folder and install them.
@@ -109,7 +92,7 @@ npm install "$cli_path"
 
 # Install the app in a temporary location
 cd $temp_app_path
-create_react_app --internal-testing-template="$root_path"/fixtures/kitchensink new test-kitchensink
+tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink browser test-kitchensink
 
 # ******************************************************************************
 # Now that we used create-react-app to create an app depending on react-scripts,
@@ -171,17 +154,10 @@ E2E_FILE=./build/index.html \
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
 
-# Unlink our preset
-# npm unlink "$root_path"/packages/babel-preset-react-app
-
 # Eject...
 echo yes | npm run eject
 
-# ...but still link to the local packages
-#npm link "$root_path"/packages/babel-preset-react-app
-#npm link "$root_path"/packages/eslint-config-react-app
-#npm link "$root_path"/packages/react-dev-utils
-#npm link "$root_path"/packages/react-scripts
+# ...but still link to tscomp
 npm link "$root_path"
 
 # Test the build
