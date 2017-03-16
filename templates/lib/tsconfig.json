@@ -12,7 +12,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "rootDir": ".",
-    "outDir": "dist"
+    "outDir": "lib"
   },
   "include": [
     "src/**/*",

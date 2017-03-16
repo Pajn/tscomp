@@ -58,8 +58,8 @@ module.exports = function(
   else if (projectType === 'lib') {
     appPackage.scripts.watch = 'tscomp watch'
 
-    appPackage.main = './build/index.js'
-    appPackage.typings = './build/index.d.ts'
+    appPackage.main = './lib/index.js'
+    appPackage.typings = './lib/index.d.ts'
   }
 
   fs.writeFileSync(

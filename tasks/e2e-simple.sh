@@ -144,6 +144,31 @@ npm init --yes
 # Now we can install the CLI from the local package.
 npm install "$cli_path"
 
+
+# ******************************************************************************
+# Common test utils
+# ******************************************************************************
+
+function test_change_outdir {
+  files_to_check=( "$@" )
+
+  # Backup package.json because we're going to make it dirty
+  cp tsconfig.json tsconfig.json.orig
+
+  sed 's/\"outDir\": \"\w*\"/\"outDir\": \"other\"/' tsconfig.json > tmp && mv tmp tsconfig.json
+
+  npm run build
+
+  for file in "${files_to_check[@]}"
+  do
+    exists "other/$file" || exit 1
+  done
+
+  # Restore tsconfig.json
+  rm tsconfig.json
+  mv tsconfig.json.orig tsconfig.json
+}
+
 # ******************************************************************************
 # ******************************************************************************
 # ******************************************************************************
@@ -233,6 +258,9 @@ npm start -- --smoke-test
 # Test environment handling
 verify_env_url
 
+# Test changing outDir
+test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg favicon.ico
+
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
@@ -262,6 +290,9 @@ npm start -- --smoke-test
 
 # Test environment handling
 verify_env_url
+
+# Test changing outDir
+test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg favicon.ico
 
 # ******************************************************************************
 # ******************************************************************************
@@ -297,6 +328,9 @@ CI=true npm test
 output=`npm start -- --smoke-test`
 [[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
 
+# Test changing outDir
+test_change_outdir index.js
+
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
@@ -321,6 +355,9 @@ CI=true npm test
 output=`npm start -- --smoke-test`
 [[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
 
+# Test changing outDir
+test_change_outdir index.js
+
 # ******************************************************************************
 # ******************************************************************************
 # ******************************************************************************
@@ -344,13 +381,16 @@ cd test-library
 # Test the build
 npm run build
 # Check for expected output
-exists build/index.js
-exists build/index.d.ts
+exists lib/index.js
+exists lib/index.d.ts
 
 # Run tests with CI flag
 CI=true npm test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
+
+# Test changing outDir
+test_change_outdir index.js index.d.ts
 
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
@@ -365,13 +405,16 @@ npm link "$root_path"
 # Test the build
 npm run build
 # Check for expected output
-exists build/index.js
-exists build/index.d.ts
+exists lib/index.js
+exists lib/index.d.ts
 
 # Run tests
 CI=true npm test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
+
+# Test changing outDir
+test_change_outdir index.js index.d.ts
 
 # Cleanup
 cleanup

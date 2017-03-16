@@ -34,6 +34,18 @@ function resolveApp(relativePath) {
   return path.resolve(appDirectory, relativePath);
 }
 
+// The user may choose to change the tsconfig.json `outDir` property.
+function resolveAppBuild(appTsConfigPath) {
+  try {
+    const outDir = require(appTsConfigPath).compilerOptions.outDir || 'build'
+    const buildPath = path.relative(path.dirname(appTsConfigPath), outDir)
+    return buildPath
+  } catch (_) {
+    const buildPath = path.relative(path.dirname(appTsConfigPath), 'build')
+    return buildPath
+  }
+}
+
 // We support resolving modules according to `NODE_PATH`.
 // This lets you use absolute paths in imports inside large monorepos:
 // https://github.com/facebookincubator/create-react-app/issues/253.
@@ -87,7 +99,7 @@ function getServedPath(appPackageJson) {
 
 // config after eject: we're in ./config/
 module.exports = {
-  appBuild: resolveApp('build'),
+  appBuild: resolveAppBuild(resolveApp('tsconfig.json')),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: findFileExtension(resolveApp('src/index')),
@@ -111,7 +123,7 @@ function resolveOwn(relativePath) {
 // config before eject: we're in ./node_modules/tscomp/config/
 module.exports = {
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
+  appBuild: resolveAppBuild(resolveApp('tsconfig.json')),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: findFileExtension(resolveApp('src/index')),
