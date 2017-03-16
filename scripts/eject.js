@@ -107,9 +107,6 @@ prompt(
 
   const ownPackage = require(path.join(ownPath, 'package.json'));
   const appPackage = require(path.join(appPath, 'package.json'));
-  const babelConfig = JSON.parse(
-    fs.readFileSync(path.join(ownPath, '.babelrc'), 'utf8')
-  );
 
   console.log(cyan('Updating the dependencies'));
   const ownPackageName = ownPackage.name;
@@ -158,7 +155,9 @@ prompt(
 
   // Add Babel config
   console.log(`  Adding ${cyan('Babel')} preset`);
-  appPackage.babel = babelConfig;
+  appPackage.babel = {
+    presets: ['react-app'],
+  };
 
   fs.writeFileSync(
     path.join(appPath, 'package.json'),

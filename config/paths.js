@@ -38,10 +38,10 @@ function resolveApp(relativePath) {
 function resolveAppBuild(appTsConfigPath) {
   try {
     const outDir = require(appTsConfigPath).compilerOptions.outDir || 'build'
-    const buildPath = path.relative(path.dirname(appTsConfigPath), outDir)
+    const buildPath = path.join(path.dirname(appTsConfigPath), outDir)
     return buildPath
   } catch (_) {
-    const buildPath = path.relative(path.dirname(appTsConfigPath), 'build')
+    const buildPath = path.join(path.dirname(appTsConfigPath), 'build')
     return buildPath
   }
 }

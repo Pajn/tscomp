@@ -18,7 +18,6 @@ const paths = [
   `${src}/**/*.jsx`,
   `${src}/**/*.ts`,
   `${src}/**/*.tsx`,
-  'typings/**/*.d.ts'
 ]
 
 const baseCompilerOptions = {
@@ -44,7 +43,7 @@ function build(dir, cb) {
 }
 
 function buildTs(dir, cb) {
-  const appTsConfig = require(path.join(dir, 'tsconfig.json'))
+  const appTsConfig = require(appPaths.appTsConfig)
   const tsStream = gulp.src(paths)
     .pipe(plumber())
     .pipe(sourcemaps.init())
