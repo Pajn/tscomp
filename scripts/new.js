@@ -36,7 +36,7 @@ let typeNames = {
   browser: 'React app',
   server: 'server app',
   lib: 'library package',
-}
+};
 
 const program = commander
   .version(require('../package.json').version)
@@ -53,14 +53,16 @@ const program = commander
   )
   .allowUnknownOption()
   .on('--help', () => {
-    console.log(`    Only ${chalk.green('<type> <project-directory>')} is required.`);
-    console.log();
     console.log(
-      `    ${chalk.cyan('<type>')} can be one of:`
+      `    Only ${chalk.green('<type> <project-directory>')} is required.`
     );
+    console.log();
+    console.log(`    ${chalk.cyan('<type>')} can be one of:`);
     console.log(`      - browser: A react browser app`);
     console.log(`      - server: A server app`);
-    console.log(`      - lib: A package that can be used in either a browser or server app`);
+    console.log(
+      `      - lib: A package that can be used in either a browser or server app`
+    );
     console.log();
     console.log(
       `    A custom ${chalk.cyan('--scripts-version')} can be one of:`
@@ -93,14 +95,15 @@ if (typeof projectType === 'undefined') {
   );
   console.log();
   console.log('For example:');
-  console.log(`  ${chalk.cyan(program.name())} ${chalk.green('browser my-react-app')}`);
+  console.log(
+    `  ${chalk.cyan(program.name())} ${chalk.green('browser my-react-app')}`
+  );
   console.log();
   console.log(
     `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
   );
   process.exit(1);
-}
-else if (['browser', 'server', 'lib'].indexOf(projectType) === -1) {
+} else if (['browser', 'server', 'lib'].indexOf(projectType) === -1) {
   console.error('Unknown project type: ' + projectType);
   console.log();
   console.log('Must be one of:');
@@ -119,7 +122,9 @@ if (typeof projectName === 'undefined') {
   );
   console.log();
   console.log('For example:');
-  console.log(`  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('my-react-app')}`);
+  console.log(
+    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('my-react-app')}`
+  );
   console.log();
   console.log(
     `Run ${chalk.cyan(`${program.name()} --help`)} to see all options.`
@@ -164,7 +169,9 @@ function createApp(name, verbose, version, template) {
     process.exit(1);
   }
 
-  console.log(`Creating a new ${typeNames[projectType]} in ${chalk.green(root)}.`);
+  console.log(
+    `Creating a new ${typeNames[projectType]} in ${chalk.green(root)}.`
+  );
   console.log();
 
   const packageJson = {
@@ -236,33 +243,34 @@ function run(root, appName, version, verbose, originalDirectory, template) {
   let allDependencies = ['@types/jest', packageToInstall];
   if (projectType === 'browser') {
     allDependencies = allDependencies.concat([
-      'react', 'react-dom', '@types/react', '@types/react-dom', '@types/webpack',
-    ])
-  }
-  else if (projectType === 'server') {
-    allDependencies = allDependencies.concat([
-      '@types/node',
-    ])
-  }
-  else if (projectType === 'lib') {
-    allDependencies = allDependencies.concat([
+      'react',
+      'react-dom',
+      '@types/react',
+      '@types/react-dom',
       '@types/webpack',
-    ])
+    ]);
+  } else if (projectType === 'server') {
+    allDependencies = allDependencies.concat(['@types/node']);
+  } else if (projectType === 'lib') {
+    allDependencies = allDependencies.concat(['@types/webpack']);
   }
 
   console.log('Installing packages. This might take a couple minutes.');
 
   const useYarn = shouldUseYarn();
   getPackageName(packageToInstall)
-    .then(packageName => checkIfOnline(useYarn).then(isOnline => ({
-      isOnline: isOnline,
-      packageName: packageName,
-    })))
+    .then(packageName =>
+      checkIfOnline(useYarn).then(isOnline => ({
+        isOnline: isOnline,
+        packageName: packageName,
+      })))
     .then(info => {
       const isOnline = info.isOnline;
       const packageName = info.packageName;
       console.log(
-        `Installing ${allDependencies.map(name => chalk.cyan(name)).join(', ')}, and ${chalk.cyan(packageName)}...`
+        `Installing ${allDependencies
+          .map(name => chalk.cyan(name))
+          .join(', ')}, and ${chalk.cyan(packageName)}...`
       );
       console.log();
 
@@ -344,7 +352,7 @@ function getInstallPackage(version) {
     // for tar.gz or alternative paths
     packageToInstall = version;
   } else {
-    packageToInstall += '@dev'
+    packageToInstall += '@dev';
   }
   return packageToInstall;
 }

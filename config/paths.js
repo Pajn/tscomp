@@ -14,17 +14,17 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
-const extensions = ['', '.tsx', '.ts', '.js', '.jsx']
+const extensions = ['', '.tsx', '.ts', '.js', '.jsx'];
 
 function findFileExtension(path) {
   for (let i = 0; i < extensions.length; i++) {
-    const extension = extensions[i]
+    const extension = extensions[i];
     if (fs.existsSync(path + extension)) {
-      return path + extension
+      return path + extension;
     }
   }
 
-  return path + '.ts'
+  return path + '.ts';
 }
 
 // Make sure any symlinks in the project folder are resolved:
@@ -37,12 +37,12 @@ function resolveApp(relativePath) {
 // The user may choose to change the tsconfig.json `outDir` property.
 function resolveAppBuild(appTsConfigPath) {
   try {
-    const outDir = require(appTsConfigPath).compilerOptions.outDir || 'build'
-    const buildPath = path.join(path.dirname(appTsConfigPath), outDir)
-    return buildPath
+    const outDir = require(appTsConfigPath).compilerOptions.outDir || 'build';
+    const buildPath = path.join(path.dirname(appTsConfigPath), outDir);
+    return buildPath;
   } catch (_) {
-    const buildPath = path.join(path.dirname(appTsConfigPath), 'build')
-    return buildPath
+    const buildPath = path.join(path.dirname(appTsConfigPath), 'build');
+    return buildPath;
   }
 }
 

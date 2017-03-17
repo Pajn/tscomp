@@ -49,10 +49,10 @@ const cli = useYarn ? 'yarn' : 'npm';
 const isInteractive = process.stdout.isTTY;
 let argv = process.argv.slice(2);
 
-const mode = getMode(paths.appPackageJson)
+const mode = getMode(paths.appPackageJson);
 
 // Warn and crash if required files are missing
-checkRequiredFiles(mode, paths)
+checkRequiredFiles(mode, paths);
 
 // Tools like Cloud9 rely on this.
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -133,46 +133,51 @@ function startWebpack() {
   });
 }
 
-
 if (mode === 'browser') {
-  startWebpack()
-}
-else if (mode === 'server') {
-  const isSmokeTest = process.argv.some(arg => arg.indexOf('--smoke-test') > -1);
+  startWebpack();
+} else if (mode === 'server') {
+  const isSmokeTest = process.argv.some(
+    arg => arg.indexOf('--smoke-test') > -1
+  );
   if (isSmokeTest) {
-    argv = argv.filter(arg => arg.indexOf('--smoke-test') === -1)
-    argv.push('--no-restart-on', 'exit', '--non-interactive', '--quiet', '--ignore', '.')
-  }
-  else {
-    argv.push('--no-restart-on', 'success', '--watch', paths.appBuild)
+    argv = argv.filter(arg => arg.indexOf('--smoke-test') === -1);
+    argv.push(
+      '--no-restart-on',
+      'exit',
+      '--non-interactive',
+      '--quiet',
+      '--ignore',
+      '.'
+    );
+  } else {
+    argv.push('--no-restart-on', 'success', '--watch', paths.appBuild);
   }
 
   gulp.build(paths.appPath, err => {
     if (err) {
       printErrors('Failed to compile.', [err]);
       process.exit(1);
-    }
-    else {
+    } else {
       console.log(chalk.green('Compiled successfully.'));
       if (!isSmokeTest) {
         gulp.watch(paths.appPath, err => {
           if (err) {
             printErrors('Failed to compile.', [err]);
-          }
-          else {
+          } else {
             console.log(chalk.green('Compiled successfully.'));
           }
-        })
+        });
       }
-      const supervisor = require('supervisor/lib/supervisor')
+      const supervisor = require('supervisor/lib/supervisor');
 
-      supervisor.run(['--extensions', 'js,jsx,ts,tsx'].concat(argv).concat(paths.appBuildIndexJs))
+      supervisor.run(
+        ['--extensions', 'js,jsx,ts,tsx']
+          .concat(argv)
+          .concat(paths.appBuildIndexJs)
+      );
     }
-  })
-}
-else {
-  console.log(
-    chalk.red(`Can only start a browser or a server app project`)
-  );
-  process.exit(1)
+  });
+} else {
+  console.log(chalk.red(`Can only start a browser or a server app project`));
+  process.exit(1);
 }

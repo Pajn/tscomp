@@ -29,7 +29,6 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  console.log('projectType init', projectType)
   const ownPackageName = require(path.join(
     __dirname,
     '..',
@@ -46,7 +45,7 @@ module.exports = function(
   // Setup tscomp options
   appPackage.tscomp = {
     mode: projectType,
-  }
+  };
 
   // Setup the script rules
   appPackage.scripts = {
@@ -55,18 +54,16 @@ module.exports = function(
     eject: 'tscomp eject',
   };
   if (projectType === 'browser') {
-    appPackage.scripts.start = 'tscomp start'
-    appPackage.scripts.test = 'tscomp test --env=jsdom'
-  }
-  else if (projectType === 'server') {
-    appPackage.scripts.start = 'tscomp start'
-    appPackage.scripts.watch = 'tscomp watch'
-  }
-  else if (projectType === 'lib') {
-    appPackage.scripts.watch = 'tscomp watch'
+    appPackage.scripts.start = 'tscomp start';
+    appPackage.scripts.test = 'tscomp test --env=jsdom';
+  } else if (projectType === 'server') {
+    appPackage.scripts.start = 'tscomp start';
+    appPackage.scripts.watch = 'tscomp watch';
+  } else if (projectType === 'lib') {
+    appPackage.scripts.watch = 'tscomp watch';
 
-    appPackage.main = './lib/index.js'
-    appPackage.typings = './lib/index.d.ts'
+    appPackage.main = './lib/index.js';
+    appPackage.typings = './lib/index.d.ts';
   }
 
   fs.writeFileSync(
@@ -145,7 +142,9 @@ module.exports = function(
   // Install react and react-dom for backward compatibility with old CRA cli
   // which doesn't install react and react-dom along with tscomp
   // or template is presetend (via --internal-testing-template)
-  if (projectType === 'browser' && (!isReactInstalled(appPackage) || template)) {
+  if (
+    projectType === 'browser' && (!isReactInstalled(appPackage) || template)
+  ) {
     console.log(`Installing react and react-dom using ${command}...`);
     console.log();
 

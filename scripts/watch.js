@@ -33,33 +33,32 @@ const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
 const printErrors = require('./utils/common').printErrors;
 
-const mode = getMode(paths.appPackageJson)
+const mode = getMode(paths.appPackageJson);
 
 // Warn and crash if required files are missing
-checkRequiredFiles(mode, paths)
+checkRequiredFiles(mode, paths);
 
 if (mode === 'browser') {
   console.log(
-    chalk.red(`Browser projects can not be watched, please use tscomp start instead`)
+    chalk.red(
+      `Browser projects can not be watched, please use tscomp start instead`
+    )
   );
-  process.exit(1)
-}
-else {
+  process.exit(1);
+} else {
   gulp.build(paths.appPath, err => {
     if (err) {
       printErrors('Failed to compile.', [err]);
       process.exit(1);
-    }
-    else {
+    } else {
       console.log(chalk.green('Compiled successfully.'));
       gulp.watch(paths.appPath, err => {
         if (err) {
           printErrors('Failed to compile.', [err]);
-        }
-        else {
+        } else {
           console.log(chalk.green('Compiled successfully.'));
         }
-      })
+      });
     }
-  })
+  });
 }

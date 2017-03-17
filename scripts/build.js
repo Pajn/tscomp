@@ -43,10 +43,10 @@ const printErrors = require('./utils/common').printErrors;
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
-const mode = getMode(paths.appPackageJson)
+const mode = getMode(paths.appPackageJson);
 
 // Warn and crash if required files are missing
-checkRequiredFiles(mode, paths)
+checkRequiredFiles(mode, paths);
 
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
@@ -58,17 +58,15 @@ measureFileSizesBeforeBuild(paths.appBuild).then(previousFileSizes => {
   if (mode === 'browser') {
     // Start the webpack build
     buildWebpack(previousFileSizes);
-  }
-  else {
+  } else {
     gulp.build(paths.appPath, err => {
       if (err) {
         printErrors('Failed to compile.', [err]);
         process.exit(1);
-      }
-      else {
+      } else {
         console.log(chalk.green('Compiled successfully.'));
       }
-    })
+    });
   }
 
   // Merge with the public folder

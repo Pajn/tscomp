@@ -1,7 +1,7 @@
 'use strict';
 
-const chalk = require('chalk')
-const utilCheckRequiredFiles = require('react-dev-utils/checkRequiredFiles')
+const chalk = require('chalk');
+const utilCheckRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 // Print out errors
 module.exports.printErrors = function printErrors(summary, errors) {
@@ -11,19 +11,20 @@ module.exports.printErrors = function printErrors(summary, errors) {
     console.log(err.message || err);
     console.log();
   });
-}
-
+};
 
 module.exports.getMode = function getMode(packageJsonPath) {
-  const mode = (require(packageJsonPath).tscomp || {}).mode
+  const mode = (require(packageJsonPath).tscomp || {}).mode;
 
   if (['browser', 'server', 'lib'].indexOf(mode) === -1) {
-    console.error('No or invalid mode specified. Specify a mode by adding "tscomp": {"mode": "browser"} to your package.json')
-    process.exit(1)
+    console.error(
+      'No or invalid mode specified. Specify a mode by adding "tscomp": {"mode": "browser"} to your package.json'
+    );
+    process.exit(1);
   }
 
-  return mode
-}
+  return mode;
+};
 
 module.exports.checkRequiredFiles = function checkRequiredFiles(mode, paths) {
   // Warn and crash if required files are missing
@@ -35,4 +36,4 @@ module.exports.checkRequiredFiles = function checkRequiredFiles(mode, paths) {
       process.exit(1);
     }
   }
-}
+};

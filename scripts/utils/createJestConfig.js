@@ -40,9 +40,13 @@ module.exports = (resolve, rootDir, isEjecting) => {
         ? '<rootDir>/node_modules/typescript-babel-jest'
         : resolve('config/jest/tsTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
-      '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve('config/jest/fileTransform.js'),
+      '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
+        'config/jest/fileTransform.js'
+      ),
     },
-    transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$'],
+    transformIgnorePatterns: [
+      '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+    ],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
     },
