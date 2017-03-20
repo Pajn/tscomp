@@ -17,7 +17,7 @@ function* load(limit) {
   }
 }
 
-export default class extends Component {
+export default class extends Component<any, {users: Array<{id: number, name: number}>}> {
   static propTypes = {
     onReady: PropTypes.func.isRequired,
   };
@@ -28,7 +28,7 @@ export default class extends Component {
   }
 
   componentDidMount() {
-    const users = [];
+    const users: this['state']['users'] = [];
     for (let user of load(4)) {
       users.push(user);
     }

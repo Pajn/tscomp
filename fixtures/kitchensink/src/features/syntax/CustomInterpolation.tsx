@@ -9,7 +9,7 @@
 
 import React, { Component, PropTypes } from 'react';
 
-const styled = ([style]) =>
+const styled = ([style]: TemplateStringsArray) =>
   style
     .trim()
     .split(/\s*;\s*/)
@@ -25,7 +25,7 @@ function load() {
   ];
 }
 
-export default class extends Component {
+export default class extends Component<any, any> {
   static propTypes = {
     onReady: PropTypes.func.isRequired,
   };

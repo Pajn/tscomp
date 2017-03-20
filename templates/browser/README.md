@@ -311,7 +311,7 @@ For example:
 ```js
 import React, { Component } from 'react';
 
-class Button extends Component {
+class Button extends Component<any, any> {
   render() {
     // ...
   }
@@ -327,7 +327,7 @@ export default Button; // Don’t forget to use export default!
 import React, { Component } from 'react';
 import Button from './Button'; // Import a component from another file
 
-class DangerButton extends Component {
+class DangerButton extends Component<any, any> {
   render() {
     return <Button color="red" />;
   }
@@ -366,7 +366,7 @@ This project setup uses [Webpack](https://webpack.github.io/) for handling all a
 import React, { Component } from 'react';
 import './Button.css'; // Tell Webpack that Button.js uses these styles
 
-class Button extends Component {
+class Button extends Component<any, any> {
   render() {
     // You can use them as regular CSS styles
     return <div className="Button" />;

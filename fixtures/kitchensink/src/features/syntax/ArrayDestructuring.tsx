@@ -13,7 +13,7 @@ function load() {
   return [[1, '1'], [2, '2'], [3, '3'], [4, '4']];
 }
 
-export default class extends Component {
+export default class extends Component<any, any> {
   static propTypes = {
     onReady: PropTypes.func.isRequired,
   };

@@ -9,7 +9,7 @@
 
 import React, { Component, PropTypes, createElement } from 'react';
 
-class BuiltEmitter extends Component {
+class BuiltEmitter extends Component<any, {}> {
   static propTypes = {
     feature: PropTypes.func.isRequired,
   };
@@ -43,7 +43,7 @@ class BuiltEmitter extends Component {
   }
 }
 
-class App extends Component {
+class App extends Component<{}, any> {
   constructor(props) {
     super(props);
 
