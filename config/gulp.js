@@ -18,6 +18,7 @@ const paths = [
   `${src}/**/*.jsx`,
   `${src}/**/*.ts`,
   `${src}/**/*.tsx`,
+  `${appPaths.appTypings}/**/*.d.ts`,
 ];
 
 const baseCompilerOptions = {

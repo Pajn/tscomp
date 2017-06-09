@@ -1,14 +1,10 @@
 {
   "name": "tscomp",
-  "version": "0.10.0-dev5",
-  "description": "Configuration and scripts for Create React App.",
-  "repository": "beanloop/tscomp",
+  "version": "0.10.1",
+  "description": "Buildtool for Typescript projects",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=4"
-  },
-  "bugs": {
-    "url": "https://github.com/beanloop/tscomp/issues"
   },
   "scripts": {
     "build": "node scripts/build.js",
