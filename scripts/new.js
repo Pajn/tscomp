@@ -212,7 +212,7 @@ function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
     let args;
     if (useYarn) {
       command = 'yarnpkg';
-      args = ['add', isDev ? '--dev' : '', isExact ? '--exact' : ''];
+      args = ['add', isDev ? '--dev' : '', isExact ? '--exact' : ''].filter(arg => !!arg);
       if (!isOnline) {
         args.push('--offline');
       }
@@ -226,7 +226,9 @@ function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
     } else {
       checkNpmVersion();
       command = 'npm';
-      args = ['install', isDev ? '--save-dev' : '--save', isExact ? '--save-exact' : ''].concat(dependencies);
+      args = ['install', isDev ? '--save-dev' : '--save', isExact ? '--save-exact' : '']
+        .filter(arg => !!arg)
+        .concat(dependencies);
     }
 
     if (verbose) {
