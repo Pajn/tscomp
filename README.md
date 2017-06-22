@@ -33,7 +33,7 @@ tscomp new <project-type> my-app
 cd my-app
 ```
 
-for example `tscomp new browsesr my-app`.
+for example `tscomp new browser my-app`.
 
 It will create a directory called `my-app` inside the dcurrent folder.
 Inside that directory, it will generate the initial project structure and

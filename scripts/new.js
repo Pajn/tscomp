@@ -72,7 +72,9 @@ const program = commander
       `      - a custom fork published on npm: ${chalk.green('my-tscomp')}`
     );
     console.log(
-      `      - a .tgz archive: ${chalk.green('https://mysite.com/my-tscomp-0.8.2.tgz')}`
+      `      - a .tgz archive: ${chalk.green(
+        'https://mysite.com/my-tscomp-0.8.2.tgz'
+      )}`
     );
     console.log(
       `    It is not needed unless you specifically want to use a fork.`
@@ -82,7 +84,7 @@ const program = commander
       `    If you have any problems, do not hesitate to file an issue:`
     );
     console.log(
-      `      ${chalk.cyan('https://github.com/beanloop/tscomp/issues/new')}`
+      `      ${chalk.cyan('https://github.com/pajn/tscomp/issues/new')}`
     );
     console.log();
   })
@@ -91,7 +93,9 @@ const program = commander
 if (typeof projectType === 'undefined') {
   console.error('Please specify the project type:');
   console.log(
-    `  ${chalk.cyan(program.name())} ${chalk.green('<type> <project-directory>')}`
+    `  ${chalk.cyan(program.name())} ${chalk.green(
+      '<type> <project-directory>'
+    )}`
   );
   console.log();
   console.log('For example:');
@@ -118,12 +122,16 @@ if (typeof projectType === 'undefined') {
 if (typeof projectName === 'undefined') {
   console.error('Please specify the project directory:');
   console.log(
-    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('<project-directory>')}`
+    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green(
+      '<project-directory>'
+    )}`
   );
   console.log();
   console.log('For example:');
   console.log(
-    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green('my-react-app')}`
+    `  ${chalk.cyan(program.name())} ${projectType} ${chalk.green(
+      'my-react-app'
+    )}`
   );
   console.log();
   console.log(
@@ -263,7 +271,8 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       checkIfOnline(useYarn).then(isOnline => ({
         isOnline: isOnline,
         packageName: packageName,
-      })))
+      }))
+    )
     .then(info => {
       const isOnline = info.isOnline;
       const packageName = info.packageName;
@@ -333,7 +342,9 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       if (!remainingFiles.length) {
         // Delete target folder if empty
         console.log(
-          `Deleting ${chalk.cyan(`${appName} /`)} from ${chalk.cyan(path.resolve(root, '..'))}`
+          `Deleting ${chalk.cyan(`${appName} /`)} from ${chalk.cyan(
+            path.resolve(root, '..')
+          )}`
         );
         process.chdir(path.resolve(root, '..'));
         fs.removeSync(path.join(root));
@@ -423,7 +434,9 @@ function getPackageName(installPackage) {
           /^.+\/(.+?)(?:-\d+.+)?\.tgz$/
         )[1];
         console.log(
-          `Based on the filename, assuming it is "${chalk.cyan(assumedProjectName)}"`
+          `Based on the filename, assuming it is "${chalk.cyan(
+            assumedProjectName
+          )}"`
         );
         return Promise.resolve(assumedProjectName);
       });
@@ -492,7 +505,9 @@ function checkAppName(appName) {
   const validationResult = validateProjectName(appName);
   if (!validationResult.validForNewPackages) {
     console.error(
-      `Could not create a project called ${chalk.red(`"${appName}"`)} because of npm naming restrictions:`
+      `Could not create a project called ${chalk.red(
+        `"${appName}"`
+      )} because of npm naming restrictions:`
     );
     printValidationResults(validationResult.errors);
     printValidationResults(validationResult.warnings);
@@ -506,7 +521,9 @@ function checkAppName(appName) {
   if (allDependencies.indexOf(appName) >= 0) {
     console.error(
       chalk.red(
-        `We cannot create a project called ${chalk.green(appName)} because a dependency with the same name exists.\n` +
+        `We cannot create a project called ${chalk.green(
+          appName
+        )} because a dependency with the same name exists.\n` +
           `Due to the way npm works, the following names are not allowed:\n\n`
       ) +
         chalk.cyan(allDependencies.map(depName => `  ${depName}`).join('\n')) +
@@ -528,7 +545,9 @@ function makeCaretRange(dependencies, name) {
 
   if (!semver.validRange(patchedVersion)) {
     console.error(
-      `Unable to patch ${name} dependency version because version ${chalk.red(version)} will become invalid ${chalk.red(patchedVersion)}`
+      `Unable to patch ${name} dependency version because version ${chalk.red(
+        version
+      )} will become invalid ${chalk.red(patchedVersion)}`
     );
     patchedVersion = version;
   }

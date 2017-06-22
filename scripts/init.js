@@ -29,11 +29,8 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  const ownPackageName = require(path.join(
-    __dirname,
-    '..',
-    'package.json'
-  )).name;
+  const ownPackageName = require(path.join(__dirname, '..', 'package.json'))
+    .name;
   const ownPath = path.join(appPath, 'node_modules', ownPackageName);
   const appPackage = require(path.join(appPath, 'package.json'));
   const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
@@ -111,6 +108,23 @@ module.exports = function(
       }
     }
   );
+  fs.move(
+    path.join(appPath, 'npmignore'),
+    path.join(appPath, '.npmignore'),
+    [],
+    err => {
+      if (err) {
+        // Append if there's already a `.npmignore` file there
+        if (err.code === 'EEXIST') {
+          const data = fs.readFileSync(path.join(appPath, 'npmignore'));
+          fs.appendFileSync(path.join(appPath, '.npmignore'), data);
+          fs.unlinkSync(path.join(appPath, 'npmignore'));
+        } else {
+          throw err;
+        }
+      }
+    }
+  );
 
   let command;
   let args;
@@ -143,7 +157,8 @@ module.exports = function(
   // which doesn't install react and react-dom along with tscomp
   // or template is presetend (via --internal-testing-template)
   if (
-    projectType === 'browser' && (!isReactInstalled(appPackage) || template)
+    projectType === 'browser' &&
+    (!isReactInstalled(appPackage) || template)
   ) {
     console.log(`Installing react and react-dom using ${command}...`);
     console.log();
@@ -212,6 +227,8 @@ module.exports = function(
 function isReactInstalled(appPackage) {
   const dependencies = appPackage.dependencies || {};
 
-  return typeof dependencies.react !== 'undefined' &&
-    typeof dependencies['react-dom'] !== 'undefined';
+  return (
+    typeof dependencies.react !== 'undefined' &&
+    typeof dependencies['react-dom'] !== 'undefined'
+  );
 }

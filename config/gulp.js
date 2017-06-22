@@ -62,6 +62,9 @@ function buildTs(dir, cb) {
           babelrc: false,
           filename: path,
           presets: [require.resolve('babel-preset-react-app')],
+          plugins: [
+            require.resolve('babel-plugin-transform-es2015-modules-commonjs'),
+          ],
         })
       )
       .pipe(sourcemaps.write('.')),

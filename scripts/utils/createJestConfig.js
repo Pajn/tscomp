@@ -9,6 +9,7 @@
  */
 'use strict';
 
+const chalk = require('chalk');
 const fs = require('fs');
 const paths = require('../../config/paths');
 
@@ -26,11 +27,11 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleFileExtensions: ['jsx', 'js', 'json', 'ts', 'tsx'],
     setupFiles: [resolve('config/polyfills.js')],
     setupTestFrameworkScriptFile: setupTestsFile,
-    testPathIgnorePatterns: [
-      '<rootDir>[/\\\\](build|docs|node_modules|scripts)[/\\\\]',
+    testMatch: [
+      '<rootDir>/src/**/__tests__/**/*.[tj]s?(x)',
+      '<rootDir>/src/**/?(*.)(spec|test).[tj]s?(x)',
     ],
     testEnvironment: 'node',
-    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
     testURL: 'http://localhost',
     transform: {
       '^.+\\.(js|jsx)$': isEjecting
@@ -53,6 +54,44 @@ module.exports = (resolve, rootDir, isEjecting) => {
   };
   if (rootDir) {
     config.rootDir = rootDir;
+  }
+  const overrides = Object.assign({}, require(paths.appPackageJson).jest);
+  const supportedKeys = [
+    'collectCoverageFrom',
+    'coverageReporters',
+    'coverageThreshold',
+    'snapshotSerializers',
+  ];
+  if (overrides) {
+    supportedKeys.forEach(key => {
+      if (overrides.hasOwnProperty(key)) {
+        config[key] = overrides[key];
+        delete overrides[key];
+      }
+    });
+    const unsupportedKeys = Object.keys(overrides);
+    if (unsupportedKeys.length) {
+      console.error(
+        chalk.red(
+          'Out of the box, tscomp only supports overriding ' +
+            'these Jest options:\n\n' +
+            supportedKeys.map(key => chalk.bold('  \u2022 ' + key)).join('\n') +
+            '.\n\n' +
+            'These options in your package.json Jest configuration ' +
+            'are not currently supported by tscomp:\n\n' +
+            unsupportedKeys
+              .map(key => chalk.bold('  \u2022 ' + key))
+              .join('\n') +
+            '\n\nIf you wish to override other Jest options, you need to ' +
+            'eject from the default setup. You can do so by running ' +
+            chalk.bold('npm run eject') +
+            ' but remember that this is a one-way operation. ' +
+            'tscomp will follow supported options form its ' +
+            'mother project Create React App.\n'
+        )
+      );
+      process.exit(1);
+    }
   }
   return config;
 };

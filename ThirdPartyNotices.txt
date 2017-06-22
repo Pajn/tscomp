@@ -1,7 +1,7 @@
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 Do Not Translate or Localize
 
-This project incorporates components from the projects listed below. The original copyright notices and the licenses under which Beanloop received such components are set forth below.
+This project incorporates components from the projects listed below. The original copyright notices and the licenses under which I received such components are set forth below.
 
 1. create-react-app (https://github.com/facebookincubator/create-react-app)
 
