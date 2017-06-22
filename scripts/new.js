@@ -206,13 +206,13 @@ function shouldUseYarn() {
   }
 }
 
-function install(useYarn, dependencies, verbose, isOnline) {
+function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
   return new Promise((resolve, reject) => {
     let command;
     let args;
     if (useYarn) {
       command = 'yarnpkg';
-      args = ['add', '--exact'];
+      args = ['add', isDev ? '--dev' : '', isExact ? '--exact' : ''];
       if (!isOnline) {
         args.push('--offline');
       }
@@ -226,7 +226,7 @@ function install(useYarn, dependencies, verbose, isOnline) {
     } else {
       checkNpmVersion();
       command = 'npm';
-      args = ['install', '--save', '--save-exact'].concat(dependencies);
+      args = ['install', isDev ? '--save-dev' : '--save', isExact ? '--save-exact' : ''].concat(dependencies);
     }
 
     if (verbose) {
@@ -248,9 +248,10 @@ function install(useYarn, dependencies, verbose, isOnline) {
 
 function run(root, appName, version, verbose, originalDirectory, template) {
   const packageToInstall = getInstallPackage(version);
-  let allDependencies = ['@types/jest', packageToInstall];
+  let dependencies = [];
+  let devDependencies = ['@types/jest'];
   if (projectType === 'browser') {
-    allDependencies = allDependencies.concat([
+    dependencies = dependencies.concat([
       'react',
       'react-dom',
       '@types/react',
@@ -258,10 +259,11 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       '@types/webpack',
     ]);
   } else if (projectType === 'server') {
-    allDependencies = allDependencies.concat(['@types/node']);
+    dependencies = dependencies.concat(['@types/node']);
   } else if (projectType === 'lib') {
-    allDependencies = allDependencies.concat(['@types/webpack']);
+    dependencies = dependencies.concat(['@types/webpack']);
   }
+  const allDependencies = [packageToInstall].concat(dependencies).concat(devDependencies);
 
   console.log('Installing packages. This might take a couple minutes.');
 
@@ -283,9 +285,10 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       );
       console.log();
 
-      return install(useYarn, allDependencies, verbose, isOnline).then(
-        () => packageName
-      );
+      return install(useYarn, [packageToInstall], verbose, {isOnline, isExact: true})
+        .then(() => install(useYarn, dependencies, verbose, {isOnline}))
+        .then(() => install(useYarn, devDependencies, verbose, {isOnline, isDev: true}))
+        .then(() => packageName)
     })
     .then(packageName => {
       checkNodeVersion(packageName);
@@ -362,8 +365,6 @@ function getInstallPackage(version) {
   } else if (version) {
     // for tar.gz or alternative paths
     packageToInstall = version;
-  } else {
-    packageToInstall += '@dev';
   }
   return packageToInstall;
 }

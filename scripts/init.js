@@ -58,6 +58,7 @@ module.exports = function(
     appPackage.scripts.watch = 'tscomp watch';
   } else if (projectType === 'lib') {
     appPackage.scripts.watch = 'tscomp watch';
+    appPackage.scripts.prepack = 'tscomp build';
 
     appPackage.main = './lib/index.js';
     appPackage.typings = './lib/index.d.ts';
