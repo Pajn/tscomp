@@ -10,9 +10,9 @@
 
 'use strict';
 
-var spawn = require('cross-spawn');
-var script = process.argv[2];
-var args = process.argv.slice(3);
+const spawn = require('react-dev-utils/crossSpawn');
+const script = process.argv[2];
+const args = process.argv.slice(3);
 
 switch (script) {
   case 'build':
@@ -21,7 +21,7 @@ switch (script) {
   case 'start':
   case 'test':
   case 'watch':
-    var result = spawn.sync(
+    const result = spawn.sync(
       'node',
       [require.resolve('../scripts/' + script)].concat(args),
       { stdio: 'inherit' }

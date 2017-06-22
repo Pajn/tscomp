@@ -11,6 +11,7 @@
 'use strict';
 
 // Do this as the first thing so that any code reading it knows the right env.
+process.env.BABEL_ENV = 'production';
 process.env.NODE_ENV = 'production';
 
 // Makes the script crash on unhandled rejections instead of silently
@@ -20,29 +21,23 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
-// Load environment variables from .env file. Suppress warnings using silent
-// if this file is missing. dotenv will never modify any environment variables
-// that have already been set.
-// https://github.com/motdotla/dotenv
-require('dotenv').config({ silent: true });
+// Ensure environment variables are read.
+require('../config/env');
 
+const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
-const path = require('path');
 const webpack = require('webpack');
-const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
-const gulp = require('../config/gulp');
 const config = require('../config/webpack.config.prod');
 const paths = require('../config/paths');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 
 const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
-const printErrors = require('./utils/common').printErrors;
 
-const measureFileSizesBeforeBuild =
-  FileSizeReporter.measureFileSizesBeforeBuild;
+const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const mode = getMode(paths.appPackageJson);
@@ -52,59 +47,29 @@ checkRequiredFiles(mode, paths);
 
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
-measureFileSizesBeforeBuild(paths.appBuild).then(previousFileSizes => {
-  // Remove all content but keep the directory so that
-  // if you're in it, you don't end up in Trash
-  fs.emptyDirSync(paths.appBuild);
+measureFileSizesBeforeBuild(paths.appBuild)
+  .then(previousFileSizes => {
+    // Remove all content but keep the directory so that
+    // if you're in it, you don't end up in Trash
+    fs.emptyDirSync(paths.appBuild);
+    // Merge with the public folder
+    copyPublicFolder();
 
-  if (mode === 'browser') {
-    // Start the webpack build
-    buildWebpack(previousFileSizes);
-  } else {
-    gulp.build(paths.appPath, err => {
-      if (err) {
-        printErrors('Failed to compile.', [err]);
-        process.exit(1);
-      } else {
-        console.log(chalk.green('Compiled successfully.'));
-      }
-    });
-  }
-
-  // Merge with the public folder
-  copyPublicFolder();
-});
-
-// Create the production build and print the deployment instructions.
-function buildWebpack(previousFileSizes) {
-  console.log('Creating an optimized production build...');
-
-  let compiler = webpack(config);
-  return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err) {
-        return reject(err);
-      }
-      const messages = formatWebpackMessages(stats.toJson({}, true));
-      if (messages.errors.length) {
-        return reject(new Error(messages.errors.join('\n\n')));
-      }
-      if (process.env.CI && messages.warnings.length) {
-        console.log(
-          chalk.yellow(
-            '\nTreating warnings as errors because process.env.CI = true.\n' +
-              'Most CI servers set it automatically.\n'
-          )
-        );
-        return reject(new Error(messages.warnings.join('\n\n')));
-      }
-      return resolve({
-        stats,
-        previousFileSizes,
-        warnings: messages.warnings,
+    if (mode === 'browser') {
+      // Start the webpack build
+      buildWebpack(previousFileSizes);
+    } else {
+      gulp.build(paths.appPath, err => {
+        if (err) {
+          printErrors('Failed to compile.', [err]);
+          process.exit(1);
+        } else {
+          console.log(chalk.green('Compiled successfully.'));
+        }
       });
-    });
-  }).then(
+    }
+  })
+  .then(
     ({ stats, previousFileSizes, warnings }) => {
       if (warnings.length) {
         console.log(chalk.yellow('Compiled with warnings.\n'));
@@ -145,6 +110,42 @@ function buildWebpack(previousFileSizes) {
       process.exit(1);
     }
   );
+
+// Create the production build and print the deployment instructions.
+function buildWebpack(previousFileSizes) {
+  console.log('Creating an optimized production build...');
+
+  let compiler = webpack(config);
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      if (err) {
+        return reject(err);
+      }
+      const messages = formatWebpackMessages(stats.toJson({}, true));
+      if (messages.errors.length) {
+        return reject(new Error(messages.errors.join('\n\n')));
+      }
+      if (
+        process.env.CI &&
+        (typeof process.env.CI !== 'string' ||
+          process.env.CI.toLowerCase() !== 'false') &&
+        messages.warnings.length
+      ) {
+        console.log(
+          chalk.yellow(
+            '\nTreating warnings as errors because process.env.CI = true.\n' +
+              'Most CI servers set it automatically.\n'
+          )
+        );
+        return reject(new Error(messages.warnings.join('\n\n')));
+      }
+      return resolve({
+        stats,
+        previousFileSizes,
+        warnings: messages.warnings,
+      });
+    });
+  });
 }
 
 function copyPublicFolder() {

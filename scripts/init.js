@@ -18,8 +18,8 @@ process.on('unhandledRejection', err => {
 
 const fs = require('fs-extra');
 const path = require('path');
-const spawn = require('cross-spawn');
 const chalk = require('chalk');
+const spawn = require('react-dev-utils/crossSpawn');
 
 module.exports = function(
   appPath,
@@ -29,8 +29,11 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  const ownPackageName = require(path.join(__dirname, '..', 'package.json'))
-    .name;
+  const ownPackageName = require(path.join(
+    __dirname,
+    '..',
+    'package.json'
+  )).name;
   const ownPath = path.join(appPath, 'node_modules', ownPackageName);
   const appPackage = require(path.join(appPath, 'package.json'));
   const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
@@ -228,8 +231,6 @@ module.exports = function(
 function isReactInstalled(appPackage) {
   const dependencies = appPackage.dependencies || {};
 
-  return (
-    typeof dependencies.react !== 'undefined' &&
-    typeof dependencies['react-dom'] !== 'undefined'
-  );
+  return typeof dependencies.react !== 'undefined' &&
+    typeof dependencies['react-dom'] !== 'undefined';
 }

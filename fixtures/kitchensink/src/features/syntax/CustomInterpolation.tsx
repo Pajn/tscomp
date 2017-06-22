@@ -7,9 +7,10 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-const styled = ([style]: TemplateStringsArray) =>
+const styled = ([style]) =>
   style
     .trim()
     .split(/\s*;\s*/)
