@@ -55,6 +55,7 @@
     "fs-extra": "^3.0.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-clone": "^1.0.0",
     "gulp-plumber": "^1.1.0",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-typescript": "^3.1.5",
@@ -91,15 +92,15 @@
     "@types/react": "^15.0.16",
     "@types/react-dom": "^15.5.0",
     "@types/webpack": "^2.2.11",
-    "lint-staged": "^3.3.2",
-    "prettier": "^1.4.4",
-    "react": "^15.3.0",
-    "react-dom": "^15.3.0",
     "eslint-loader": "1.7.1",
     "eslint-plugin-flowtype": "2.33.0",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "5.0.3",
-    "eslint-plugin-react": "7.0.1"
+    "eslint-plugin-react": "7.0.1",
+    "lint-staged": "^3.3.2",
+    "prettier": "^1.4.4",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0"
   },
   "optionalDependencies": {
     "fsevents": "1.1.2"

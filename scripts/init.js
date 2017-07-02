@@ -63,7 +63,8 @@ module.exports = function(
     appPackage.scripts.watch = 'tscomp watch';
     appPackage.scripts.prepack = 'tscomp build';
 
-    appPackage.main = './lib/index.js';
+    appPackage.main = './cjs/index.js';
+    appPackage.module = './lib/index.js';
     appPackage.typings = './lib/index.d.ts';
   }
 

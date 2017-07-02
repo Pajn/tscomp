@@ -128,30 +128,30 @@ if (mode === 'browser') {
     argv.push('--no-restart-on', 'success', '--watch', paths.appBuild);
   }
 
-  gulp.build(paths.appPath, err => {
-    if (err) {
-      printErrors('Failed to compile.', [err]);
-      process.exit(1);
-    } else {
-      console.log(chalk.green('Compiled successfully.'));
-      if (!isSmokeTest) {
-        gulp.watch(paths.appPath, err => {
-          if (err) {
-            printErrors('Failed to compile.', [err]);
-          } else {
-            console.log(chalk.green('Compiled successfully.'));
-          }
-        });
-      }
-      const supervisor = require('supervisor/lib/supervisor');
+  gulp.build(paths.appPath, mode)
+      .catch(err => {
+        printErrors('Failed to compile.', [err]);
+        process.exit(1);
+      })
+      .then(() => {
+        console.log(chalk.green('Compiled successfully.'));
+        if (!isSmokeTest) {
+          gulp.watch(paths.appPath, mode, err => {
+            if (err) {
+              printErrors('Failed to compile.', [err]);
+            } else {
+              console.log(chalk.green('Compiled successfully.'));
+            }
+          });
+        }
+        const supervisor = require('supervisor/lib/supervisor');
 
-      supervisor.run(
-        ['--extensions', 'js,jsx,ts,tsx']
-          .concat(argv)
-          .concat(paths.appBuildIndexJs)
-      );
-    }
-  });
+        supervisor.run(
+          ['--extensions', 'js,jsx,ts,tsx']
+            .concat(argv)
+            .concat(paths.appBuildIndexJs)
+        );
+      });
 } else {
   console.log(chalk.red(`Can only start a browser or a server app project`));
   process.exit(1);

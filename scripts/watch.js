@@ -46,19 +46,19 @@ if (mode === 'browser') {
   );
   process.exit(1);
 } else {
-  gulp.build(paths.appPath, err => {
-    if (err) {
+  gulp.build(paths.appPath, mode)
+    .catch(err => {
       printErrors('Failed to compile.', [err]);
       process.exit(1);
-    } else {
+    })
+    .then(() => {
       console.log(chalk.green('Compiled successfully.'));
-      gulp.watch(paths.appPath, err => {
+      gulp.watch(paths.appPath, mode, err => {
         if (err) {
           printErrors('Failed to compile.', [err]);
         } else {
           console.log(chalk.green('Compiled successfully.'));
         }
       });
-    }
-  });
+    });
 }

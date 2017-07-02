@@ -77,6 +77,7 @@ function getServedPath(appPackageJson) {
 module.exports = {
   dotenv: resolveApp('.env'),
   appBuild: resolveAppBuild(resolveApp('tsconfig.json')),
+  appBuildCjs: resolveApp('cjs'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: findFileExtension(resolveApp('src/index')),
@@ -100,6 +101,7 @@ module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
   appBuild: resolveAppBuild(resolveApp('tsconfig.json')),
+  appBuildCjs: resolveApp('cjs'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: findFileExtension(resolveApp('src/index')),
@@ -133,6 +135,7 @@ if (
     dotenv: resolveOwn('template/.env'),
     appPath: resolveApp('.'),
     appBuild: resolveOwn('build'),
+    appBuildCjs: resolveOwn('cjs'),
     appPublic: resolveOwn('template/public'),
     appHtml: resolveOwn('template/public/index.html'),
     appIndexJs: findFileExtension(resolveOwn('template/src/index')),

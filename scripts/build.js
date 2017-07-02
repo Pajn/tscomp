@@ -29,6 +29,7 @@ const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 const config = require('../config/webpack.config.prod');
+const gulp = require('../config/gulp');
 const paths = require('../config/paths');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
@@ -36,6 +37,7 @@ const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 
 const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
+const printErrors = require('./utils/common').printErrors;
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
@@ -45,71 +47,84 @@ const mode = getMode(paths.appPackageJson);
 // Warn and crash if required files are missing
 checkRequiredFiles(mode, paths);
 
-// First, read the current file sizes in build directory.
-// This lets us display how much they changed later.
-measureFileSizesBeforeBuild(paths.appBuild)
-  .then(previousFileSizes => {
-    // Remove all content but keep the directory so that
-    // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild);
-    // Merge with the public folder
-    copyPublicFolder();
+if (mode === 'browser') {
+  buildBrowser();
+} else {
 
-    if (mode === 'browser') {
+  // Remove all content but keep the directory so that
+  // if you're in it, you don't end up in Trash
+  fs.emptyDirSync(paths.appBuild);
+  // Merge with the public folder
+  copyPublicFolder();
+
+  if (mode === 'lib') {
+    fs.emptyDirSync(paths.appBuildCjs);
+  }
+
+  gulp.build(paths.appPath, mode)
+    .then(() => console.log(chalk.green('Compiled successfully.')))
+    .catch(err => {
+      printErrors('Failed to compile.', [err]);
+      process.exit(1);
+    });
+}
+
+function buildBrowser() {
+  // First, read the current file sizes in build directory.
+  // This lets us display how much they changed later.
+  measureFileSizesBeforeBuild(paths.appBuild)
+    .then(previousFileSizes => {
+      // Remove all content but keep the directory so that
+      // if you're in it, you don't end up in Trash
+      fs.emptyDirSync(paths.appBuild);
+      // Merge with the public folder
+      copyPublicFolder();
+
       // Start the webpack build
       buildWebpack(previousFileSizes);
-    } else {
-      gulp.build(paths.appPath, err => {
-        if (err) {
-          printErrors('Failed to compile.', [err]);
-          process.exit(1);
+    })
+    .then(
+      ({ stats, previousFileSizes, warnings }) => {
+        if (warnings.length) {
+          console.log(chalk.yellow('Compiled with warnings.\n'));
+          console.log(warnings.join('\n\n'));
+          console.log(
+            '\nSearch for the ' +
+              chalk.underline(chalk.yellow('keywords')) +
+              ' to learn more about each warning.'
+          );
+          console.log(
+            'To ignore, add ' +
+              chalk.cyan('// eslint-disable-next-line') +
+              ' to the line before.\n'
+          );
         } else {
-          console.log(chalk.green('Compiled successfully.'));
+          console.log(chalk.green('Compiled successfully.\n'));
         }
-      });
-    }
-  })
-  .then(
-    ({ stats, previousFileSizes, warnings }) => {
-      if (warnings.length) {
-        console.log(chalk.yellow('Compiled with warnings.\n'));
-        console.log(warnings.join('\n\n'));
-        console.log(
-          '\nSearch for the ' +
-            chalk.underline(chalk.yellow('keywords')) +
-            ' to learn more about each warning.'
+
+        console.log('File sizes after gzip:\n');
+        printFileSizesAfterBuild(stats, previousFileSizes, paths.appBuild);
+        console.log();
+
+        const appPackage = require(paths.appPackageJson);
+        const publicUrl = paths.publicUrl;
+        const publicPath = config.output.publicPath;
+        const buildFolder = path.relative(process.cwd(), paths.appBuild);
+        printHostingInstructions(
+          appPackage,
+          publicUrl,
+          publicPath,
+          buildFolder,
+          useYarn
         );
-        console.log(
-          'To ignore, add ' +
-            chalk.cyan('// eslint-disable-next-line') +
-            ' to the line before.\n'
-        );
-      } else {
-        console.log(chalk.green('Compiled successfully.\n'));
+      },
+      err => {
+        console.log(chalk.red('Failed to compile.\n'));
+        console.log((err.message || err) + '\n');
+        process.exit(1);
       }
-
-      console.log('File sizes after gzip:\n');
-      printFileSizesAfterBuild(stats, previousFileSizes, paths.appBuild);
-      console.log();
-
-      const appPackage = require(paths.appPackageJson);
-      const publicUrl = paths.publicUrl;
-      const publicPath = config.output.publicPath;
-      const buildFolder = path.relative(process.cwd(), paths.appBuild);
-      printHostingInstructions(
-        appPackage,
-        publicUrl,
-        publicPath,
-        buildFolder,
-        useYarn
-      );
-    },
-    err => {
-      console.log(chalk.red('Failed to compile.\n'));
-      console.log((err.message || err) + '\n');
-      process.exit(1);
-    }
-  );
+    );
+}
 
 // Create the production build and print the deployment instructions.
 function buildWebpack(previousFileSizes) {
