@@ -58,7 +58,7 @@ function buildTs(dir, mode) {
 
   const babelPipe =
     tsStream.js
-      .pipe(changedInPlace())
+      .pipe(changedInPlace({firstPass: true}))
       .pipe(
         babel({
           babelrc: false,
