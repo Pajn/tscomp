@@ -116,14 +116,6 @@ if (mode === 'browser') {
   );
   if (isSmokeTest) {
     argv = argv.filter(arg => arg.indexOf('--smoke-test') === -1);
-    // argv.push(
-    //   '--no-restart-on',
-    //   'exit',
-    //   '--non-interactive',
-    //   '--quiet',
-    //   '--ignore',
-    //   '.'
-    // );
   }
 
   console.log(chalk.blue('Building app...'));
@@ -133,7 +125,7 @@ if (mode === 'browser') {
       process.exit(1);
     })
     .then(() => {
-      console.log(chalk.green('Compiled successfully.'), argv);
+      console.log(chalk.green('Compiled successfully.'));
 
       let nodeArgs = [];
       let isNodeArgs = false;
@@ -147,18 +139,25 @@ if (mode === 'browser') {
           argv[i] = undefined;
         }
       });
+      argv = argv.filter(arg => arg !== undefined);
+
+      if (isSmokeTest) {
+        const spawn = require('nodemon/lib/spawn');
+        const command = ['node'].concat(nodeArgs).concat(paths.appBuildIndexJs).concat(argv);
+        return spawn(command, {options: {execOptions: {env: {}}, stdout: true}}, []);
+      }
 
       const nodemon = require('nodemon');
 
       nodemon({
         script: paths.appBuildIndexJs,
-        args: argv.filter(arg => arg !== undefined),
+        args: argv,
         nodeArgs: nodeArgs,
         delay: 400,
         watch: [paths.appBuild],
         ext: 'js jsx json ts tsx',
         ignore: ['*.test.js', '*.map'],
-        env: Object.assign({}, process.env, {NODE_ENV: process.env.NODE_ENV || 'development'}),
+        env: {NODE_ENV: process.env.NODE_ENV || 'development'},
       });
 
       nodemon
