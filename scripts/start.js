@@ -29,13 +29,13 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const clearConsole = require('react-dev-utils/clearConsole');
-const openBrowser = require('react-dev-utils/openBrowser');
 const {
   choosePort,
   createCompiler,
   prepareProxy,
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
+const openBrowser = require('react-dev-utils/openBrowser');
 const gulp = require('../config/gulp');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
@@ -116,42 +116,76 @@ if (mode === 'browser') {
   );
   if (isSmokeTest) {
     argv = argv.filter(arg => arg.indexOf('--smoke-test') === -1);
-    argv.push(
-      '--no-restart-on',
-      'exit',
-      '--non-interactive',
-      '--quiet',
-      '--ignore',
-      '.'
-    );
-  } else {
-    argv.push('--no-restart-on', 'success', '--watch', paths.appBuild);
+    // argv.push(
+    //   '--no-restart-on',
+    //   'exit',
+    //   '--non-interactive',
+    //   '--quiet',
+    //   '--ignore',
+    //   '.'
+    // );
   }
 
+  console.log(chalk.blue('Building app...'));
   gulp.build(paths.appPath, mode)
-      .catch(err => {
-        printErrors('Failed to compile.', [err]);
-        process.exit(1);
-      })
-      .then(() => {
-        console.log(chalk.green('Compiled successfully.'));
-        if (!isSmokeTest) {
-          gulp.watch(paths.appPath, mode, err => {
-            if (err) {
-              printErrors('Failed to compile.', [err]);
-            } else {
-              console.log(chalk.green('Compiled successfully.'));
-            }
-          });
-        }
-        const supervisor = require('supervisor/lib/supervisor');
+    .catch(err => {
+      printErrors('Failed to compile.', [err]);
+      process.exit(1);
+    })
+    .then(() => {
+      console.log(chalk.green('Compiled successfully.'), argv);
 
-        supervisor.run(
-          ['--extensions', 'js,jsx,ts,tsx']
-            .concat(argv)
-            .concat(paths.appBuildIndexJs)
-        );
+      let nodeArgs = [];
+      let isNodeArgs = false;
+
+      argv.forEach((arg, i) => {
+        if (arg === '--') {
+          isNodeArgs = !isNodeArgs;
+          argv[i] = undefined;
+        } else if (isNodeArgs) {
+          nodeArgs.push(arg);
+          argv[i] = undefined;
+        }
       });
+
+      const nodemon = require('nodemon');
+
+      nodemon({
+        script: paths.appBuildIndexJs,
+        args: argv.filter(arg => arg !== undefined),
+        nodeArgs: nodeArgs,
+        delay: 400,
+        watch: [paths.appBuild],
+        ext: 'js jsx json ts tsx',
+        ignore: ['*.test.js', '*.map'],
+        env: Object.assign({}, process.env, {NODE_ENV: process.env.NODE_ENV || 'development'}),
+      });
+
+      nodemon
+        .on('quit', function () {
+          process.exit();
+        })
+        .on('crash', function () {
+          console.error(chalk.red('App crashed, change a file or type rs to restart'));
+        })
+        .on('restart', function (files) {
+          if (files) {
+            console.log(chalk.green('App restarted due to: ' + files.map(file => chalk.blue(file)).join(', ')));
+          } else {
+            console.log(chalk.green('App restarted'));
+          }
+        });
+
+      if (!isSmokeTest) {
+        gulp.watch(paths.appPath, mode, err => {
+          if (err) {
+            printErrors('Failed to compile.', [err]);
+          } else {
+            console.log(chalk.green('Compiled successfully.'));
+          }
+        });
+      }
+    })
 } else {
   console.log(chalk.red(`Can only start a browser or a server app project`));
   process.exit(1);

@@ -1,7 +1,9 @@
 'use strict';
 
+const chalk = require('chalk');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
+const changedInPlace = require('gulp-changed-in-place');
 const clone = require('gulp-clone');
 const plumber = require('gulp-plumber');
 const sourcemaps = require('gulp-sourcemaps');
@@ -34,6 +36,8 @@ const baseCompilerOptions = {
   typescript: require('typescript'),
 };
 
+let tsProject;
+
 function build(dir, mode) {
   return buildTs(dir, mode);
 }
@@ -45,13 +49,16 @@ function buildTs(dir, mode) {
     .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(
-      ts.createProject(
-        Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
-      )()
+      (
+        tsProject = ts.createProject(
+          Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
+        )()
+      )
     );
 
   const babelPipe =
     tsStream.js
+      .pipe(changedInPlace())
       .pipe(
         babel({
           babelrc: false,
@@ -101,7 +108,7 @@ function buildTs(dir, mode) {
 
 function watch(dir, mode, cb) {
   gulp.watch(paths, () => {
-    console.info('changes detected, rebuilding...');
+    console.info(chalk.blue('changes detected, rebuilding...'));
     buildTs(dir, mode).then(() => cb()).catch(err => cb(err || true))
   });
 }
