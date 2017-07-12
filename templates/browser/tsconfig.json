@@ -9,9 +9,10 @@
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "sourceMap": true,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
-    "rootDir": ".",
+    "baseUrl": "src",
     "outDir": "build"
   },
   "include": [

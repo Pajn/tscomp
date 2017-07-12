@@ -28,14 +28,6 @@ describe('Integration', () => {
       );
     });
 
-    it('no ext inclusion', async () => {
-      const doc = await initDOM('no-ext-inclusion');
-
-      expect(doc.getElementById('feature-no-ext-inclusion').href).to.match(
-        /\/static\/media\/aFileWithoutExt\.[a-f0-9]{8}\.bin$/
-      );
-    });
-
     it('json inclusion', async () => {
       const doc = await initDOM('json-inclusion');
 

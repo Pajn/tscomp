@@ -119,10 +119,6 @@ class App extends Component<{}, any> {
       case 'node-path':
         import('./features/env/NodePath').then(f => this.setFeature(f.default));
         break;
-      case 'no-ext-inclusion':
-        import('./features/webpack/NoExtInclusion').then(f =>
-          this.setFeature(f.default));
-        break;
       case 'object-destructuring':
         import(
           './features/syntax/ObjectDestructuring'

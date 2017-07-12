@@ -63,6 +63,34 @@ set -x
 cd ..
 root_path=$PWD
 
+# Clear cache to avoid issues with incorrect packages being used
+if hash yarnpkg 2>/dev/null
+then
+  # AppVeyor uses an old version of yarn.
+  # Once updated to 0.24.3 or above, the workaround can be removed
+  # and replaced with `yarnpkg cache clean`
+  # Issues:
+  #    https://github.com/yarnpkg/yarn/issues/2591
+  #    https://github.com/appveyor/ci/issues/1576
+  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  # When removing workaround, you may run into
+  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  case "$(uname -s)" in
+    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
+    *) yarn=yarnpkg;;
+  esac
+  $yarn cache clean
+fi
+
+#if hash npm 2>/dev/null
+#then
+#  # npm 5 is too buggy right now
+#  if [ $(npm -v | head -c 1) -eq 5 ]; then
+#    npm i -g npm@^4.x
+#  fi;
+#  npm cache clean || npm cache verify
+#fi
+
 npm install
 
 if [ "$USE_YARN" = "yes" ]
@@ -88,7 +116,7 @@ npm install "$cli_path"
 # Test nested folder path as the project name
 # ******************************************************************************
 
-#Testing a path that exists
+# Testing a path that exists
 cd "$temp_app_path"
 mkdir test-app-nested-paths-t1
 cd test-app-nested-paths-t1
@@ -97,13 +125,13 @@ tscomp new lib test-app-nested-paths-t1/aa/bb/cc/dd
 cd test-app-nested-paths-t1/aa/bb/cc/dd
 CI=true npm test
 
-#Testing a path that does not exist
+# Testing a path that does not exist
 cd "$temp_app_path"
 tscomp new lib test-app-nested-paths-t2/aa/bb/cc/dd
 cd test-app-nested-paths-t2/aa/bb/cc/dd
 CI=true npm test
 
-#Testing a path that is half exists
+# Testing a path that is half exists
 cd "$temp_app_path"
 mkdir -p test-app-nested-paths-t3/aa
 tscomp new lib test-app-nested-paths-t3/aa/bb/cc/dd

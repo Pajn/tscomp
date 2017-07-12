@@ -21,7 +21,7 @@ export default class extends Component<any, any> {
     this.state = { users: [] };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const users = load();
     this.setState({ users });
   }

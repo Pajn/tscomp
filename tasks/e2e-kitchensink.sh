@@ -65,6 +65,34 @@ set -x
 cd ..
 root_path=$PWD
 
+# Clear cache to avoid issues with incorrect packages being used
+if hash yarnpkg 2>/dev/null
+then
+  # AppVeyor uses an old version of yarn.
+  # Once updated to 0.24.3 or above, the workaround can be removed
+  # and replaced with `yarnpkg cache clean`
+  # Issues:
+  #    https://github.com/yarnpkg/yarn/issues/2591
+  #    https://github.com/appveyor/ci/issues/1576
+  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  # When removing workaround, you may run into
+  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  case "$(uname -s)" in
+    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
+    *) yarn=yarnpkg;;
+  esac
+  $yarn cache clean
+fi
+
+#if hash npm 2>/dev/null
+#then
+#  # npm 5 is too buggy right now
+#  if [ $(npm -v | head -c 1) -eq 5 ]; then
+#    npm i -g npm@^4.x
+#  fi;
+#  npm cache clean || npm cache verify
+#fi
+
 npm install
 
 if [ "$USE_YARN" = "yes" ]
@@ -130,7 +158,7 @@ PORT=3001 \
   nohup npm start &>$tmp_server_log &
 while true
 do
-  if grep -q 'The app is running at:' $tmp_server_log; then
+  if grep -q 'You can now view' $tmp_server_log; then
     break
   else
     sleep 1
@@ -185,7 +213,7 @@ PORT=3002 \
   nohup npm start &>$tmp_server_log &
 while true
 do
-  if grep -q 'The app is running at:' $tmp_server_log; then
+  if grep -q 'You can now view' $tmp_server_log; then
     break
   else
     sleep 1

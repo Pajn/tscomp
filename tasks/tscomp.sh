@@ -65,7 +65,7 @@ yarn cache clean || true
 
 # Go back to the root directory and run the command from here
 cd "$root_path"
-node bin/tscomp.js "$@"
+node bin/tscomp.js --scripts-version="$scripts_path" "$@"
 
 # Cleanup
 cleanup

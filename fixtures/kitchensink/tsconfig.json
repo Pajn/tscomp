@@ -2,8 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "declaration": false,
-    "target": "es2015",
-    "module": "es2015",
+    "target": "esnext",
+    "module": "esnext",
     "lib": ["dom", "es5", "es2015", "es2016"],
     "jsx": "react",
     "moduleResolution": "node",
@@ -11,7 +11,7 @@
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
-    "rootDir": ".",
+    "baseUrl": "src",
     "outDir": "build"
   },
   "include": [

@@ -10,7 +10,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-const styled = ([style]) =>
+const styled = ([style]: TemplateStringsArray) =>
   style
     .trim()
     .split(/\s*;\s*/)
