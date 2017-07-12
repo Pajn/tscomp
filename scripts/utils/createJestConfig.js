@@ -9,8 +9,8 @@
  */
 'use strict';
 
-const chalk = require('chalk');
 const fs = require('fs');
+const chalk = require('chalk');
 const paths = require('../../config/paths');
 
 module.exports = (resolve, rootDir, isEjecting) => {
@@ -24,7 +24,6 @@ module.exports = (resolve, rootDir, isEjecting) => {
   // in Jest configs. We need help from somebody with Windows to determine this.
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
-    moduleFileExtensions: ['jsx', 'js', 'json', 'ts', 'tsx'],
     setupFiles: [resolve('config/polyfills.js')],
     setupTestFrameworkScriptFile: setupTestsFile,
     testMatch: [
@@ -51,6 +50,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
     },
+    moduleFileExtensions: ['web.js', 'js', 'json', 'web.jsx', 'jsx', 'ts', 'tsx'],
   };
   if (rootDir) {
     config.rootDir = rootDir;

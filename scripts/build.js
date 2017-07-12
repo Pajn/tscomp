@@ -39,9 +39,14 @@ const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
 const printErrors = require('./utils/common').printErrors;
 
-const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
+const measureFileSizesBeforeBuild =
+  FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
+
+// These sizes are pretty large. We'll warn for bundles exceeding them.
+const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
+const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 const mode = getMode(paths.appPackageJson);
 
 // Warn and crash if required files are missing
@@ -50,7 +55,10 @@ checkRequiredFiles(mode, paths);
 if (mode === 'browser') {
   buildBrowser();
 } else {
+  buildGulp();
+}
 
+function buildGulp() {
   // Remove all content but keep the directory so that
   // if you're in it, you don't end up in Trash
   fs.emptyDirSync(paths.appBuild);
@@ -79,9 +87,8 @@ function buildBrowser() {
       fs.emptyDirSync(paths.appBuild);
       // Merge with the public folder
       copyPublicFolder();
-
       // Start the webpack build
-      buildWebpack(previousFileSizes);
+      return buildWebpack(previousFileSizes);
     })
     .then(
       ({ stats, previousFileSizes, warnings }) => {
@@ -103,7 +110,13 @@ function buildBrowser() {
         }
 
         console.log('File sizes after gzip:\n');
-        printFileSizesAfterBuild(stats, previousFileSizes, paths.appBuild);
+        printFileSizesAfterBuild(
+          stats,
+          previousFileSizes,
+          paths.appBuild,
+          WARN_AFTER_BUNDLE_GZIP_SIZE,
+          WARN_AFTER_CHUNK_GZIP_SIZE
+        );
         console.log();
 
         const appPackage = require(paths.appPackageJson);
