@@ -10,11 +10,13 @@ const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 const merge = require('merge2');
 const path = require('path');
+const fs = require('fs');
 
 const appPaths = require('./paths');
 
 const src = appPaths.appSrc;
 const outDir = appPaths.appBuild;
+const projectRelativeOutDir = appPaths.getAppBuildFolder(appPaths.appTsConfig);
 
 const paths = [
   `${src}/**/*.js`,
@@ -71,7 +73,17 @@ function buildTs(dir, mode) {
         })
       )
 
-  const primaryStream = merge([babelPipe.pipe(sourcemaps.write('.')), tsStream.dts])
+  const primaryStream = merge([
+    babelPipe
+      .pipe(sourcemaps.mapSources(sourcePath =>
+        path.relative(
+          path.resolve(projectRelativeOutDir, sourcePath.replace(/^..\/src/, "..")),
+          path.resolve(projectRelativeOutDir, sourcePath)
+        )
+      ))
+      .pipe(sourcemaps.write('.')),
+    tsStream.dts
+  ])
     .pipe(gulp.dest(outDir))
 
   const primaryPromise = new Promise((resolve, reject) => {

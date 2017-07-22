@@ -33,15 +33,21 @@ const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 // The user may choose to change the tsconfig.json `outDir` property.
-function resolveAppBuild(appTsConfigPath) {
+function getAppBuildFolder(appTsConfigPath) {
   try {
     const outDir = require(appTsConfigPath).compilerOptions.outDir || 'build';
-    const buildPath = path.join(path.dirname(appTsConfigPath), outDir);
-    return buildPath;
+    return outDir;
   } catch (_) {
-    const buildPath = path.join(path.dirname(appTsConfigPath), 'build');
-    return buildPath;
+    return 'build';
   }
+}
+module.exports.getAppBuildFolder = getAppBuildFolder
+
+// The user may choose to change the tsconfig.json `outDir` property.
+function resolveAppBuild(appTsConfigPath) {
+  const outDir = getAppBuildFolder(appTsConfigPath);
+  const buildPath = path.join(path.dirname(appTsConfigPath), outDir);
+  return buildPath;
 }
 
 const envPublicUrl = process.env.PUBLIC_URL;
