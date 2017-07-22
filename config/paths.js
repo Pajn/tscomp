@@ -41,7 +41,6 @@ function getAppBuildFolder(appTsConfigPath) {
     return 'build';
   }
 }
-module.exports.getAppBuildFolder = getAppBuildFolder
 
 // The user may choose to change the tsconfig.json `outDir` property.
 function resolveAppBuild(appTsConfigPath) {
@@ -161,3 +160,5 @@ if (
   };
 }
 // @remove-on-eject-end
+
+module.exports.getAppBuildFolder = getAppBuildFolder
