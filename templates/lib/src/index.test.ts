@@ -1,5 +1,5 @@
-import {message} from './index'
+import { message } from './index';
 
 it('exports a message', () => {
-  expect(message).toBeTruthy()
-})
+  expect(message).toBeTruthy();
+});

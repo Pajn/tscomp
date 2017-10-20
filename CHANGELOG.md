@@ -1,4 +1,8 @@
-## 0.10.0
+## 0.13.2
+
+Upgraded to [create-react-app 1.0.14](https://github.com/facebookincubator/create-react-app/blob/master/CHANGELOG.md#1014-september-26-2017)
+
+q## 0.10.0
 
 #### Breaking Changes
 

@@ -1,1 +1,1 @@
-export const message = 'Your library are ready to be used'
+export const message = 'Your library are ready to be used';
