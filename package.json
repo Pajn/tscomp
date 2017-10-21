@@ -1,8 +1,10 @@
 {
   "name": "tscomp",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "description": "Buildtool for Typescript projects",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
+  "author": "Rasmus Eneman <rasmus@eneman.eu>",
+  "repository": "Pajn/tscomp",
   "engines": {
     "node": ">=6"
   },
