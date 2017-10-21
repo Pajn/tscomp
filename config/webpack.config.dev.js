@@ -42,6 +42,8 @@ module.exports = {
   // This means they will be the "root" imports that are included in JS bundle.
   // The first two entry points enable "hot" CSS and auto-refreshes for JS.
   entry: [
+    // We ship a few polyfills by default:
+    require.resolve('./polyfills'),
     // Include an alternative client for WebpackDevServer. A client's job is to
     // connect to WebpackDevServer by a socket and get notified about changes.
     // When you save a file, the client will either apply hot updates (in case
@@ -53,10 +55,6 @@ module.exports = {
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
     require.resolve('react-dev-utils/webpackHotDevClient'),
-    // We ship a few polyfills by default:
-    require.resolve('./polyfills'),
-    // Errors should be considered fatal in development
-    require.resolve('react-error-overlay'),
     // Finally, this is your app's code:
     paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
@@ -126,7 +124,7 @@ module.exports = {
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
 
-            {
+      {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
         // back to the "file" loader at the end of the loader list.
@@ -183,7 +181,7 @@ module.exports = {
                   // for better build speed
                   transpileOnly: true,
                 },
-              }
+              },
             ],
           },
           // "postcss" loader applies autoprefixer to our CSS.
@@ -226,7 +224,7 @@ module.exports = {
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.
-          // This loader don't uses a "test" so it will catch all modules
+          // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
             // Exclude `js` files to keep "css" loader working as it injects
@@ -293,6 +291,7 @@ module.exports = {
     fs: 'empty',
     net: 'empty',
     tls: 'empty',
+    child_process: 'empty',
   },
   // Turn off performance hints during development because we don't do any
   // splitting or minification in interest of speed. These warnings become
