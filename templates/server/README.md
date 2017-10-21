@@ -1,15 +1,12 @@
-This project was bootstrapped with [tscomp](https://github.com/pajn/tscomp).  
-Tscomp is based upon [Create React App](https://github.com/facebookincubator/create-react-app/) and their [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) is helpful
-for tscomp projects as well.
+This project was bootstrapped with [tscomp](https://github.com/pajn/tscomp).
 
 ## Commands
 
 #### `yarn start` or `npm start`
 Runs the app in development mode.
-Open <http://localhost:3000> to view it in the browser.
 
-The page will reload if you make edits. You will see build errors in the
-console and the browser.
+The server will restart if you make edits. You will see build errors in the
+console.
 
 #### `yarn test` or `npm test`
 Runs the test watcher in interactive mode.
@@ -18,12 +15,14 @@ By default, runs test related to files changed since the last commit.
 [Read more about testing in the Create React App README](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
 tscomp does of course support test files with `.ts` and `.tsx` file endings as well.
 
+#### `yarn watch` or `npm run watch`
+Builds the app to the build folder, or if you have changed your `tsconfig.json`,
+to the `outDir` specified in it. The files will be rebuilt if you make edits.
+
 #### `yarn build` or `npm run build`
 Builds the app for production to the build folder, or if you have changed your `tsconfig.json`,
 to the `outDir` specified in it.
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.
 Your app is ready to be deployed!
 
 ## Converting to a Custom Setup
