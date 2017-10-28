@@ -1,6 +1,6 @@
 {
   "name": "tscomp",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "Buildtool for Typescript projects",
   "license": "MIT",
   "author": "Rasmus Eneman <rasmus@eneman.eu>",
