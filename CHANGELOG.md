@@ -1,6 +1,7 @@
 ## 0.14.0
 
 Upgraded Jest to 22
+Upgraded Gulp to 4
 
 ## 0.13.2
 
