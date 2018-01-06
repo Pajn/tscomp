@@ -1,3 +1,7 @@
+## 0.14.1
+
+Fix bug where watch only recompiled on first change
+
 ## 0.14.0
 
 Upgraded Jest to 22

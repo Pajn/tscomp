@@ -123,7 +123,7 @@ function buildTs(dir, mode) {
 function watch(dir, mode, cb) {
   gulp.watch(paths, () => {
     console.info(chalk.blue('changes detected, rebuilding...'));
-    buildTs(dir, mode)
+    return buildTs(dir, mode)
       .then(() => cb())
       .catch(err => cb(err || true));
   });
