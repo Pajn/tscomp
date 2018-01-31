@@ -1,3 +1,8 @@
+## 0.14.2
+
+Upgraded Typescript to 2.7
+Upgraded Jest to 22.1
+
 ## 0.14.1
 
 Fix bug where watch only recompiled on first change
