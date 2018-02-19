@@ -75,7 +75,7 @@
     "jest": "^22.0.4",
     "jest-cli": "^22.0.4",
     "merge2": "1.2.0",
-    "nodemon": "1.12.1",
+    "nodemon": "1.14.11",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.6",
@@ -92,7 +92,7 @@
     "url-loader": "0.6.2",
     "validate-npm-package-name": "^3.0.0",
     "webpack": "3.5.1",
-    "webpack-dev-server": "2.8.2",
+    "webpack-dev-server": "2.10.0",
     "webpack-manifest-plugin": "1.2.1",
     "whatwg-fetch": "2.0.3"
   },
