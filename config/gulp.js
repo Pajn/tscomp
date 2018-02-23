@@ -46,78 +46,88 @@ function build(dir, mode) {
 
 function buildTs(dir, mode) {
   const appTsConfig = require(appPaths.appTsConfig);
-  const tsStream = gulp
-    .src(paths)
-    .pipe(plumber())
-    .pipe(sourcemaps.init())
-    .pipe(
-      (tsProject = ts.createProject(
-        Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
-      )())
-    );
-
-  const babelPipe = tsStream.js.pipe(changedInPlace({ firstPass: true })).pipe(
-    babel({
-      babelrc: false,
-      filename: path,
-      presets: [require.resolve('babel-preset-react-app')],
-      plugins:
-        mode === 'lib'
-          ? []
-          : [require.resolve('babel-plugin-transform-es2015-modules-commonjs')],
-    })
-  );
-
-  const primaryStream = merge([
-    babelPipe
+  return new Promise((resolve, reject) => {
+    function errorHandler(e) {
+      reject(e);
+      this.emit("end");
+    }
+    const tsStream = gulp
+      .src(paths)
+      .pipe(plumber())
+      .pipe(sourcemaps.init())
       .pipe(
-        sourcemaps.mapSources(sourcePath =>
-          path.relative(
-            path.resolve(
-              projectRelativeOutDir,
-              sourcePath.replace(/^..\/src/, '..')
-            ),
-            path.resolve(projectRelativeOutDir, sourcePath)
+        (tsProject = ts.createProject(
+          Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
+        )())
+      );
+
+    const babelPipe = tsStream.js
+      .pipe(changedInPlace({ firstPass: true }))
+      .pipe(
+        babel({
+          babelrc: false,
+          filename: path,
+          presets: [require.resolve('babel-preset-react-app')],
+          plugins:
+            mode === 'lib'
+              ? []
+              : [require.resolve('babel-plugin-transform-es2015-modules-commonjs')],
+        })
+      )
+      .on("error", errorHandler);
+
+    const primaryStream = merge([
+      babelPipe
+        .pipe(
+          sourcemaps.mapSources(sourcePath =>
+            path.relative(
+              path.resolve(
+                projectRelativeOutDir,
+                sourcePath.replace(/^..\/src/, '..')
+              ),
+              path.resolve(projectRelativeOutDir, sourcePath)
+            )
           )
         )
-      )
-      .pipe(sourcemaps.write('.')),
-    tsStream.dts,
-  ]).pipe(gulp.dest(outDir));
+        .pipe(sourcemaps.write('.')),
+      tsStream.dts,
+    ]).pipe(gulp.dest(outDir));
 
-  const primaryPromise = new Promise((resolve, reject) => {
-    primaryStream.on('end', resolve);
-    primaryStream.on('error', reject);
-  });
+    const primaryPromise = new Promise((resolve, reject) => {
+      primaryStream.on('end', resolve);
+      primaryStream.on('error', reject);
+    });
 
-  const cjsPromise =
-    mode === 'lib'
-      ? new Promise((resolve, reject) => {
-          const cjsStream = merge([
-            babelPipe
-              .pipe(clone())
-              .pipe(
-                babel({
-                  babelrc: false,
-                  filename: path,
-                  presets: [],
-                  plugins: [
-                    require.resolve(
-                      'babel-plugin-transform-es2015-modules-commonjs'
-                    ),
-                  ],
-                })
-              )
-              .pipe(sourcemaps.write('.')),
-            tsStream.dts,
-          ]).pipe(gulp.dest(appPaths.appBuildCjs));
+    const cjsPromise =
+      mode === 'lib'
+        ? new Promise((resolve, reject) => {
+            const cjsStream = merge([
+              babelPipe
+                .pipe(clone())
+                .pipe(
+                  babel({
+                    babelrc: false,
+                    filename: path,
+                    presets: [],
+                    plugins: [
+                      require.resolve(
+                        'babel-plugin-transform-es2015-modules-commonjs'
+                      ),
+                    ],
+                  })
+                )
+                .pipe(sourcemaps.write('.')),
+              tsStream.dts,
+            ]).pipe(gulp.dest(appPaths.appBuildCjs));
 
-          cjsStream.on('end', resolve);
-          cjsStream.on('error', reject);
-        })
-      : Promise.resolve();
+            cjsStream.on('end', resolve);
+            cjsStream.on('error', reject);
+          })
+        : Promise.resolve();
 
-  return Promise.all([primaryPromise, cjsPromise]);
+        return resolve(Promise.all([primaryPromise, cjsPromise]));
+      })
+
 }
 
 function watch(dir, mode, cb) {

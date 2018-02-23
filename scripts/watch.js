@@ -49,10 +49,12 @@ if (mode === 'browser') {
   gulp.build(paths.appPath, mode)
     .catch(err => {
       printErrors('Failed to compile.', [err]);
-      process.exit(1);
+      return true;
     })
-    .then(() => {
-      console.log(chalk.green('Compiled successfully.'));
+    .then(isError => {
+      if (!isError) {
+        console.log(chalk.green('Compiled successfully.'));
+      }
       gulp.watch(paths.appPath, mode, err => {
         if (err) {
           printErrors('Failed to compile.', [err]);
