@@ -53,6 +53,15 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
     { publicPath: Array(cssFilename.split('/').length).join('../') }
   : {};
 
+const typescript = (() => {
+  try {
+    require(path.join(paths.appNodeModules, 'typescript'))
+    return path.join(paths.appNodeModules, 'typescript')
+  } catch (_) {
+    return 'typescript'
+  }
+})()
+
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
@@ -169,7 +178,13 @@ module.exports = {
                   compact: true,
                 },
               },
-              require.resolve('ts-loader'),
+              {
+                loader: require.resolve('ts-loader'),
+                options: {
+                  compiler: typescript,
+                  logLevel: 'info',
+                }
+              }
             ],
           },
           // The notation here is somewhat confusing.

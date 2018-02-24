@@ -53,6 +53,13 @@ Open <http://localhost:3000> to view it in the browser.
 The page will reload if you make edits. You will see build errors in the
 console and the browser.
 
+##### Big project?
+Async typechecks can be enabled for changes to appear quicker. The downside is that errors will
+no longer be displayed in the browser.
+
+Add `asyncTypechecks: true` to the `tscomp` object in your `package.json` or set the environment variable
+`ASYNC_TYPECHECK` to `true`.
+
 #### `yarn test` or `npm test`
 Runs the test watcher in interactive mode.
 By default, runs test related to files changed since the last commit.

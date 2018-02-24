@@ -31,6 +31,15 @@ const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
+const typescript = (() => {
+  try {
+    require(path.join(paths.appNodeModules, 'typescript'))
+    return path.join(paths.appNodeModules, 'typescript')
+  } catch (_) {
+    return 'typescript'
+  }
+})()
+
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
@@ -177,9 +186,11 @@ module.exports = {
               {
                 loader: require.resolve('ts-loader'),
                 options: {
-                  // Disable type checker - we will use the ForkTsCheckerWebpackPlugin instead
-                  // for better build speed
-                  transpileOnly: true,
+                  compiler: typescript,
+                  logLevel: 'info',
+                  // Disable type checker if the user wants to use async typechecks
+                  // - we will use the ForkTsCheckerWebpackPlugin instead for better build speed
+                  transpileOnly: paths.useAsyncTypechecks,
                 },
               },
             ],
@@ -276,13 +287,18 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // Run Typescript checker in a separate process for increased build speed
-    new ForkTsCheckerWebpackPlugin(),
-    // Growl/libnotify notifications for TypeScript errors
-    new ForkTsCheckerNotifierWebpackPlugin({
-      title: require(paths.appPackageJson).name,
-      skipSuccessful: true,
-    }),
+    ...(paths.useAsyncTypechecks
+      ? [
+          // Run Typescript checker in a separate process for increased build speed
+          new ForkTsCheckerWebpackPlugin(),
+          // Growl/libnotify notifications for TypeScript errors
+          new ForkTsCheckerNotifierWebpackPlugin({
+            title: require(paths.appPackageJson).name,
+            skipSuccessful: true,
+            compiler: typescript,
+          }),
+        ]
+      : [])
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

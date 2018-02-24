@@ -14,6 +14,14 @@ const fs = require('fs');
 
 const appPaths = require('./paths');
 
+const typescript = (() => {
+  try {
+    return require(path.join(appPaths.appNodeModules, 'typescript'))
+  } catch (_) {
+    return require('typescript')
+  }
+})()
+
 const src = appPaths.appSrc;
 const outDir = appPaths.appBuild;
 const projectRelativeOutDir = appPaths.getAppBuildFolder(appPaths.appTsConfig);
@@ -35,12 +43,13 @@ const baseCompilerOptions = {
   jsx: 'preserve',
   sourceMap: true,
   moduleResolution: 'node',
-  typescript: require('typescript'),
+  typescript: typescript,
 };
 
 let tsProject;
 
 function build(dir, mode) {
+  console.log(chalk.green(`Using typescript@${typescript.version}`))
   return buildTs(dir, mode);
 }
 
