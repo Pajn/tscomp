@@ -1,3 +1,9 @@
+## 0.15.0
+
+Fix bug where gulp watch (server start and watch, lib watch) would exit on syntax errors
+Make async typechecks in browser mode optional (defaults to false)
+Support overriding the typescript version by installing another version
+
 ## 0.14.2
 
 Upgraded Typescript to 2.7
