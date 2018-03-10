@@ -252,12 +252,12 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       'react-dom',
       '@types/react',
       '@types/react-dom',
-      '@types/webpack',
+      '@types/webpack-env',
     ]);
   } else if (projectType === 'server') {
-    dependencies = dependencies.concat(['@types/node']);
+    dependencies = dependencies.concat(['@types/node', 'babel-runtime']);
   } else if (projectType === 'lib') {
-    dependencies = dependencies.concat(['@types/webpack']);
+    dependencies = dependencies.concat(['babel-runtime']);
   }
   const allDependencies = [packageToInstall].concat(dependencies).concat(devDependencies);
 
