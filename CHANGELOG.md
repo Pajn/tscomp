@@ -1,3 +1,7 @@
+## next
+
+Avoid the error overlay for unused variables
+
 ## 0.15.0
 
 Fix bug where gulp watch (server start and watch, lib watch) would exit on syntax errors

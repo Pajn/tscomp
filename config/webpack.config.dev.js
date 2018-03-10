@@ -188,6 +188,8 @@ module.exports = {
                 options: {
                   compiler: typescript,
                   logLevel: 'info',
+                  // Avoid rendering the error overlay for unused variables
+                  ignoreDiagnostics: [6133],
                   // Disable type checker if the user wants to use async typechecks
                   // - we will use the ForkTsCheckerWebpackPlugin instead for better build speed
                   transpileOnly: paths.useAsyncTypechecks,
