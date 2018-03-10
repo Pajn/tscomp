@@ -136,5 +136,19 @@ tscomp new lib test-app-nested-paths-t3/aa/bb/cc/dd
 cd test-app-nested-paths-t3/aa/bb/cc/dd
 CI=true npm test
 
+# Testing a browser project
+cd "$temp_app_path"
+mkdir -p test-app-nested-paths-t4/aa
+tscomp new browser test-app-nested-paths-t4/aa
+cd test-app-nested-paths-t4/aa/
+CI=true npm test
+
+# Testing a server project
+cd "$temp_app_path"
+mkdir -p test-app-nested-paths-t5/aa
+tscomp new server test-app-nested-paths-t5/aa
+cd test-app-nested-paths-t5/aa/
+CI=true npm test
+
 # Cleanup
 cleanup

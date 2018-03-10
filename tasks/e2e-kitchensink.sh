@@ -91,7 +91,7 @@ fi
 #  npm cache clean || npm cache verify
 #fi
 
-npm install
+yarn
 
 if [ "$USE_YARN" = "yes" ]
 then
@@ -114,7 +114,7 @@ cli_path=$PWD/`npm pack`
 
 # Install the CLI in a temporary location
 cd "$temp_cli_path"
-npm install "$cli_path"
+yarn add "$cli_path"
 
 # Install the app in a temporary location
 cd $temp_app_path
@@ -129,13 +129,13 @@ tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path
 cd test-kitchensink
 
 # Link to our preset
-# npm link "$root_path"/packages/babel-preset-react-app
+# yarn add "$root_path"/packages/babel-preset-react-app
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
   PUBLIC_URL=http://www.example.org/spa/ \
-  npm run build
+  yarn build
 
 # Check for expected output
 exists build/*.html
@@ -146,14 +146,14 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
   NODE_PATH=src \
   NODE_ENV=test \
-  npm test -- --no-cache --testPathPattern="/src/"
+  yarn test --no-cache --testPathPattern="/src/"
 
 # Test "development" environment
 tmp_server_log=`mktemp`
 PORT=3001 \
   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
-  nohup npm start &>$tmp_server_log &
+  nohup yarn start &>$tmp_server_log &
 while true
 do
   if grep -q 'You can now view' $tmp_server_log; then
@@ -181,16 +181,16 @@ E2E_FILE=./build/index.html \
 # ******************************************************************************
 
 # Eject...
-echo yes | npm run eject
+echo yes | yarn eject
 
 # ...but still link to tscomp
-npm link "$root_path"
+yarn add "$root_path"
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
   PUBLIC_URL=http://www.example.org/spa/ \
-  npm run build
+  yarn build
 
 # Check for expected output
 exists build/*.html
@@ -201,14 +201,14 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
   NODE_PATH=src \
   NODE_ENV=test \
-  npm test -- --no-cache --testPathPattern='/src/'
+  yarn test --no-cache --testPathPattern='/src/'
 
 # Test "development" environment
 tmp_server_log=`mktemp`
 PORT=3002 \
   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
-  nohup npm start &>$tmp_server_log &
+  nohup yarn start &>$tmp_server_log &
 while true
 do
   if grep -q 'You can now view' $tmp_server_log; then
