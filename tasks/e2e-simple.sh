@@ -284,7 +284,7 @@ test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg fav
 echo yes | yarn eject
 
 # ...but still link to the local packages
-yarn link "$root_path"
+yarn add "$root_path"
 
 # Test the build
 yarn build
@@ -354,7 +354,7 @@ test_change_outdir index.js
 echo yes | yarn eject
 
 # ...but still link to the local packages
-yarn link "$root_path"
+yarn add "$root_path"
 
 # Test the build
 yarn build
@@ -415,7 +415,7 @@ test_change_outdir index.js index.d.ts
 echo yes | yarn eject
 
 # ...but still link to the local packages
-yarn link "$root_path"
+yarn add "$root_path"
 
 # Test the build
 yarn build
