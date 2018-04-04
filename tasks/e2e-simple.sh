@@ -121,7 +121,7 @@ fi
 # ******************************************************************************
 
 # # Test local build command
-# npm run build
+# yarn build
 # # Check for expected output
 # exists build/*.html
 # exists build/static/js/*.js
@@ -130,12 +130,12 @@ fi
 # exists build/favicon.ico
 
 # # Run tests with CI flag
-# CI=true npm test
+# CI=true yarn test
 # # Uncomment when snapshot testing is enabled by default:
 # # exists template/src/__snapshots__/App.test.js.snap
 
 # # Test local start command
-# npm start -- --smoke-test
+# yarn start --smoke-test
 
 # ******************************************************************************
 # Next, pack tscomp so we can verify that it work.
@@ -172,7 +172,7 @@ function test_change_outdir {
 
   sed 's/\"outDir\": \"\w*\"/\"outDir\": \"other\"/' tsconfig.json > tmp && mv tmp tsconfig.json
 
-  npm run build
+  yarn build
 
   for file in "${files_to_check[@]}"
   do
@@ -211,24 +211,24 @@ function verify_env_url {
   # Test relative path build
   awk -v n=2 -v s="  \"homepage\": \".\"," 'NR == n {print s} {print}' package.json > tmp && mv tmp package.json
 
-  npm run build
+  yarn build
   # Disabled until this can be tested
   # grep -F -R --exclude=*.map "../../static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"./static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
 
-  PUBLIC_URL="/anabsolute" npm run build
+  PUBLIC_URL="/anabsolute" yarn build
   grep -F -R --exclude=*.map "/anabsolute/static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
 
   # Test absolute path build
   sed "2s/.*/  \"homepage\": \"\/testingpath\",/" package.json > tmp && mv tmp package.json
 
-  npm run build
+  yarn build
   grep -F -R --exclude=*.map "/testingpath/static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
 
-  PUBLIC_URL="https://www.example.net/overridetest" npm run build
+  PUBLIC_URL="https://www.example.net/overridetest" yarn build
   grep -F -R --exclude=*.map "https://www.example.net/overridetest/static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
   grep -F -R --exclude=*.map "testingpath/static" build/ -q; test $? -eq 1 || exit 1
@@ -236,11 +236,11 @@ function verify_env_url {
   # Test absolute url build
   sed "2s/.*/  \"homepage\": \"https:\/\/www.example.net\/testingpath\",/" package.json > tmp && mv tmp package.json
 
-  npm run build
+  yarn build
   grep -F -R --exclude=*.map "/testingpath/static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
 
-  PUBLIC_URL="https://www.example.net/overridetest" npm run build
+  PUBLIC_URL="https://www.example.net/overridetest" yarn build
   grep -F -R --exclude=*.map "https://www.example.net/overridetest/static/" build/ -q; test $? -eq 0 || exit 1
   grep -F -R --exclude=*.map "\"/static/" build/ -q; test $? -eq 1 || exit 1
   grep -F -R --exclude=*.map "testingpath/static" build/ -q; test $? -eq 1 || exit 1
@@ -254,7 +254,7 @@ function verify_env_url {
 cd test-browser-app
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists build/*.html
 exists build/static/js/*.js
@@ -263,12 +263,12 @@ exists build/static/media/*.svg
 exists build/favicon.ico
 
 # Run tests with CI flag
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
 # Test the server
-npm start -- --smoke-test
+yarn start --smoke-test
 
 # Test environment handling
 verify_env_url
@@ -281,13 +281,13 @@ test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg fav
 # ******************************************************************************
 
 # Eject...
-echo yes | npm run eject
+echo yes | yarn eject
 
 # ...but still link to the local packages
-npm link "$root_path"
+yarn link "$root_path"
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists build/*.html
 exists build/static/js/*.js
@@ -296,12 +296,12 @@ exists build/static/media/*.svg
 exists build/favicon.ico
 
 # Run tests
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
 # Test the server
-npm start -- --smoke-test
+yarn start --smoke-test
 
 # Test environment handling
 verify_env_url
@@ -330,17 +330,17 @@ tscomp new server --scripts-version="$cli_path" test-server-app
 cd test-server-app
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists build/index.js
 
 # Run tests with CI flag
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
 # Test the server
-output=`npm start -- --smoke-test`
+output=`yarn start --smoke-test`
 [[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
 
 # Test changing outDir
@@ -351,23 +351,23 @@ test_change_outdir index.js
 # ******************************************************************************
 
 # Eject...
-echo yes | npm run eject
+echo yes | yarn eject
 
 # ...but still link to the local packages
-npm link "$root_path"
+yarn link "$root_path"
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists build/index.js
 
 # Run tests
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
 # Test the server
-output=`npm start -- --smoke-test`
+output=`yarn start --smoke-test`
 [[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
 
 # Test changing outDir
@@ -394,13 +394,13 @@ tscomp new lib --scripts-version="$cli_path" test-library
 cd test-library
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists lib/index.js
 exists lib/index.d.ts
 
 # Run tests with CI flag
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
@@ -412,19 +412,19 @@ test_change_outdir index.js index.d.ts
 # ******************************************************************************
 
 # Eject...
-echo yes | npm run eject
+echo yes | yarn eject
 
 # ...but still link to the local packages
-npm link "$root_path"
+yarn link "$root_path"
 
 # Test the build
-npm run build
+yarn build
 # Check for expected output
 exists lib/index.js
 exists lib/index.d.ts
 
 # Run tests
-CI=true npm test
+CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
