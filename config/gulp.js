@@ -126,7 +126,8 @@ function buildTs(dir, mode) {
                   })
                 )
                 .pipe(sourcemaps.write('.')),
-              tsStream.dts,
+              tsStream.dts
+                .pipe(clone()),
             ]).pipe(gulp.dest(appPaths.appBuildCjs));
 
             cjsStream.on('end', resolve);
@@ -134,7 +135,8 @@ function buildTs(dir, mode) {
           })
         : Promise.resolve();
 
-        return resolve(Promise.all([primaryPromise, cjsPromise]));
+        return Promise.all([primaryPromise, cjsPromise])
+          .then(resolve, reject)
       })
 
 }
