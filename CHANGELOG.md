@@ -1,5 +1,7 @@
 ## next
 
+Fix library projects not creating declaration files in lib
+
 ## 0.15.2
 
 Upgraded Typescript to 2.8
