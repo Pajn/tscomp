@@ -341,7 +341,7 @@ CI=true yarn test
 
 # Test the server
 output=`yarn start --smoke-test`
-[[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
+[[ "$output" == *"To get started, edit src/index.ts and save to restart."* ]]
 
 # Test changing outDir
 test_change_outdir index.js
@@ -368,7 +368,7 @@ CI=true yarn test
 
 # Test the server
 output=`yarn start --smoke-test`
-[[ "$output" == *"To get started, edit src/index.ts and save to restart." ]]
+[[ "$output" == *"To get started, edit src/index.ts and save to restart."* ]]
 
 # Test changing outDir
 test_change_outdir index.js
