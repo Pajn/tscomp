@@ -1,5 +1,11 @@
 ## next
 
+## 0.15.2
+
+Upgraded Typescript to 2.8
+
+## 0.15.1
+
 Avoid the error overlay for unused variables.  
 Add `babel-runtime` to dependencies for new lib and server projects. This fixes some errors where
 the application would crash after installing only production dependencies.  
