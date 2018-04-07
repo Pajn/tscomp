@@ -92,7 +92,7 @@
     "url-loader": "0.6.2",
     "validate-npm-package-name": "^3.0.0",
     "webpack": "3.5.1",
-    "webpack-dev-server": "2.10.0",
+    "webpack-dev-server": "3.1.2",
     "webpack-manifest-plugin": "1.2.1",
     "whatwg-fetch": "2.0.4"
   },
