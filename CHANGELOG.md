@@ -1,4 +1,12 @@
-## next
+## 1.0.0-beta.0
+
+Upgraded Webpack to 4
+Upgraded Babel to 7
+
+Add support for .graphql files
+Add support for CSS modules using .module.css extension
+
+## 0.15.3
 
 Fix library projects not creating declaration files in lib
 

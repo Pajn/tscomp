@@ -11,6 +11,7 @@
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+const findMonorepo = require('react-dev-utils/workspaceUtils').findMonorepo;
 
 const extensions = ['', '.tsx', '.ts', '.js', '.jsx'];
 
@@ -105,6 +106,8 @@ module.exports = {
   useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
 };
 
+let checkForMonorepo = true;
+
 // @remove-on-eject-begin
 const resolveOwn = relativePath => path.resolve(__dirname, '..', relativePath);
 
@@ -133,18 +136,13 @@ module.exports = {
   ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
 };
 
-const ownPackageJson = require('../package.json');
-const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
-const reactScriptsLinked =
-  fs.existsSync(reactScriptsPath) &&
-  fs.lstatSync(reactScriptsPath).isSymbolicLink();
+// detect if template should be used, ie. when cwd is react-scripts itself
+const useTemplate =
+  appDirectory === fs.realpathSync(path.join(__dirname, '..'));
 
-// config before publish: we're in ./tscomp/config/
-if (
-  !reactScriptsLinked &&
-  __dirname.indexOf(path.join('tscomp', 'config')) !== -1 &&
-  __dirname.indexOf(path.join('node_modules', 'tscomp', 'config')) === -1
-) {
+checkForMonorepo = !useTemplate;
+
+if (useTemplate) {
   module.exports = {
     dotenv: resolveOwn('template/.env'),
     appPath: resolveApp('.'),
@@ -172,3 +170,19 @@ if (
 // @remove-on-eject-end
 
 module.exports.getAppBuildFolder = getAppBuildFolder;
+
+module.exports.srcPaths = [module.exports.appSrc];
+
+module.exports.useYarn = fs.existsSync(
+  path.join(module.exports.appPath, 'yarn.lock')
+);
+
+if (checkForMonorepo) {
+  // if app is in a monorepo (lerna or yarn workspace), treat other packages in
+  // the monorepo as if they are app source
+  const mono = findMonorepo(appDirectory);
+  if (mono.isAppIncluded) {
+    Array.prototype.push.apply(module.exports.srcPaths, mono.pkgs);
+  }
+  module.exports.useYarn = module.exports.useYarn || mono.isYarnWs;
+}
