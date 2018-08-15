@@ -1,5 +1,6 @@
 declare module '*.css';
 declare module '*.gif';
+declare module '*.graphql';
 declare module '*.jpeg';
 declare module '*.jpg';
 declare module '*.json';

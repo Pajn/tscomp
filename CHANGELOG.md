@@ -1,3 +1,25 @@
+## 1.0.0-beta.1
+
+### Breaking Changes
+
+`typescript-babel-jest` have been replaced with `ts-jest`. This changes
+how module import are compiled in tests.
+After upgrading you'll experience problems with default imports. Fix this
+by adding `"esModuleInterop": true` in your tsconfig.json `compilerOptions`
+
+### Fixes
+
+- Fix kitchensink tests
+- Fix CSS modules in production builds
+
+### Known issues
+
+- Class methods does not work for child classes when compiled with Babel.
+  Use `"target": "es5"` in your tsconfig.json `compilerOptions` to instead 
+  build them with TypeScript.
+
+- Full module splitting has been disabled as it did produce broken builds
+
 ## 1.0.0-beta.0
 
 Upgraded Webpack to 4

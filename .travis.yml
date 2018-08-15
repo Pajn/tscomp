@@ -1,18 +1,20 @@
 language: node_js
 node_js:
+  - 10
   - 8
-  - 9
 cache: yarn
 install: yarn
 script:
  - 'if [ $TEST_SUITE = "simple" ]; then tasks/e2e-simple.sh; fi'
  - 'if [ $TEST_SUITE = "installs" ]; then tasks/e2e-installs.sh; fi'
  - 'if [ $TEST_SUITE = "kitchensink" ]; then tasks/e2e-kitchensink.sh; fi'
+ - 'if [ $TEST_SUITE = "kitchensink-eject" ]; then tasks/e2e-kitchensink-eject.sh; fi'
 env:
   matrix:
     - TEST_SUITE=simple
     - TEST_SUITE=installs
     - TEST_SUITE=kitchensink
+    - TEST_SUITE=kitchensink-eject
 matrix:
   include:
     - node_js: 6

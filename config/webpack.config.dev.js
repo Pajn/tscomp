@@ -108,13 +108,13 @@ module.exports = {
     // Automatically split vendor and commons
     // https://twitter.com/wSokra/status/969633336732905474
     // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
-    splitChunks: {
-      chunks: 'all',
-      name: false,
-    },
+    // splitChunks: {
+    //   chunks: 'all',
+    //   name: false,
+    // },
     // Keep the runtime chunk seperated to enable long term caching
     // https://twitter.com/wSokra/status/969679223278505985
-    runtimeChunk: true,
+    // runtimeChunk: true,
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -131,7 +131,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.ts', '.tsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.web.ts', '.ts', '.web.tsx', '.tsx'],
     alias: {
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
@@ -198,7 +198,7 @@ module.exports = {
                       {
                         loaderMap: {
                           svg: {
-                            ReactComponent: 'svgr/webpack![path]',
+                            ReactComponent: '@svgr/webpack![path]',
                           },
                         },
                       },
@@ -240,7 +240,7 @@ module.exports = {
                       {
                         loaderMap: {
                           svg: {
-                            ReactComponent: 'svgr/webpack![path]',
+                            ReactComponent: '@svgr/webpack![path]',
                           },
                         },
                       },

@@ -255,9 +255,9 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       '@types/webpack-env',
     ]);
   } else if (projectType === 'server') {
-    dependencies = dependencies.concat(['@types/node', 'babel-runtime']);
+    dependencies = dependencies.concat(['@types/node', '@babel/runtime']);
   } else if (projectType === 'lib') {
-    dependencies = dependencies.concat(['babel-runtime']);
+    dependencies = dependencies.concat(['@babel/runtime']);
   }
   const allDependencies = [packageToInstall].concat(dependencies).concat(devDependencies);
 

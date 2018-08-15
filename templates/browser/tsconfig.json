@@ -11,6 +11,7 @@
     "noUnusedParameters": true,
     "sourceMap": true,
     "strict": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "outDir": "build"

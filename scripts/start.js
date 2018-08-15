@@ -22,7 +22,6 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-const fs = require('fs');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -43,7 +42,6 @@ const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
 const printErrors = require('./utils/common').printErrors;
 
-const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 let argv = process.argv.slice(2);
 
@@ -57,9 +55,15 @@ const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 function startWebpack() {
-// We attempt to use the default port but if it is busy, we offer the user to
-// run on a different port. `detect()` Promise resolves to the next free port.
-choosePort(HOST, DEFAULT_PORT)
+  // We require that you explictly set browsers and do not fall back to
+  // browserslist defaults.
+  const { checkBrowsers } = require('react-dev-utils/browsersHelper');
+  checkBrowsers(paths.appPath)
+  .then(() => {
+    // We attempt to use the default port but if it is busy, we offer the user to
+    // run on a different port. `choosePort()` Promise resolves to the next free port.
+    return choosePort(HOST, DEFAULT_PORT);
+  })
   .then(port => {
     if (port == null) {
       // We have not found a port.
@@ -69,7 +73,13 @@ choosePort(HOST, DEFAULT_PORT)
     const appName = require(paths.appPackageJson).name;
     const urls = prepareUrls(protocol, HOST, port);
     // Create a webpack compiler that is configured with custom messages.
-    const compiler = createCompiler(webpack, config, appName, urls, useYarn);
+    const compiler = createCompiler(
+      webpack,
+      config,
+      appName,
+      urls,
+      paths.useYarn
+    );
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy;
     const proxyConfig = prepareProxy(proxySetting, paths.appPublic);

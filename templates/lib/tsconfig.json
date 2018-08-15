@@ -11,6 +11,7 @@
     "noUnusedParameters": true,
     "sourceMap": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "rootDir": ".",
     "outDir": "lib"

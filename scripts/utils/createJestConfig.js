@@ -35,7 +35,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
         ? '<rootDir>/node_modules/babel-jest'
         : resolve('config/jest/babelTransform.js'),
       '^.+\\.(ts|tsx)$': isEjecting
-        ? '<rootDir>/node_modules/typescript-babel-jest'
+        ? '<rootDir>/node_modules/ts-jest/dist/index.js'
         : resolve('config/jest/tsTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(

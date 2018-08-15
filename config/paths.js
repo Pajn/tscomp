@@ -88,6 +88,7 @@ function getUseAsyncTypechecks(appPackageJson) {
 // config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp('.env'),
+  appPath: resolveApp('.'),
   appBuild: resolveAppBuild(resolveApp('tsconfig.json')),
   appBuildCjs: resolveApp('cjs'),
   appPublic: resolveApp('public'),
