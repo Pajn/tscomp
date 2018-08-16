@@ -259,7 +259,7 @@ function run(root, appName, version, verbose, originalDirectory, template) {
   } else if (projectType === 'lib') {
     dependencies = dependencies.concat(['@babel/runtime']);
   }
-  const allDependencies = [packageToInstall].concat(dependencies).concat(devDependencies);
+  const allDependencies = [].concat(dependencies).concat(devDependencies);
 
   console.log('Installing packages. This might take a couple minutes.');
 
