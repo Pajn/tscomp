@@ -1,3 +1,11 @@
+## 1.0.0-beta.2
+
+- Support dynamic imports in server and library projects
+- Fix class method compilation with Babel. All TypeScript targets
+  should now work again.
+- Reenable full module splitting
+- Add kitchensink tests for server projects
+
 ## 1.0.0-beta.1
 
 ### Breaking Changes
