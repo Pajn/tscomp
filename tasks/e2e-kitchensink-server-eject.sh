@@ -20,7 +20,7 @@ temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'tscomp' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'kitchensink' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_cli_path" "$temp_app_path" || $CI
@@ -64,12 +64,31 @@ set -x
 cd ..
 root_path=$PWD
 
-# if hash npm 2>/dev/null
-# then
-#   npm i -g npm@latest
-# fi
+# Clear cache to avoid issues with incorrect packages being used
+if hash yarnpkg 2>/dev/null
+then
+  # AppVeyor uses an old version of yarn.
+  # Once updated to 0.24.3 or above, the workaround can be removed
+  # and replaced with `yarnpkg cache clean`
+  # Issues:
+  #    https://github.com/yarnpkg/yarn/issues/2591
+  #    https://github.com/appveyor/ci/issues/1576
+  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  # When removing workaround, you may run into
+  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  case "$(uname -s)" in
+    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
+    *) yarn=yarnpkg;;
+  esac
+fi
 
-# Bootstrap monorepo
+if [ "$USE_YARN" = "yes" ]
+then
+  # Install Yarn so that the test can use it to install packages.
+  npm install -g yarn
+  yarn cache clean
+fi
+
 yarn
 
 # ******************************************************************************
@@ -90,7 +109,7 @@ yarn add "$cli_path"
 
 # Install the app in a temporary location
 cd $temp_app_path
-tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink browser test-kitchensink
+tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-server server test-kitchensink
 
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
@@ -119,36 +138,34 @@ yarn add "$root_path"
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
-  PUBLIC_URL=http://www.example.org/spa/ \
   yarn build
 
 # Check for expected output
-exists build/*.html
-exists build/static/js/main.*.js
+exists build/*.js
 
 # Unit tests
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
-  NODE_PATH=src \
+  NODE_PATH="$temp_app_path/test-kitchensink/build/" \
   NODE_ENV=test \
   yarn test --no-cache --testPathPattern='/src/'
 
 # Test "development" environment
-tmp_server_log=`mktemp`
-PORT=9002 \
-  REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-  NODE_PATH=src \
-  nohup yarn start &>$tmp_server_log &
-grep -q 'You can now view' <(tail -f $tmp_server_log)
-E2E_URL="http://localhost:9002" \
-  REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-  CI=true NODE_PATH=src \
-  NODE_ENV=development \
-  BABEL_ENV=test \
-  node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
+# tmp_server_log=`mktemp`
+# PORT=9002 \
+#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+#   NODE_PATH=src \
+#   nohup yarn start &>$tmp_server_log &
+# grep -q 'You can now view' <(tail -f $tmp_server_log)
+# E2E_URL="http://localhost:9002" \
+#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+#   CI=true NODE_PATH=src \
+#   NODE_ENV=development \
+#   BABEL_ENV=test \
+#   node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
 
 # Test "production" environment
-E2E_FILE=./build/index.html \
+E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   CI=true \
   NODE_ENV=production \
   BABEL_ENV=test \

@@ -46,7 +46,7 @@ if (mode === 'browser') {
   );
   process.exit(1);
 } else {
-  gulp.build(paths.appPath, mode)
+  gulp.build(mode)
     .catch(err => {
       printErrors('Failed to compile.', [err]);
       return true;
@@ -55,7 +55,7 @@ if (mode === 'browser') {
       if (!isError) {
         console.log(chalk.green('Compiled successfully.'));
       }
-      gulp.watch(paths.appPath, mode, err => {
+      gulp.watch(mode, err => {
         if (err) {
           printErrors('Failed to compile.', [err]);
         } else {

@@ -68,7 +68,7 @@ function buildGulp() {
   }
 
   gulp
-    .build(paths.appPath, mode)
+    .build(mode)
     .then(() => console.log(chalk.green("Compiled successfully.")))
     .catch(err => {
       printErrors("Failed to compile.", [err]);

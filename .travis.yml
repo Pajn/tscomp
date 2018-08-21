@@ -5,13 +5,21 @@ node_js:
 cache: yarn
 install: yarn
 script:
- - 'if [ $TEST_SUITE = "simple" ]; then tasks/e2e-simple.sh; fi'
+ - 'if [ $TEST_SUITE = "simple-browser" ]; then tasks/e2e-simple-browser.sh; fi'
+ - 'if [ $TEST_SUITE = "simple-server" ]; then tasks/e2e-simple-server.sh; fi'
+ - 'if [ $TEST_SUITE = "simple-lib" ]; then tasks/e2e-simple-lib.sh; fi'
  - 'if [ $TEST_SUITE = "installs" ]; then tasks/e2e-installs.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink" ]; then tasks/e2e-kitchensink.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink-eject" ]; then tasks/e2e-kitchensink-eject.sh; fi'
+ - 'if [ $TEST_SUITE = "kitchensink-browser" ]; then tasks/e2e-kitchensink-browser.sh; fi'
+ - 'if [ $TEST_SUITE = "kitchensink-browser-eject" ]; then tasks/e2e-kitchensink-browser-eject.sh; fi'
+ - 'if [ $TEST_SUITE = "kitchensink-server" ]; then tasks/e2e-kitchensink-server.sh; fi'
+ - 'if [ $TEST_SUITE = "kitchensink-server-eject" ]; then tasks/e2e-kitchensink-server-eject.sh; fi'
 env:
   matrix:
-    - TEST_SUITE=simple
+    - TEST_SUITE=simple-browser
+    - TEST_SUITE=simple-server
+    - TEST_SUITE=simple-lib
     - TEST_SUITE=installs
-    - TEST_SUITE=kitchensink
-    - TEST_SUITE=kitchensink-eject
+    - TEST_SUITE=kitchensink-browser
+    - TEST_SUITE=kitchensink-browser-eject
+    - TEST_SUITE=kitchensink-server
+    - TEST_SUITE=kitchensink-server-eject
