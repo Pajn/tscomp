@@ -23,7 +23,7 @@ function cleanup {
   ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  #rm -rf "$temp_cli_path" $temp_app_path || $CI
+  rm -rf "$temp_cli_path" $temp_app_path || $CI
 }
 
 # Error messages are redirected to stderr

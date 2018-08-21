@@ -20,7 +20,7 @@ temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'kitchensink' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-browser-eject.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_cli_path" "$temp_app_path" || $CI
