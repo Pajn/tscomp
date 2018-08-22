@@ -47,6 +47,8 @@ const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 const mode = getMode(paths.appPackageJson);
 
+const jsonOutput = process.argv.includes("--json");
+
 // Warn and crash if required files are missing
 checkRequiredFiles(mode, paths);
 
@@ -98,43 +100,56 @@ function buildBrowser() {
     .then(
       ({ stats, previousFileSizes, warnings }) => {
         if (warnings.length) {
-          console.log(chalk.yellow("Compiled with warnings.\n"));
-          console.log(warnings.join("\n\n"));
-          console.log(
+          console.error(chalk.yellow("Compiled with warnings.\n"));
+          console.error(warnings.join("\n\n"));
+          console.error(
             "\nSearch for the " +
               chalk.underline(chalk.yellow("keywords")) +
               " to learn more about each warning."
           );
-          console.log(
+          console.error(
             "To ignore, add " +
               chalk.cyan("// eslint-disable-next-line") +
               " to the line before.\n"
           );
-        } else {
+        } else if (!jsonOutput) {
           console.log(chalk.green("Compiled successfully.\n"));
         }
 
-        console.log("File sizes after gzip:\n");
-        printFileSizesAfterBuild(
-          stats,
-          previousFileSizes,
-          paths.appBuild,
-          WARN_AFTER_BUNDLE_GZIP_SIZE,
-          WARN_AFTER_CHUNK_GZIP_SIZE
-        );
-        console.log();
+        if (jsonOutput) {
+          console.log(
+            JSON.stringify(
+              stats.toJson({
+                json: true,
+                modules: true
+              }),
+              null,
+              2
+            ) + "\n"
+          );
+        } else {
+          console.log("File sizes after gzip:\n");
+          printFileSizesAfterBuild(
+            stats,
+            previousFileSizes,
+            paths.appBuild,
+            WARN_AFTER_BUNDLE_GZIP_SIZE,
+            WARN_AFTER_CHUNK_GZIP_SIZE
+          );
+          console.log();
 
-        const appPackage = require(paths.appPackageJson);
-        const publicUrl = paths.publicUrl;
-        const publicPath = config.output.publicPath;
-        const buildFolder = path.relative(process.cwd(), paths.appBuild);
-        printHostingInstructions(
-          appPackage,
-          publicUrl,
-          publicPath,
-          buildFolder,
-          path.useYarn
-        );
+          const appPackage = require(paths.appPackageJson);
+          const publicUrl = paths.publicUrl;
+          const publicPath = config.output.publicPath;
+          const buildFolder = path.relative(process.cwd(), paths.appBuild);
+          printHostingInstructions(
+            appPackage,
+            publicUrl,
+            publicPath,
+            buildFolder,
+            path.useYarn
+          );
+        }
       },
       err => {
         console.log(chalk.red("Failed to compile.\n"));
@@ -144,7 +159,7 @@ function buildBrowser() {
     )
     .catch(err => {
       if (err && err.message) {
-        console.log(err.message);
+        console.error(err.message);
       }
       process.exit(1);
     });
@@ -152,7 +167,9 @@ function buildBrowser() {
 
 // Create the production build and print the deployment instructions.
 function buildWebpack(previousFileSizes) {
-  console.log("Creating an optimized production build...");
+  if (!jsonOutput) {
+    console.log("Creating an optimized production build...");
+  }
 
   let compiler = webpack(config);
   return new Promise((resolve, reject) => {
