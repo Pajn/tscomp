@@ -6,7 +6,7 @@
   "author": "Rasmus Eneman <rasmus@eneman.eu>",
   "repository": "Pajn/tscomp",
   "engines": {
-    "node": ">=6"
+    "node": ">=8"
   },
   "scripts": {
     "build": "node scripts/build.js",
