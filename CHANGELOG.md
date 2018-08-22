@@ -1,3 +1,10 @@
+## 1.0.0-beta.3
+
+- Upgrade Webpack to 4.17.1 to fix issue importing from `export * from` reexports https://github.com/webpack/webpack/issues/7930
+- Replace UglifyJS with Terser
+- Add tsconfig.json to .npmignore in new library projects.
+- Support for `--json` to `tscomp build` to expose Webpack stats, allowing the use of tools such as Webpack Analyzer
+
 ## 1.0.0-beta.2
 
 - Support dynamic imports in server and library projects
