@@ -283,6 +283,9 @@ module.exports = {
                   presets: [
                     require.resolve('babel-preset-react-app/dependencies'),
                   ],
+                  plugins: [
+                    require.resolve('@babel/plugin-syntax-dynamic-import'),
+                  ],
                   cacheDirectory: true,
                   highlightCode: true,
                 },
