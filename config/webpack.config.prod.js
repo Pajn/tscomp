@@ -270,7 +270,7 @@ module.exports = {
                 loader: require.resolve('ts-loader'),
                 options: {
                   compiler: typescript,
-                  logLevel: 'info',
+                  logLevel: 'error',
                 }
               }
             ],
