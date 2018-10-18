@@ -11,7 +11,6 @@
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const findMonorepo = require('react-dev-utils/workspaceUtils').findMonorepo;
 
 const extensions = ['', '.tsx', '.ts', '.js', '.jsx'];
 
@@ -108,8 +107,6 @@ module.exports = {
   useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
 };
 
-let checkForMonorepo = true;
-
 // @remove-on-eject-begin
 const resolveOwn = relativePath => path.resolve(__dirname, '..', relativePath);
 
@@ -142,8 +139,6 @@ module.exports = {
 // detect if template should be used, ie. when cwd is react-scripts itself
 const useTemplate =
   appDirectory === fs.realpathSync(path.join(__dirname, '..'));
-
-checkForMonorepo = !useTemplate;
 
 if (useTemplate) {
   module.exports = {
@@ -180,13 +175,3 @@ module.exports.srcPaths = [module.exports.appSrc];
 module.exports.useYarn = fs.existsSync(
   path.join(module.exports.appPath, 'yarn.lock')
 );
-
-if (checkForMonorepo) {
-  // if app is in a monorepo (lerna or yarn workspace), treat other packages in
-  // the monorepo as if they are app source
-  const mono = findMonorepo(appDirectory);
-  if (mono.isAppIncluded) {
-    Array.prototype.push.apply(module.exports.srcPaths, mono.pkgs);
-  }
-  module.exports.useYarn = module.exports.useYarn || mono.isYarnWs;
-}
