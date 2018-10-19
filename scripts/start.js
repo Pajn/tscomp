@@ -21,6 +21,13 @@ process.on('unhandledRejection', err => {
 
 // Ensure environment variables are read.
 require('../config/env');
+// @remove-on-eject-begin
+// Do the preflight check (only happens before eject).
+const verifyPackageTree = require('./utils/verifyPackageTree');
+if (process.env.SKIP_PREFLIGHT_CHECK !== 'true') {
+  verifyPackageTree();
+}
+// @remove-on-eject-end
 
 const chalk = require('chalk');
 const webpack = require('webpack');
@@ -42,6 +49,7 @@ const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
 const getMode = require('./utils/common').getMode;
 const printErrors = require('./utils/common').printErrors;
 
+const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 let argv = process.argv.slice(2);
 
@@ -53,6 +61,23 @@ checkRequiredFiles(mode, paths);
 // Tools like Cloud9 rely on this.
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
+
+if (process.env.HOST) {
+  console.log(
+    chalk.cyan(
+      `Attempting to bind to HOST environment variable: ${chalk.yellow(
+        chalk.bold(process.env.HOST)
+      )}`
+    )
+  );
+  console.log(
+    `If this was unintentional, check that you haven't mistakenly set it in your shell.`
+  );
+  console.log(
+    `Learn more here: ${chalk.yellow('http://bit.ly/CRA-advanced-config')}`
+  );
+  console.log();
+}
 
 function startWebpack() {
   // We require that you explictly set browsers and do not fall back to
@@ -78,7 +103,7 @@ function startWebpack() {
       config,
       appName,
       urls,
-      paths.useYarn
+      useYarn
     );
     // Load proxy config
     const proxySetting = require(paths.appPackageJson).proxy;
