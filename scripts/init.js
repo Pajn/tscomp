@@ -17,14 +17,14 @@ process.on("unhandledRejection", err => {
 const fs = require("fs-extra");
 const path = require("path");
 const chalk = require("chalk");
-const execSync = require('child_process').execSync;
+const execSync = require("child_process").execSync;
 const spawn = require("react-dev-utils/crossSpawn");
 const { defaultBrowsers } = require("react-dev-utils/browsersHelper");
 const os = require("os");
 
 function isInGitRepository() {
   try {
-    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
+    execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
     return true;
   } catch (e) {
     return false;
@@ -33,7 +33,7 @@ function isInGitRepository() {
 
 function isInMercurialRepository() {
   try {
-    execSync('hg --cwd . root', { stdio: 'ignore' });
+    execSync("hg --cwd . root", { stdio: "ignore" });
     return true;
   } catch (e) {
     return false;
@@ -43,17 +43,17 @@ function isInMercurialRepository() {
 function tryGitInit(appPath) {
   let didInit = false;
   try {
-    execSync('git --version', { stdio: 'ignore' });
+    execSync("git --version", { stdio: "ignore" });
     if (isInGitRepository() || isInMercurialRepository()) {
       return false;
     }
 
-    execSync('git init', { stdio: 'ignore' });
+    execSync("git init", { stdio: "ignore" });
     didInit = true;
 
-    execSync('git add -A', { stdio: 'ignore' });
+    execSync("git add -A", { stdio: "ignore" });
     execSync('git commit -m "Initial commit from Create React App"', {
-      stdio: 'ignore',
+      stdio: "ignore"
     });
     return true;
   } catch (e) {
@@ -65,7 +65,7 @@ function tryGitInit(appPath) {
       // remove the Git files to avoid a half-done state.
       try {
         // unlinkSync() doesn't work on directories.
-        fs.removeSync(path.join(appPath, '.git'));
+        fs.removeSync(path.join(appPath, ".git"));
       } catch (removeErr) {
         // Ignore.
       }
@@ -149,35 +149,37 @@ module.exports = function(
   // See: https://github.com/npm/npm/issues/1862
   try {
     fs.moveSync(
-      path.join(appPath, 'gitignore'),
-      path.join(appPath, '.gitignore'),
+      path.join(appPath, "gitignore"),
+      path.join(appPath, ".gitignore"),
       []
     );
   } catch (err) {
     // Append if there's already a `.gitignore` file there
-    if (err.code === 'EEXIST') {
-      const data = fs.readFileSync(path.join(appPath, 'gitignore'));
-      fs.appendFileSync(path.join(appPath, '.gitignore'), data);
-      fs.unlinkSync(path.join(appPath, 'gitignore'));
+    if (err.code === "EEXIST") {
+      const data = fs.readFileSync(path.join(appPath, "gitignore"));
+      fs.appendFileSync(path.join(appPath, ".gitignore"), data);
+      fs.unlinkSync(path.join(appPath, "gitignore"));
     } else {
       throw err;
     }
   }
 
-  try {
-    fs.moveSync(
-      path.join(appPath, 'npmignore'),
-      path.join(appPath, '.npmignore'),
-      []
-    );
-  } catch (err) {
-    // Append if there's already a `.npmignore` file there
-    if (err.code === 'EEXIST') {
-      const data = fs.readFileSync(path.join(appPath, 'npmignore'));
-      fs.appendFileSync(path.join(appPath, '.npmignore'), data);
-      fs.unlinkSync(path.join(appPath, 'npmignore'));
-    } else {
-      throw err;
+  if (fs.existsSync(path.join(appPath, "npmignore"))) {
+    try {
+      fs.moveSync(
+        path.join(appPath, "npmignore"),
+        path.join(appPath, ".npmignore"),
+        []
+      );
+    } catch (err) {
+      // Append if there's already a `.npmignore` file there
+      if (err.code === "EEXIST") {
+        const data = fs.readFileSync(path.join(appPath, "npmignore"));
+        fs.appendFileSync(path.join(appPath, ".npmignore"), data);
+        fs.unlinkSync(path.join(appPath, "npmignore"));
+      } else {
+        throw err;
+      }
     }
   }
 
@@ -230,7 +232,7 @@ module.exports = function(
 
   if (tryGitInit(appPath)) {
     console.log();
-    console.log('Initialized a git repository.');
+    console.log("Initialized a git repository.");
   }
 
   // Display the most elegant way to cd.

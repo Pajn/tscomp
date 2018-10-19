@@ -32,7 +32,7 @@ if (process.env.SKIP_PREFLIGHT_CHECK !== 'true') {
 
 const jest = require('jest');
 const execSync = require('child_process').execSync;
-const argv = process.argv.slice(2);
+let argv = process.argv.slice(2);
 
 function isInGitRepository() {
   try {
