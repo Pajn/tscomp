@@ -171,7 +171,3 @@ if (useTemplate) {
 module.exports.getAppBuildFolder = getAppBuildFolder;
 
 module.exports.srcPaths = [module.exports.appSrc];
-
-module.exports.useYarn = fs.existsSync(
-  path.join(module.exports.appPath, 'yarn.lock')
-);

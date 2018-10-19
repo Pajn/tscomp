@@ -23,6 +23,8 @@ const createJestConfig = require('./utils/createJestConfig');
 const inquirer = require('react-dev-utils/inquirer');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 
+const useYarn = fs.existsSync(paths.yarnLockFile);
+
 const green = chalk.green;
 const cyan = chalk.cyan;
 
@@ -221,7 +223,7 @@ inquirer
       }
     }
 
-    if (paths.useYarn) {
+    if (useYarn) {
       const windowsCmdFilePath = path.join(
         appPath,
         'node_modules',

@@ -30,6 +30,7 @@ if (process.env.SKIP_PREFLIGHT_CHECK !== 'true') {
 // @remove-on-eject-end
 
 const chalk = require('chalk');
+const fs = require('fs');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const clearConsole = require('react-dev-utils/clearConsole');
