@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@babel/register": "7.0.0",
     "bootstrap": "4.1.0",
     "chai": "3.5.0",
     "jsdom": "11.12.0",
