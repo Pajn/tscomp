@@ -77,7 +77,7 @@ then
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
   esac
-  $yarn cache clean
+  # $yarn cache clean
 fi
 
 #if hash npm 2>/dev/null
@@ -89,13 +89,14 @@ fi
 #  npm cache clean || npm cache verify
 #fi
 
-npm install
+# npm install
+yarn
 
 if [ "$USE_YARN" = "yes" ]
 then
   # Install Yarn so that the test can use it to install packages.
   npm install -g yarn
-  yarn cache clean
+  # yarn cache clean
 fi
 
 # ******************************************************************************

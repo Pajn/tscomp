@@ -16,6 +16,7 @@ cd "$(dirname "$0")"
 # http://unix.stackexchange.com/a/84980
 temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
+temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
 
 function cleanup {
   echo 'Cleaning up.'
@@ -23,7 +24,7 @@ function cleanup {
   ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-browser-eject.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  rm -rf "$temp_cli_path" "$temp_app_path" || $CI
+  rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
 }
 
 # Error messages are redirected to stderr
@@ -92,6 +93,10 @@ yarn add "$cli_path"
 cd $temp_app_path
 tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-browser browser test-kitchensink
 
+# Install the test module
+cd "$temp_module_path"
+yarn add test-integrity@^2.0.1
+
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
 # let's make sure all npm scripts are in the working state.
@@ -102,6 +107,9 @@ cd test-kitchensink
 
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
+
+# Link to test module
+npm link "$temp_module_path/node_modules/test-integrity"
 
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
@@ -131,7 +139,7 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
   NODE_PATH=src \
   NODE_ENV=test \
-  yarn test --no-cache --testPathPattern='/src/'
+  yarn test --no-cache --runInBand --testPathPattern=src
 
 # Test "development" environment
 tmp_server_log=`mktemp`
@@ -145,7 +153,7 @@ E2E_URL="http://localhost:9002" \
   CI=true NODE_PATH=src \
   NODE_ENV=development \
   BABEL_ENV=test \
-  node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
+  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
 
 # Test "production" environment
 E2E_FILE=./build/index.html \
@@ -154,7 +162,7 @@ E2E_FILE=./build/index.html \
   BABEL_ENV=test \
   NODE_PATH=src \
   PUBLIC_URL=http://www.example.org/spa/ \
-  node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
+  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
 
 # Cleanup
 cleanup

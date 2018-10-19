@@ -182,6 +182,7 @@ function test_change_outdir {
   # Restore tsconfig.json
   rm tsconfig.json
   mv tsconfig.json.orig tsconfig.json
+  rm -rf other
 }
 
 # ******************************************************************************
