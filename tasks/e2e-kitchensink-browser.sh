@@ -122,7 +122,7 @@ yarn add test-integrity@^2.0.1
 # ******************************************************************************
 
 # Enter the app directory
-cd test-kitchensink
+cd $temp_app_path/test-kitchensink
 
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
