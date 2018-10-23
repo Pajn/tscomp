@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { expect } from "chai";
 import { initServer } from "./initServer";
 
 describe("Integration", () => {

@@ -112,6 +112,9 @@ yarn add "$cli_path"
 cd $temp_app_path
 tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-browser browser test-kitchensink
 
+# ...but still link to tscomp
+yarn add "$root_path"
+
 # Install the test module
 cd "$temp_module_path"
 yarn add test-integrity@^2.0.1

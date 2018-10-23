@@ -77,7 +77,7 @@ then
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
   esac
-  # $yarn cache clean
+  $yarn cache clean
 fi
 
 #if hash npm 2>/dev/null
@@ -89,7 +89,6 @@ fi
 #  npm cache clean || npm cache verify
 #fi
 
-# npm install
 yarn
 
 if [ "$USE_YARN" = "yes" ]
