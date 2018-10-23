@@ -1,5 +1,5 @@
 const babelOptions = {
-  presets: ["react-app"],
+  presets: [["react-app", { allowESModules: false }]],
   plugins: ["@babel/plugin-transform-modules-commonjs"]
 };
 

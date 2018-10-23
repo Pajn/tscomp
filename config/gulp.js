@@ -76,7 +76,12 @@ function buildTs(mode) {
         babel({
           babelrc: false,
           filename: path,
-          presets: [require.resolve("babel-preset-react-app")],
+          presets: [
+            [
+              require.resolve("babel-preset-react-app"),
+              { allowESModules: false }
+            ]
+          ],
           plugins:
             mode === "lib"
               ? []
