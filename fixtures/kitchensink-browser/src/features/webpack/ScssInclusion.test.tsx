@@ -7,12 +7,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SvgComponent from './SvgComponent';
+import ScssInclusion from './ScssInclusion';
 
-describe('svg component', () => {
+describe('scss inclusion', () => {
   it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<SvgComponent />, div);
-    expect(div.textContent).toBe('logo.svg');
+    ReactDOM.render(<ScssInclusion />, div);
   });
 });

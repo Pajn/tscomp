@@ -12,21 +12,8 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 
-const extensions = ['', '.tsx', '.ts', '.js', '.jsx'];
-
-function findFileExtension(path) {
-  for (let i = 0; i < extensions.length; i++) {
-    const extension = extensions[i];
-    if (fs.existsSync(path + extension)) {
-      return path + extension;
-    }
-  }
-
-  return path + '.ts';
-}
-
 // Make sure any symlinks in the project folder are resolved:
-// https://github.com/facebookincubator/create-react-app/issues/637
+// https://github.com/facebook/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
@@ -52,7 +39,7 @@ const envPublicUrl = process.env.PUBLIC_URL;
 function ensureSlash(inputPath, needsSlash) {
   const hasSlash = inputPath.endsWith('/');
   if (hasSlash && !needsSlash) {
-    return inputPath.substr(inputPath, inputPath.length - 1);
+    return inputPath.substr(0, inputPath.length - 1);
   } else if (!hasSlash && needsSlash) {
     return `${inputPath}/`;
   } else {
@@ -76,11 +63,38 @@ function getServedPath(appPackageJson) {
   return ensureSlash(servedUrl, true);
 }
 
-const envUseAsyncTypechecks = ['true', '1', 'yes', 'y', 't'].includes(process.env.ASYNC_TYPECHECK)
-  || (['false', '0', 'no', 'n', 'f'].includes(process.env.ASYNC_TYPECHECK) ? false : undefined);
+const moduleFileExtensions = [
+  'web.js',
+  'js',
+  'web.ts',
+  'ts',
+  'web.tsx',
+  'tsx',
+  'json',
+  'web.jsx',
+  'jsx'
+];
+
+// Resolve file paths in the same order as webpack
+const resolveModule = (resolveFn, filePath) => {
+  const extension = moduleFileExtensions.find(extension =>
+    fs.existsSync(resolveFn(`${filePath}.${extension}`))
+  );
+
+  if (extension) {
+    return resolveFn(`${filePath}.${extension}`);
+  }
+  return resolveFn(`${filePath}.ts`);
+};
+
+const envUseAsyncTypechecks =
+  ['true', '1', 'yes', 'y', 't'].includes(process.env.ASYNC_TYPECHECK) ||
+  (['false', '0', 'no', 'n', 'f'].includes(process.env.ASYNC_TYPECHECK)
+    ? false
+    : undefined);
 
 function getUseAsyncTypechecks(appPackageJson) {
-  if (envUseAsyncTypechecks !== undefined) return envUseAsyncTypechecks
+  if (envUseAsyncTypechecks !== undefined) return envUseAsyncTypechecks;
   return (require(appPackageJson).tscomp || {}).asyncTypechecks || false;
 }
 
@@ -92,7 +106,7 @@ module.exports = {
   appBuildCjs: resolveApp('cjs'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: findFileExtension(resolveApp('src/index')),
+  appIndexJs: resolveModule(resolveApp, 'src/index'),
   appBuildIndexJs: resolveApp('build/index.js'),
   appPackageJson: resolveApp('package.json'),
   appTsConfig: resolveApp('tsconfig.json'),
@@ -104,7 +118,7 @@ module.exports = {
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
-  useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
+  useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json'))
 };
 
 // @remove-on-eject-begin
@@ -118,7 +132,7 @@ module.exports = {
   appBuildCjs: resolveApp('cjs'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
-  appIndexJs: findFileExtension(resolveApp('src/index')),
+  appIndexJs: resolveModule(resolveApp, 'src/index'),
   appBuildIndexJs: resolveApp('build/index.js'),
   appPackageJson: resolveApp('package.json'),
   appTsConfig: resolveApp('tsconfig.json'),
@@ -133,14 +147,20 @@ module.exports = {
   useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
   // These properties only exist before ejecting:
   ownPath: resolveOwn('.'),
-  ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
+  ownNodeModules: resolveOwn('node_modules') // This is empty on npm 3
 };
 
-// detect if template should be used, ie. when cwd is react-scripts itself
-const useTemplate =
-  appDirectory === fs.realpathSync(path.join(__dirname, '..'));
+const ownPackageJson = require('../package.json');
+const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
+const reactScriptsLinked =
+  fs.existsSync(reactScriptsPath) &&
+  fs.lstatSync(reactScriptsPath).isSymbolicLink();
 
-if (useTemplate) {
+// config before publish: we're in ./packages/react-scripts/config/
+if (
+  !reactScriptsLinked &&
+  __dirname.indexOf(path.join('packages', 'react-scripts', 'config')) !== -1
+) {
   module.exports = {
     dotenv: resolveOwn('template/.env'),
     appPath: resolveApp('.'),
@@ -148,7 +168,7 @@ if (useTemplate) {
     appBuildCjs: resolveOwn('cjs'),
     appPublic: resolveOwn('template/public'),
     appHtml: resolveOwn('template/public/index.html'),
-    appIndexJs: findFileExtension(resolveOwn('template/src/index')),
+    appIndexJs: resolveModule(resolveOwn, 'template/src/index'),
     appBuildIndexJs: resolveOwn('build/index.js'),
     appPackageJson: resolveOwn('package.json'),
     appTsConfig: resolveOwn('template/tsconfig.json'),
@@ -163,11 +183,12 @@ if (useTemplate) {
     useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
     // These properties only exist before ejecting:
     ownPath: resolveOwn('.'),
-    ownNodeModules: resolveOwn('node_modules'),
+    ownNodeModules: resolveOwn('node_modules')
   };
 }
 // @remove-on-eject-end
 
+module.exports.moduleFileExtensions = moduleFileExtensions;
 module.exports.getAppBuildFolder = getAppBuildFolder;
 
 module.exports.srcPaths = [module.exports.appSrc];

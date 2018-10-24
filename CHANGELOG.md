@@ -81,7 +81,7 @@ Upgraded Gulp to 4
 
 ## 0.13.2
 
-Upgraded to [create-react-app 1.0.14](https://github.com/facebookincubator/create-react-app/blob/master/CHANGELOG.md#1014-september-26-2017)  
+Upgraded to [create-react-app 1.0.14](https://github.com/facebook/create-react-app/blob/master/CHANGELOG.md#1014-september-26-2017)  
 
 ## 0.10.0
 

@@ -1,4 +1,6 @@
 declare module '*.css';
+declare module '*.sass';
+declare module '*.scss';
 declare module '*.gif';
 declare module '*.jpeg';
 declare module '*.jpg';

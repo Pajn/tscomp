@@ -17,6 +17,18 @@ async function load() {
   ];
 }
 
+function use(_) {}
+
+// Regression test for https://github.com/facebook/create-react-app/issues/3055
+const x = async (
+  /* prettier-ignore */
+  y: void
+) => {
+  const z = await y;
+  use(z);
+};
+use(x);
+
 export default class extends Component<any, any> {
   static propTypes = {
     onReady: PropTypes.func.isRequired,
@@ -39,7 +51,9 @@ export default class extends Component<any, any> {
   render() {
     return (
       <div id="feature-async-await">
-        {this.state.users.map(user => <div key={user.id}>{user.name}</div>)}
+        {this.state.users.map(user => (
+          <div key={user.id}>{user.name}</div>
+        ))}
       </div>
     );
   }

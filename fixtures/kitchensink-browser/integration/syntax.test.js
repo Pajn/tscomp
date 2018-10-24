@@ -21,18 +21,18 @@ describe('Integration', () => {
     it('array spread', async () => {
       const doc = await initDOM('array-spread');
 
-      expect(
-        doc.getElementById('feature-array-spread').childElementCount
-      ).toBe(4);
+      expect(doc.getElementById('feature-array-spread').childElementCount).toBe(
+        4
+      );
       doc.defaultView.close();
     });
 
     it('async/await', async () => {
       const doc = await initDOM('async-await');
 
-      expect(
-        doc.getElementById('feature-async-await').childElementCount
-      ).toBe(4);
+      expect(doc.getElementById('feature-async-await').childElementCount).toBe(
+        4
+      );
       doc.defaultView.close();
     });
 
@@ -84,9 +84,9 @@ describe('Integration', () => {
     it('generators', async () => {
       const doc = await initDOM('generators');
 
-      expect(
-        doc.getElementById('feature-generators').childElementCount
-      ).toBe(4);
+      expect(doc.getElementById('feature-generators').childElementCount).toBe(
+        4
+      );
       doc.defaultView.close();
     });
 
@@ -111,9 +111,7 @@ describe('Integration', () => {
     it('promises', async () => {
       const doc = await initDOM('promises');
 
-      expect(doc.getElementById('feature-promises').childElementCount).toBe(
-        4
-      );
+      expect(doc.getElementById('feature-promises').childElementCount).toBe(4);
       doc.defaultView.close();
     });
 

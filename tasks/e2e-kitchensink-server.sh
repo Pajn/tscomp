@@ -12,7 +12,7 @@
 # Start in tasks/ even if run from root directory
 cd "$(dirname "$0")"
 
-# CLI and app temporary locations
+# CLI, app, and test module temporary locations
 # http://unix.stackexchange.com/a/84980
 temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
@@ -21,7 +21,7 @@ temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
@@ -74,20 +74,14 @@ then
   # Issues:
   #    https://github.com/yarnpkg/yarn/issues/2591
   #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  #    https://github.com/facebook/create-react-app/pull/2400
   # When removing workaround, you may run into
-  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  #    https://github.com/facebook/create-react-app/issues/2030
   case "$(uname -s)" in
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
   esac
-fi
-
-if [ "$USE_YARN" = "yes" ]
-then
-  # Install Yarn so that the test can use it to install packages.
-  npm install -g yarn
-  yarn cache clean
+  $yarn cache clean
 fi
 
 yarn

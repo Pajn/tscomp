@@ -69,4 +69,4 @@ export default feature =>
     });
 
     doc.close();
-});
+  });

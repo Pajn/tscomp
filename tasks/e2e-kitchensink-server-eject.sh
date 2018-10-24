@@ -21,7 +21,7 @@ temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-server-eject.sh' | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server-eject.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
@@ -74,20 +74,14 @@ then
   # Issues:
   #    https://github.com/yarnpkg/yarn/issues/2591
   #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  #    https://github.com/facebook/create-react-app/pull/2400
   # When removing workaround, you may run into
-  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  #    https://github.com/facebook/create-react-app/issues/2030
   case "$(uname -s)" in
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
   esac
-fi
-
-if [ "$USE_YARN" = "yes" ]
-then
-  # Install Yarn so that the test can use it to install packages.
-  npm install -g yarn
-  yarn cache clean
+  $yarn cache clean
 fi
 
 yarn
@@ -130,9 +124,6 @@ cd $temp_app_path/test-kitchensink
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
 
-# Link to test module
-npm link "$temp_module_path/node_modules/test-integrity"
-
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
@@ -142,6 +133,9 @@ echo yes | npm run eject
 
 # ...but still link to tscomp
 yarn add "$root_path"
+
+# Link to test module
+npm link "$temp_module_path/node_modules/test-integrity"
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \

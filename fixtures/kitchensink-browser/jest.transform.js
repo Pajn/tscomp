@@ -1,3 +1,5 @@
-const babelOptions = { presets: [["react-app", { allowESModules: false }]] };
+const babelOptions = {
+  presets: [['react-app', { allowESModules: false }]],
+};
 
-module.exports = require("babel-jest").createTransformer(babelOptions);
+module.exports = require('babel-jest').createTransformer(babelOptions);

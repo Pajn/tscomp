@@ -106,11 +106,11 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.5",
-    "@types/react": "^16.4.16",
+    "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "prettier": "1.14.3",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2"
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0"
   },
   "optionalDependencies": {
     "fsevents": "1.2.4"
@@ -120,5 +120,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
+  }
 }

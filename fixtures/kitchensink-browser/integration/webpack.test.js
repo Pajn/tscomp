@@ -51,6 +51,36 @@ describe('Integration', () => {
       doc.defaultView.close();
     });
 
+    it('scss inclusion', async () => {
+      const doc = await initDOM('scss-inclusion');
+      matchCSS(doc, [/#feature-scss-inclusion\{background:.+;color:.+}/]);
+      doc.defaultView.close();
+    });
+
+    it('scss modules inclusion', async () => {
+      const doc = await initDOM('scss-modules-inclusion');
+      matchCSS(doc, [
+        /.+scss-styles_scssModulesInclusion.+\{background:.+;color:.+}/,
+        /.+assets_scssModulesIndexInclusion.+\{background:.+;color:.+}/,
+      ]);
+      doc.defaultView.close();
+    });
+
+    it('sass inclusion', async () => {
+      const doc = await initDOM('sass-inclusion');
+      matchCSS(doc, [/#feature-sass-inclusion\{background:.+;color:.+}/]);
+      doc.defaultView.close();
+    });
+
+    it('sass modules inclusion', async () => {
+      const doc = await initDOM('sass-modules-inclusion');
+      matchCSS(doc, [
+        /.+sass-styles_sassModulesInclusion.+\{background:.+;color:.+}/,
+        /.+assets_sassModulesIndexInclusion.+\{background:.+;color:.+}/,
+      ]);
+      doc.defaultView.close();
+    });
+
     it('image inclusion', async () => {
       const doc = await initDOM('image-inclusion');
 
@@ -98,9 +128,7 @@ describe('Integration', () => {
     it('svg component', async () => {
       const doc = await initDOM('svg-component');
 
-      expect(doc.getElementById('feature-svg-component').textContent).toBe(
-        ''
-      );
+      expect(doc.getElementById('feature-svg-component').textContent).toBe('');
       doc.defaultView.close();
     });
 
