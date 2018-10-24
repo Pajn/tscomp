@@ -61,6 +61,7 @@
     "file-loader": "2.0.0",
     "fork-ts-checker-notifier-webpack-plugin": "0.6.2",
     "fork-ts-checker-webpack-plugin": "0.4.10",
+    "fork-ts-checker-webpack-plugin-alt": "0.4.10",
     "fs-extra": "7.0.0",
     "gulp": "4.0.0",
     "gulp-babel": "8.0.0",
