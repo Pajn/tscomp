@@ -180,7 +180,9 @@ module.exports = {
         },
         // Use multi-process parallel running to improve the build speed
         // Default number of concurrent runs: os.cpus().length - 1
-        parallel: true,
+        // Disabled due to hangs
+        // https://github.com/webpack-contrib/terser-webpack-plugin/issues/21
+        parallel: false,
         // Enable file caching
         cache: true,
         sourceMap: shouldUseSourceMap
