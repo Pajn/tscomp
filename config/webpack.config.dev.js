@@ -220,12 +220,12 @@ module.exports = {
               // side of caution.
               // We remove this when the user ejects because the default
               // is sane and uses Babel options. Instead of options, we use
-              // the react-scripts and babel-preset-react-app versions.
+              // the tscomp and babel-preset-react-app versions.
               cacheIdentifier: getCacheIdentifier('development', [
                 'babel-plugin-named-asset-import',
                 'babel-preset-react-app',
                 'react-dev-utils',
-                'react-scripts'
+                'tscomp'
               ]),
               // @remove-on-eject-end
               plugins: [
@@ -267,12 +267,12 @@ module.exports = {
                   // side of caution.
                   // We remove this when the user ejects because the default
                   // is sane and uses Babel options. Instead of options, we use
-                  // the react-scripts and babel-preset-react-app versions.
+                  // the tscomp and babel-preset-react-app versions.
                   cacheIdentifier: getCacheIdentifier('development', [
                     'babel-plugin-named-asset-import',
                     'babel-preset-react-app',
                     'react-dev-utils',
-                    'react-scripts'
+                    'tscomp'
                   ]),
                   // @remove-on-eject-end
                   plugins: [
@@ -334,7 +334,7 @@ module.exports = {
                 'babel-plugin-named-asset-import',
                 'babel-preset-react-app',
                 'react-dev-utils',
-                'react-scripts'
+                'tscomp'
               ]),
               // @remove-on-eject-end
               // If an error happens in a package, it's possible to be

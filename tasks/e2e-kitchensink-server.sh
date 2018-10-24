@@ -21,7 +21,7 @@ temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
+  # ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
@@ -108,6 +108,8 @@ tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path
 
 # ...but still link to tscomp
 yarn add "$root_path"
+
+yarn add babel-preset-react-app@Pajn/babel-preset-react-app
 
 # Install the test module
 cd "$temp_module_path"
