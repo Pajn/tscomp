@@ -122,6 +122,7 @@ cd $temp_app_path/test-kitchensink
 yarn add "$root_path"
 
 yarn add babel-preset-react-app@Pajn/babel-preset-react-app
+git stash
 
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
