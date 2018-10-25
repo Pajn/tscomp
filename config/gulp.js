@@ -88,7 +88,7 @@ function buildTs(mode) {
               : [
                   require.resolve("babel-plugin-dynamic-import-node"),
                   require.resolve(
-                    "babel-plugin-transform-es2015-modules-commonjs"
+                    "@babel/plugin-transform-modules-commonjs"
                   )
                 ]
         })
@@ -131,7 +131,7 @@ function buildTs(mode) {
                     plugins: [
                       require.resolve("babel-plugin-dynamic-import-node"),
                       require.resolve(
-                        "babel-plugin-transform-es2015-modules-commonjs"
+                        "@babel/plugin-transform-modules-commonjs"
                       )
                     ]
                   })
