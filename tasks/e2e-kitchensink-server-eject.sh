@@ -16,14 +16,15 @@ cd "$(dirname "$0")"
 # http://unix.stackexchange.com/a/84980
 temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
+temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
 
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'kitchensink' | grep -v grep | grep -v 'e2e-kitchensink-server-eject.sh' | awk '{print $2}' | xargs kill -9
+  # ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server-eject.sh' | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  rm -rf "$temp_cli_path" "$temp_app_path" || $CI
+  rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
 }
 
 # Error messages are redirected to stderr
@@ -73,20 +74,14 @@ then
   # Issues:
   #    https://github.com/yarnpkg/yarn/issues/2591
   #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  #    https://github.com/facebook/create-react-app/pull/2400
   # When removing workaround, you may run into
-  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  #    https://github.com/facebook/create-react-app/issues/2030
   case "$(uname -s)" in
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
   esac
-fi
-
-if [ "$USE_YARN" = "yes" ]
-then
-  # Install Yarn so that the test can use it to install packages.
-  npm install -g yarn
-  yarn cache clean
+  $yarn cache clean
 fi
 
 yarn
@@ -111,13 +106,23 @@ yarn add "$cli_path"
 cd $temp_app_path
 tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-server server test-kitchensink
 
+# Install the test module
+cd "$temp_module_path"
+yarn add test-integrity@^2.0.1
+
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
 
 # Enter the app directory
-cd test-kitchensink
+cd $temp_app_path/test-kitchensink
+
+# Still link to tscomp
+yarn add "$root_path"
+
+yarn add babel-preset-react-app@Pajn/babel-preset-react-app
+git stash
 
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
@@ -126,14 +131,14 @@ export BROWSERSLIST='ie 9'
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
 
-# ...but still link to tscomp
-yarn add "$root_path"
-
 # Eject...
 echo yes | npm run eject
 
 # ...but still link to tscomp
 yarn add "$root_path"
+
+# Link to test module
+npm link "$temp_module_path/node_modules/test-integrity"
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
@@ -148,7 +153,7 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
   NODE_PATH="$temp_app_path/test-kitchensink/build/" \
   NODE_ENV=test \
-  yarn test --no-cache --testPathPattern='/src/'
+  yarn test --no-cache --runInBand --testPathPattern=src
 
 # Test "development" environment
 # tmp_server_log=`mktemp`
@@ -171,7 +176,7 @@ E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   BABEL_ENV=test \
   NODE_PATH=src \
   PUBLIC_URL=http://www.example.org/spa/ \
-  node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
+  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
 
 # Cleanup
 cleanup

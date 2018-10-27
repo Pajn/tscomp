@@ -23,6 +23,8 @@ const createJestConfig = require('./utils/createJestConfig');
 const inquirer = require('react-dev-utils/inquirer');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 
+const useYarn = fs.existsSync(paths.yarnLockFile);
+
 const green = chalk.green;
 const cyan = chalk.cyan;
 
@@ -54,11 +56,17 @@ inquirer
     if (gitStatus) {
       console.error(
         chalk.red(
-          `This git repository has untracked files or uncommitted changes:\n\n` +
-            gitStatus.split('\n').map(line => '  ' + line) +
-            '\n\n' +
+          'This git repository has untracked files or uncommitted changes:'
+        ) +
+          '\n\n' +
+          gitStatus
+            .split('\n')
+            .map(line => line.match(/ .*/g)[0].trim())
+            .join('\n') +
+          '\n\n' +
+          chalk.red(
             'Remove untracked files, stash or commit any changes, and try again.'
-        )
+          )
       );
       process.exit(1);
     }
@@ -215,7 +223,7 @@ inquirer
       }
     }
 
-    if (paths.useYarn) {
+    if (useYarn) {
       const windowsCmdFilePath = path.join(
         appPath,
         'node_modules',

@@ -1,5 +1,5 @@
 This project was bootstrapped with [tscomp](https://github.com/pajn/tscomp).  
-Tscomp is based upon [Create React App](https://github.com/facebookincubator/create-react-app/) and their [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) is helpful
+Tscomp is based upon [Create React App](https://github.com/facebook/create-react-app/) and their [User Guide](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md) is helpful
 for tscomp projects as well.
 
 ## Commands
@@ -15,7 +15,7 @@ console and the browser.
 Runs the test watcher in interactive mode.
 By default, runs test related to files changed since the last commit.
 
-[Read more about testing in the Create React App README](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
+[Read more about testing in the Create React App README](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
 tscomp does of course support test files with `.ts` and `.tsx` file endings as well.
 
 #### `yarn build` or `npm run build`

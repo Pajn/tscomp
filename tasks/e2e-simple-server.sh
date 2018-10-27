@@ -73,9 +73,9 @@ then
   # Issues:
   #    https://github.com/yarnpkg/yarn/issues/2591
   #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebookincubator/create-react-app/pull/2400
+  #    https://github.com/facebook/create-react-app/pull/2400
   # When removing workaround, you may run into
-  #    https://github.com/facebookincubator/create-react-app/issues/2030
+  #    https://github.com/facebook/create-react-app/issues/2030
   case "$(uname -s)" in
     *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
     *) yarn=yarnpkg;;
@@ -182,6 +182,7 @@ function test_change_outdir {
   # Restore tsconfig.json
   rm tsconfig.json
   mv tsconfig.json.orig tsconfig.json
+  rm -rf other
 }
 
 # ******************************************************************************

@@ -76,14 +76,19 @@ function buildTs(mode) {
         babel({
           babelrc: false,
           filename: path,
-          presets: [require.resolve("babel-preset-react-app")],
+          presets: [
+            [
+              require.resolve("babel-preset-react-app"),
+              { allowESModules: false }
+            ]
+          ],
           plugins:
             mode === "lib"
               ? []
               : [
                   require.resolve("babel-plugin-dynamic-import-node"),
                   require.resolve(
-                    "babel-plugin-transform-es2015-modules-commonjs"
+                    "@babel/plugin-transform-modules-commonjs"
                   )
                 ]
         })
@@ -126,7 +131,7 @@ function buildTs(mode) {
                     plugins: [
                       require.resolve("babel-plugin-dynamic-import-node"),
                       require.resolve(
-                        "babel-plugin-transform-es2015-modules-commonjs"
+                        "@babel/plugin-transform-modules-commonjs"
                       )
                     ]
                   })

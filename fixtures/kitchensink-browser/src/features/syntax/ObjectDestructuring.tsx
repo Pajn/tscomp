@@ -17,7 +17,12 @@ function load() {
   ];
 }
 
-export default class extends Component<any, any> {
+function use(_) {}
+
+export default class extends Component<
+  any,
+  { users: Array<{ id: number; name: string }> }
+> {
   static propTypes = {
     onReady: PropTypes.func.isRequired,
   };
@@ -40,7 +45,9 @@ export default class extends Component<any, any> {
     return (
       <div id="feature-object-destructuring">
         {this.state.users.map(user => {
-          const { id, name } = user;
+          const { id, ...rest } = user;
+          const [{ name, ...innerRest }] = [{ ...rest }];
+          use(innerRest);
           return <div key={id}>{name}</div>;
         })}
       </div>

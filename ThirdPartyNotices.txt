@@ -3,7 +3,7 @@ Do Not Translate or Localize
 
 This project incorporates components from the projects listed below. The original copyright notices and the licenses under which I received such components are set forth below.
 
-1. create-react-app (https://github.com/facebookincubator/create-react-app)
+1. create-react-app (https://github.com/facebook/create-react-app)
 
 %% create-react-app NOTICES AND INFORMATION BEGIN HERE
 MIT License
