@@ -1,3 +1,9 @@
+## 1.0.0-beta.5
+
+- Upgrades to sync with create-react-app 2
+- Remove .graphql support in favor of Babel Macros. See https://gist.github.com/gaearon/8650d1c70e436e5eff01f396dffc4114#graphql-support-was-removed
+
+
 ## 1.0.0-beta.3
 
 - Upgrade Webpack to 4.17.1 to fix issue importing from `export * from` reexports https://github.com/webpack/webpack/issues/7930
