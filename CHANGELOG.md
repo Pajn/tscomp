@@ -1,3 +1,7 @@
+## 1.0.0-beta.7
+
+- New release as beta 6 was botched
+
 ## 1.0.0-beta.6
 
 - Do not use absolute path to babel runtime in server and lib builds
