@@ -1,3 +1,7 @@
+## 1.0.0-beta.6
+
+- Do not use absolute path to babel runtime in server and lib builds
+
 ## 1.0.0-beta.5
 
 - Upgrades to sync with create-react-app 2

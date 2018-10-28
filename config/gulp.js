@@ -79,7 +79,7 @@ function buildTs(mode) {
           presets: [
             [
               require.resolve("babel-preset-react-app"),
-              { allowESModules: false }
+              { allowESModules: false, useAbsoluteRuntime: false }
             ]
           ],
           plugins:
