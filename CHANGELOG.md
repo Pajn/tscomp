@@ -1,3 +1,7 @@
+## 1.0.0-beta.8
+
+- Fix modules using mjs extension
+
 ## 1.0.0-beta.7
 
 - New release as beta 6 was botched
