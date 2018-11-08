@@ -1,3 +1,9 @@
+## 1.0.0-beta.9
+
+- Fix import of ES modules from unit tests
+- Fix source maps in unit tests
+- Do not watch build dirs for library and server projects
+
 ## 1.0.0-beta.8
 
 - Fix modules using mjs extension
