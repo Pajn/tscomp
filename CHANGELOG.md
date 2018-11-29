@@ -1,3 +1,8 @@
+## 1.0.0-beta.10
+
+- Fix unit test was not run through Babel, causing some imports to break
+- Update templates with newer lib.d.ts support
+
 ## 1.0.0-beta.9
 
 - Fix import of ES modules from unit tests
