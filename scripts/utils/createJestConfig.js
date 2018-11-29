@@ -62,6 +62,15 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
       ext => !ext.includes('mjs')
     ),
+    globals: {
+      'ts-jest': {
+        babelConfig: {
+          presets: [
+            [require.resolve('babel-preset-react-app'), { allowESModules: false }]
+          ]
+        }
+      }
+    }
   };
   if (mode === 'server') {
     config.watchPathIgnorePatterns = [paths.appBuild];
