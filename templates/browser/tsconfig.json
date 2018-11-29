@@ -4,7 +4,7 @@
     "declaration": false,
     "target": "es2015",
     "module": "es2015",
-    "lib": ["dom", "es5", "es2015", "es2016"],
+    "lib": ["dom", "es5", "es2015", "es2016", "es2017"],
     "jsx": "react",
     "moduleResolution": "node",
     "noUnusedLocals": true,
@@ -13,7 +13,7 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "src",
+    "rootDir": ".",
     "outDir": "build"
   },
   "include": [
