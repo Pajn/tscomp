@@ -83,15 +83,6 @@ then
   $yarn cache clean
 fi
 
-#if hash npm 2>/dev/null
-#then
-#  # npm 5 is too buggy right now
-#  if [ $(npm -v | head -c 1) -eq 5 ]; then
-#    npm i -g npm@^4.x
-#  fi;
-#  npm cache clean || npm cache verify
-#fi
-
 # We need to install create-react-app deps to test it
 npm install
 
@@ -116,33 +107,10 @@ then
 fi
 
 # ******************************************************************************
-# First, test the tscomp development environment.
-# This does not affect our users but makes sure we can develop it.
-# ******************************************************************************
-
-# # Test local build command
-# yarn build
-# # Check for expected output
-# exists build/*.html
-# exists build/static/js/*.js
-# exists build/static/css/*.css
-# exists build/static/media/*.svg
-# exists build/favicon.ico
-
-# # Run tests with CI flag
-# CI=true yarn test
-# # Uncomment when snapshot testing is enabled by default:
-# # exists template/src/__snapshots__/App.test.js.snap
-
-# # Test local start command
-# yarn start --smoke-test
-
-# ******************************************************************************
 # Next, pack tscomp so we can verify that it work.
 # ******************************************************************************
 
 # Pack CLI
-# cd "$root_path"/packages/create-react-app
 cli_path=$PWD/`npm pack`
 
 # ******************************************************************************
@@ -158,7 +126,6 @@ npm init --yes
 
 # Now we can install the CLI from the local package.
 npm install "$cli_path"
-
 
 # ******************************************************************************
 # Common test utils
@@ -204,6 +171,9 @@ tscomp new server --scripts-version="$cli_path" test-server-app
 
 # Enter the app directory
 cd test-server-app
+
+# Workaround Jest dependency issue
+yarn add babel-core@7.0.0-bridge.0
 
 # Test the build
 yarn build

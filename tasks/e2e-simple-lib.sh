@@ -116,28 +116,6 @@ then
 fi
 
 # ******************************************************************************
-# First, test the tscomp development environment.
-# This does not affect our users but makes sure we can develop it.
-# ******************************************************************************
-
-# # Test local build command
-# yarn build
-# # Check for expected output
-# exists build/*.html
-# exists build/static/js/*.js
-# exists build/static/css/*.css
-# exists build/static/media/*.svg
-# exists build/favicon.ico
-
-# # Run tests with CI flag
-# CI=true yarn test
-# # Uncomment when snapshot testing is enabled by default:
-# # exists template/src/__snapshots__/App.test.js.snap
-
-# # Test local start command
-# yarn start --smoke-test
-
-# ******************************************************************************
 # Next, pack tscomp so we can verify that it work.
 # ******************************************************************************
 
@@ -204,6 +182,9 @@ tscomp new lib --scripts-version="$cli_path" test-library
 
 # Enter the app directory
 cd test-library
+
+# Workaround Jest dependency issue
+yarn add babel-core@7.0.0-bridge.0
 
 # Test the build
 yarn build

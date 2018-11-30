@@ -106,17 +106,20 @@ yarn add "$cli_path"
 cd $temp_app_path
 tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-server server test-kitchensink
 
+# Enter the app directory
+cd $temp_app_path/test-kitchensink
+
 # Install the test module
 cd "$temp_module_path"
 yarn add test-integrity@^2.0.1
+
+# Workaround Jest dependency issue
+yarn add babel-core@7.0.0-bridge.0
 
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
-
-# Enter the app directory
-cd $temp_app_path/test-kitchensink
 
 # Still link to tscomp
 yarn add "$root_path"
