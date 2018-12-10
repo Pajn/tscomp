@@ -1,6 +1,6 @@
 const babelOptions = {
-  presets: [["react-app", { allowESModules: false }]],
-  plugins: ["@babel/plugin-transform-modules-commonjs"]
+  presets: [['react-app', { allowESModules: false, flow: false }]],
+  plugins: ['@babel/plugin-transform-modules-commonjs'],
 };
 
-module.exports = require("babel-jest").createTransformer(babelOptions);
+module.exports = require('babel-jest').createTransformer(babelOptions);
