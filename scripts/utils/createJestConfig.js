@@ -64,6 +64,21 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ),
     globals: {
       'ts-jest': {
+        diagnostics: {
+          ignoreCodes: [
+            6059, // rootDir is expected to contain all source files
+            6133, // Declared but never read
+            6134, // Unused locals
+            6135, // Unused parameters
+            6192, // Unused import declaration
+            6196, // Declared but never used
+            6198, // Unused destructured element
+            6199, // Unused variables
+            6205, // Unused type parameters
+            18002, // The files list in config file is empty
+            18003, // No inputs were found in config file
+          ],
+        },
         babelConfig: {
           presets: [
             [require.resolve('babel-preset-react-app'), { allowESModules: false }]

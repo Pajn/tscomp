@@ -307,7 +307,16 @@ module.exports = {
                   compiler: typescript,
                   logLevel: 'info',
                   // Avoid rendering the error overlay for unused variables
-                  ignoreDiagnostics: [6133, 6192, 6196],
+                  ignoreDiagnostics: [
+                    6133, // Declared but never read
+                    6134, // Unused locals
+                    6135, // Unused parameters
+                    6192, // Unused import declaration
+                    6196, // Declared but never used
+                    6198, // Unused destructured element
+                    6199, // Unused variables
+                    6205, // Unused type parameters
+                  ],
                   // Disable type checker if the user wants to use async typechecks
                   // - we will use the ForkTsCheckerWebpackPlugin instead for better build speed
                   happyPackMode: paths.useAsyncTypechecks,
