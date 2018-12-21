@@ -29,9 +29,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
     // But we can't simply emit this because it'll be an absolute path.
     // The proper fix is to write jest.config.js on eject instead of a package.json key.
     // Then these can always stay as require.resolve()s.
-    resolver: isEjecting
-      ? 'jest-pnp-resolver'
-      : require.resolve('jest-pnp-resolver'),
+    // resolver: isEjecting
+    //   ? 'jest-pnp-resolver'
+    //   : require.resolve('jest-pnp-resolver'),
     setupFiles: [
       isEjecting
         ? 'react-app-polyfill/jsdom'
@@ -81,11 +81,14 @@ module.exports = (resolve, rootDir, isEjecting) => {
         },
         babelConfig: {
           presets: [
-            [require.resolve('babel-preset-react-app'), { allowESModules: false }]
-          ]
-        }
-      }
-    }
+            [
+              require.resolve('babel-preset-react-app'),
+              { allowESModules: false },
+            ],
+          ],
+        },
+      },
+    },
   };
   if (mode === 'server') {
     config.watchPathIgnorePatterns = [paths.appBuild];

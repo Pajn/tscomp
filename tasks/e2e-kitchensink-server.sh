@@ -113,9 +113,6 @@ cd $temp_app_path/test-kitchensink
 cd "$temp_module_path"
 yarn add test-integrity@^2.0.1
 
-# Workaround Jest dependency issue
-yarn add babel-core@7.0.0-bridge.0
-
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
 # let's make sure all npm scripts are in the working state.

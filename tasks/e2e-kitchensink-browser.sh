@@ -23,7 +23,7 @@ function cleanup {
   ps -ef | grep 'tscomp' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
+  # rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
 }
 
 # Error messages are redirected to stderr
@@ -105,15 +105,15 @@ yarn add "$cli_path"
 cd $temp_app_path
 tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-browser browser test-kitchensink
 
+# Install the test module
+cd "$temp_module_path"
+yarn add test-integrity@^2.0.1
+
 # Enter the app directory
 cd $temp_app_path/test-kitchensink
 
 # ...but still link to tscomp
 yarn add "$root_path"
-
-# Install the test module
-cd "$temp_module_path"
-yarn add test-integrity@^2.0.1
 
 # Workaround Jest dependency issue
 yarn add babel-core@7.0.0-bridge.0
