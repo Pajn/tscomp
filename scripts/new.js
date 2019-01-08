@@ -200,13 +200,15 @@ function shouldUseYarn() {
   }
 }
 
-function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
+function install(useYarn, dependencies, verbose, { isOnline, isDev, isExact }) {
   return new Promise((resolve, reject) => {
     let command;
     let args;
     if (useYarn) {
       command = 'yarnpkg';
-      args = ['add', isDev ? '--dev' : '', isExact ? '--exact' : ''].filter(arg => !!arg);
+      args = ['add', isDev ? '--dev' : '', isExact ? '--exact' : ''].filter(
+        arg => !!arg
+      );
       if (!isOnline) {
         args.push('--offline');
       }
@@ -220,7 +222,11 @@ function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
     } else {
       checkNpmVersion();
       command = 'npm';
-      args = ['install', isDev ? '--save-dev' : '--save', isExact ? '--save-exact' : '']
+      args = [
+        'install',
+        isDev ? '--save-dev' : '--save',
+        isExact ? '--save-exact' : '',
+      ]
         .filter(arg => !!arg)
         .concat(dependencies);
     }
@@ -245,7 +251,7 @@ function install(useYarn, dependencies, verbose, {isOnline, isDev, isExact}) {
 function run(root, appName, version, verbose, originalDirectory, template) {
   const packageToInstall = getInstallPackage(version);
   let dependencies = [];
-  let devDependencies = ['@types/jest'];
+  let devDependencies = ['@types/jest', 'babel-core@7.0.0-bridge.0'];
   if (projectType === 'browser') {
     dependencies = dependencies.concat([
       'react',
@@ -281,10 +287,15 @@ function run(root, appName, version, verbose, originalDirectory, template) {
       );
       console.log();
 
-      return install(useYarn, [packageToInstall], verbose, {isOnline, isExact: true})
-        .then(() => install(useYarn, dependencies, verbose, {isOnline}))
-        .then(() => install(useYarn, devDependencies, verbose, {isOnline, isDev: true}))
-        .then(() => packageName)
+      return install(useYarn, [packageToInstall], verbose, {
+        isOnline,
+        isExact: true,
+      })
+        .then(() => install(useYarn, dependencies, verbose, { isOnline }))
+        .then(() =>
+          install(useYarn, devDependencies, verbose, { isOnline, isDev: true })
+        )
+        .then(() => packageName);
     })
     .then(packageName => {
       checkNodeVersion(packageName);
