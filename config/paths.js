@@ -72,7 +72,7 @@ const moduleFileExtensions = [
   'tsx',
   'json',
   'web.jsx',
-  'jsx'
+  'jsx',
 ];
 
 // Resolve file paths in the same order as webpack
@@ -87,15 +87,15 @@ const resolveModule = (resolveFn, filePath) => {
   return resolveFn(`${filePath}.ts`);
 };
 
-const envUseAsyncTypechecks =
-  ['true', '1', 'yes', 'y', 't'].includes(process.env.ASYNC_TYPECHECK) ||
-  (['false', '0', 'no', 'n', 'f'].includes(process.env.ASYNC_TYPECHECK)
+const envUseBabelOnly =
+  ['true', '1', 'yes', 'y', 't'].includes(process.env.BABEL_ONLY) ||
+  (['false', '0', 'no', 'n', 'f'].includes(process.env.BABEL_ONLY)
     ? false
     : undefined);
 
-function getUseAsyncTypechecks(appPackageJson) {
-  if (envUseAsyncTypechecks !== undefined) return envUseAsyncTypechecks;
-  return (require(appPackageJson).tscomp || {}).asyncTypechecks || false;
+function getUseBabelOnly(appPackageJson) {
+  if (envUseBabelOnly !== undefined) return envUseBabelOnly;
+  return (require(appPackageJson).tscomp || {}).babelOnly || false;
 }
 
 // config after eject: we're in ./config/
@@ -118,7 +118,7 @@ module.exports = {
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
-  useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json'))
+  useBabelOnly: getUseBabelOnly(resolveApp('package.json')),
 };
 
 // @remove-on-eject-begin
@@ -144,10 +144,10 @@ module.exports = {
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
-  useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
+  useBabelOnly: getUseBabelOnly(resolveApp('package.json')),
   // These properties only exist before ejecting:
   ownPath: resolveOwn('.'),
-  ownNodeModules: resolveOwn('node_modules') // This is empty on npm 3
+  ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
 };
 
 const ownPackageJson = require('../package.json');
@@ -180,10 +180,10 @@ if (
     appNodeModules: resolveOwn('node_modules'),
     publicUrl: getPublicUrl(resolveOwn('package.json')),
     servedPath: getServedPath(resolveOwn('package.json')),
-    useAsyncTypechecks: getUseAsyncTypechecks(resolveApp('package.json')),
+    useBabelOnly: getUseBabelOnly(resolveApp('package.json')),
     // These properties only exist before ejecting:
     ownPath: resolveOwn('.'),
-    ownNodeModules: resolveOwn('node_modules')
+    ownNodeModules: resolveOwn('node_modules'),
   };
 }
 // @remove-on-eject-end

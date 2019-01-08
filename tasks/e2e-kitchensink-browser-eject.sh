@@ -129,6 +129,7 @@ export BROWSERSLIST='ie 9'
 # ******************************************************************************
 
 # Eject...
+git stash
 echo yes | npm run eject
 
 # ...but still link to tscomp
@@ -156,14 +157,62 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
 
 # Prepare "development" environment
 tmp_server_log=`mktemp`
-PORT=9002 \
+PORT=9003 \
   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \
   nohup yarn start &>$tmp_server_log &
 grep -q 'You can now view' <(tail -f $tmp_server_log)
 
 # Test "development" environment
-E2E_URL="http://localhost:9002" \
+E2E_URL="http://localhost:9003" \
+  REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  CI=true NODE_PATH=src \
+  NODE_ENV=development \
+  BABEL_ENV=test \
+  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
+
+# Test "production" environment
+E2E_FILE=./build/index.html \
+  CI=true \
+  NODE_ENV=production \
+  BABEL_ENV=test \
+  NODE_PATH=src \
+  PUBLIC_URL=http://www.example.org/spa/ \
+  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
+
+# ******************************************************************************
+# Now run all tests in babelOnly mode
+# ******************************************************************************
+rm -rf build
+sed -i 's/tscomp": {/tscomp": {\n"babelOnly": true,/' package.json
+
+# Test the build
+REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  NODE_PATH=src \
+  PUBLIC_URL=http://www.example.org/spa/ \
+  yarn build
+
+# Check for expected output
+exists build/*.html
+exists build/static/js/main.*.js
+
+# Unit tests
+REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  CI=true \
+  NODE_PATH=src \
+  NODE_ENV=test \
+  yarn test --no-cache --runInBand --testPathPattern=src
+
+# Prepare "development" environment
+tmp_server_log=`mktemp`
+PORT=9004 \
+  REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  NODE_PATH=src \
+  nohup yarn start &>$tmp_server_log &
+grep -q 'You can now view' <(tail -f $tmp_server_log)
+
+# Test "development" environment
+E2E_URL="http://localhost:9004" \
   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true NODE_PATH=src \
   NODE_ENV=development \

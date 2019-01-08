@@ -80,15 +80,6 @@ then
   $yarn cache clean
 fi
 
-#if hash npm 2>/dev/null
-#then
-#  # npm 5 is too buggy right now
-#  if [ $(npm -v | head -c 1) -eq 5 ]; then
-#    npm i -g npm@^4.x
-#  fi;
-#  npm cache clean || npm cache verify
-#fi
-
 yarn
 
 if [ "$USE_YARN" = "yes" ]
@@ -108,6 +99,7 @@ cli_path=$PWD/`npm pack`
 
 # Install the CLI in a temporary location
 cd "$temp_cli_path"
+npm init -y
 npm install "$cli_path"
 
 # ******************************************************************************

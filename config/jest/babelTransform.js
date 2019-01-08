@@ -13,7 +13,7 @@ module.exports = babelJest.createTransformer({
   presets: [
     [
       require.resolve('babel-preset-react-app'),
-      { allowESModules: false, flow: false },
+      { useESModules: false },
     ],
   ],
   babelrc: false,

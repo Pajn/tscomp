@@ -6,50 +6,49 @@
  * LICENSE file in the root directory of this source tree.
  */
 // @remove-on-eject-end
-"use strict";
+'use strict';
 
 // Do this as the first thing so that any code reading it knows the right env.
-process.env.BABEL_ENV = "production";
-process.env.NODE_ENV = "production";
+process.env.BABEL_ENV = 'production';
+process.env.NODE_ENV = 'production';
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
-process.on("unhandledRejection", err => {
+process.on('unhandledRejection', err => {
   throw err;
 });
 
 // Ensure environment variables are read.
-require("../config/env");
+require('../config/env');
 // @remove-on-eject-begin
 // Do the preflight check (only happens before eject).
-const verifyPackageTree = require("./utils/verifyPackageTree");
-if (process.env.SKIP_PREFLIGHT_CHECK !== "true") {
+const verifyPackageTree = require('./utils/verifyPackageTree');
+if (process.env.SKIP_PREFLIGHT_CHECK !== 'true') {
   verifyPackageTree();
 }
 // @remove-on-eject-end
 
-const path = require("path");
-const chalk = require("chalk");
-const fs = require("fs-extra");
-const webpack = require("webpack");
-const bfj = require("bfj");
-const config = require("../config/webpack.config.prod");
-const gulp = require("../config/gulp");
-const paths = require("../config/paths");
-const formatWebpackMessages = require("react-dev-utils/formatWebpackMessages");
-const printHostingInstructions = require("react-dev-utils/printHostingInstructions");
-const FileSizeReporter = require("react-dev-utils/FileSizeReporter");
-const printBuildError = require("react-dev-utils/printBuildError");
+const path = require('path');
+const chalk = require('chalk');
+const fs = require('fs-extra');
+const webpack = require('webpack');
+const bfj = require('bfj');
+const configFactory = require('../config/webpack.config');
+const gulp = require('../config/gulp');
+const paths = require('../config/paths');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
+const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
+const printBuildError = require('react-dev-utils/printBuildError');
 
-const checkRequiredFiles = require("./utils/common").checkRequiredFiles;
-const getMode = require("./utils/common").getMode;
-const printErrors = require("./utils/common").printErrors;
+const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
+const getMode = require('./utils/common').getMode;
+const printErrors = require('./utils/common').printErrors;
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
-const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
@@ -60,12 +59,12 @@ const isInteractive = process.stdout.isTTY;
 
 // Process CLI arguments
 const argv = process.argv.slice(2);
-const writeStatsJson = argv.indexOf("--stats") !== -1;
+const writeStatsJson = argv.indexOf('--stats') !== -1;
 
 // Warn and crash if required files are missing
 checkRequiredFiles(mode, paths);
 
-if (mode === "browser") {
+if (mode === 'browser') {
   buildBrowser();
 } else {
   buildGulp();
@@ -78,23 +77,26 @@ function buildGulp() {
   // Merge with the public folder
   copyPublicFolder();
 
-  if (mode === "lib") {
+  if (mode === 'lib') {
     fs.emptyDirSync(paths.appBuildCjs);
   }
 
   gulp
     .build(mode)
-    .then(() => console.log(chalk.green("Compiled successfully.")))
+    .then(() => console.log(chalk.green('Compiled successfully.')))
     .catch(err => {
-      printErrors("Failed to compile.", [err]);
+      printErrors('Failed to compile.', [err]);
       process.exit(1);
     });
 }
 
 function buildBrowser() {
+  // Generate configuration
+  const config = configFactory('production');
+
   // We require that you explictly set browsers and do not fall back to
   // browserslist defaults.
-  const { checkBrowsers } = require("react-dev-utils/browsersHelper");
+  const { checkBrowsers } = require('react-dev-utils/browsersHelper');
   checkBrowsers(paths.appPath, isInteractive)
     .then(() => {
       // First, read the current file sizes in build directory.
@@ -108,28 +110,28 @@ function buildBrowser() {
       // Merge with the public folder
       copyPublicFolder();
       // Start the webpack build
-      return buildWebpack(previousFileSizes);
+      return buildWebpack(config, previousFileSizes);
     })
     .then(
       ({ stats, previousFileSizes, warnings }) => {
         if (warnings.length) {
-          console.error(chalk.yellow("Compiled with warnings.\n"));
-          console.error(warnings.join("\n\n"));
+          console.error(chalk.yellow('Compiled with warnings.\n'));
+          console.error(warnings.join('\n\n'));
           console.error(
-            "\nSearch for the " +
-              chalk.underline(chalk.yellow("keywords")) +
-              " to learn more about each warning."
+            '\nSearch for the ' +
+              chalk.underline(chalk.yellow('keywords')) +
+              ' to learn more about each warning.'
           );
           console.error(
-            "To ignore, add " +
-              chalk.cyan("// eslint-disable-next-line") +
-              " to the line before.\n"
+            'To ignore, add ' +
+              chalk.cyan('// eslint-disable-next-line') +
+              ' to the line before.\n'
           );
         } else {
-          console.log(chalk.green("Compiled successfully.\n"));
+          console.log(chalk.green('Compiled successfully.\n'));
         }
 
-        console.log("File sizes after gzip:\n");
+        console.log('File sizes after gzip:\n');
         printFileSizesAfterBuild(
           stats,
           previousFileSizes,
@@ -152,7 +154,7 @@ function buildBrowser() {
         );
       },
       err => {
-        console.log(chalk.red("Failed to compile.\n"));
+        console.log(chalk.red('Failed to compile.\n'));
         printBuildError(err);
         process.exit(1);
       }
@@ -166,8 +168,8 @@ function buildBrowser() {
 }
 
 // Create the production build and print the deployment instructions.
-function buildWebpack(previousFileSizes) {
-  console.log("Creating an optimized production build...");
+function buildWebpack(config, previousFileSizes) {
+  console.log('Creating an optimized production build...');
 
   let compiler = webpack(config);
   return new Promise((resolve, reject) => {
@@ -179,7 +181,7 @@ function buildWebpack(previousFileSizes) {
         }
         messages = formatWebpackMessages({
           errors: [err.message],
-          warnings: []
+          warnings: [],
         });
       } else {
         messages = formatWebpackMessages(
@@ -192,31 +194,31 @@ function buildWebpack(previousFileSizes) {
         if (messages.errors.length > 1) {
           messages.errors.length = 1;
         }
-        return reject(new Error(messages.errors.join("\n\n")));
+        return reject(new Error(messages.errors.join('\n\n')));
       }
       if (
         process.env.CI &&
-        (typeof process.env.CI !== "string" ||
-          process.env.CI.toLowerCase() !== "false") &&
+        (typeof process.env.CI !== 'string' ||
+          process.env.CI.toLowerCase() !== 'false') &&
         messages.warnings.length
       ) {
         console.log(
           chalk.yellow(
-            "\nTreating warnings as errors because process.env.CI = true.\n" +
-              "Most CI servers set it automatically.\n"
+            '\nTreating warnings as errors because process.env.CI = true.\n' +
+              'Most CI servers set it automatically.\n'
           )
         );
-        return reject(new Error(messages.warnings.join("\n\n")));
+        return reject(new Error(messages.warnings.join('\n\n')));
       }
 
       const resolveArgs = {
         stats,
         previousFileSizes,
-        warnings: messages.warnings
+        warnings: messages.warnings,
       };
       if (writeStatsJson) {
         return bfj
-          .write(paths.appBuild + "/bundle-stats.json", stats.toJson())
+          .write(paths.appBuild + '/bundle-stats.json', stats.toJson())
           .then(() => resolve(resolveArgs))
           .catch(error => reject(new Error(error)));
       }
@@ -230,7 +232,7 @@ function copyPublicFolder() {
   if (fs.existsSync(paths.appPublic)) {
     fs.copySync(paths.appPublic, paths.appBuild, {
       dereference: true,
-      filter: file => file !== paths.appHtml
+      filter: file => file !== paths.appHtml,
     });
   }
 }

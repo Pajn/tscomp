@@ -231,9 +231,6 @@ function verify_env_url {
 # Enter the app directory
 cd test-browser-app
 
-# Workaround Jest dependency issue
-yarn add babel-core@7.0.0-bridge.0
-
 # Test the build
 yarn build
 # Check for expected output

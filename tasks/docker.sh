@@ -51,6 +51,9 @@ while [ "$1" != "" ]; do
       print_help
       exit 0
       ;;
+    *)
+      echo "Unknown option $1"
+      exit 1
   esac
   shift
 done

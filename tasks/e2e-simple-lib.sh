@@ -174,9 +174,6 @@ tscomp new lib --scripts-version="$cli_path" test-library
 # Enter the app directory
 cd test-library
 
-# Workaround Jest dependency issue
-yarn add babel-core@7.0.0-bridge.0
-
 # Test the build
 yarn build
 # Check for expected output

@@ -5,6 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-module.exports = function() {
+export default function() {
   return `haha`;
 };

@@ -121,9 +121,6 @@ cd $temp_app_path/test-kitchensink
 # Still link to tscomp
 yarn add "$root_path"
 
-yarn add babel-preset-react-app@Pajn/babel-preset-react-app
-git stash
-
 # In kitchensink, we want to test all transforms
 export BROWSERSLIST='ie 9'
 
@@ -132,6 +129,7 @@ export BROWSERSLIST='ie 9'
 # ******************************************************************************
 
 # Eject...
+git stash
 echo yes | npm run eject
 
 # ...but still link to tscomp

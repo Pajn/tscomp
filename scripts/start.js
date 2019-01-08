@@ -43,7 +43,7 @@ const {
 const openBrowser = require('react-dev-utils/openBrowser');
 const gulp = require('../config/gulp');
 const paths = require('../config/paths');
-const config = require('../config/webpack.config.dev');
+const configFactory = require('../config/webpack.config');
 const createDevServerConfig = require('../config/webpackDevServer.config');
 
 const checkRequiredFiles = require('./utils/common').checkRequiredFiles;
@@ -95,6 +95,7 @@ function startWebpack() {
         // We have not found a port.
         return;
       }
+      const config = configFactory('development');
       const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
       const appName = require(paths.appPackageJson).name;
       const urls = prepareUrls(protocol, HOST, port);

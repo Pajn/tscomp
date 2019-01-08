@@ -81,11 +81,16 @@ module.exports = (resolve, rootDir, isEjecting) => {
         },
         babelConfig: {
           presets: [
-            [require.resolve('babel-preset-react-app'), { allowESModules: false }]
-          ]
-        }
-      }
-    }
+            [
+              require.resolve('babel-preset-react-app'),
+              { useESModules: false, flow: false, typescript: false },
+            ],
+          ],
+          babelrc: false,
+          configFile: false,
+        },
+      },
+    },
   };
   if (mode === 'server') {
     config.watchPathIgnorePatterns = [paths.appBuild];
