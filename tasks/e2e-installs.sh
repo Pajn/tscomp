@@ -14,13 +14,17 @@ cd "$(dirname "$0")"
 
 # CLI and app temporary locations
 # http://unix.stackexchange.com/a/84980
-temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
+custom_registry_url=http://localhost:4873
+original_npm_registry_url=`npm get registry`
+original_yarn_registry_url=`yarn config get registry`
 
 function cleanup {
   echo 'Cleaning up.'
   cd "$root_path"
-  rm -rf "$temp_cli_path" "$temp_app_path"
+  rm -rf "$temp_app_path"
+  npm set registry "$original_npm_registry_url"
+  yarn config set registry "$original_yarn_registry_url"
 }
 
 # Error messages are redirected to stderr
@@ -44,8 +48,15 @@ function exists {
   done
 }
 
-function tscomp {
-  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js $*
+# Check for accidental dependencies in package.json
+function checkDependencies {
+  if ! awk '/"dependencies": {/{y=1;next}/},/{y=0; next}y' package.json | \
+  grep -v -q -E '^\s*"react(-dom|-scripts)?"'; then
+   echo "Dependencies are correct"
+  else
+   echo "There are extraneous dependencies in package.json"
+   exit 1
+  fi
 }
 
 # Exit the script with a helpful error message when any error is encountered
@@ -61,46 +72,79 @@ set -x
 cd ..
 root_path=$PWD
 
-# Clear cache to avoid issues with incorrect packages being used
-if hash yarnpkg 2>/dev/null
+if hash npm 2>/dev/null
 then
-  # AppVeyor uses an old version of yarn.
-  # Once updated to 0.24.3 or above, the workaround can be removed
-  # and replaced with `yarnpkg cache clean`
-  # Issues:
-  #    https://github.com/yarnpkg/yarn/issues/2591
-  #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebook/create-react-app/pull/2400
-  # When removing workaround, you may run into
-  #    https://github.com/facebook/create-react-app/issues/2030
-  case "$(uname -s)" in
-    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
-    *) yarn=yarnpkg;;
-  esac
-  $yarn cache clean
+  npm i -g npm@latest
 fi
 
+# Bootstrap monorepo
 yarn
 
-if [ "$USE_YARN" = "yes" ]
-then
-  # Install Yarn so that the test can use it to install packages.
-  npm install -g yarn
-  # yarn cache clean
+# ******************************************************************************
+# First, publish tscomp.
+# ******************************************************************************
+
+# Start local registry
+tmp_registry_log=`mktemp`
+(cd && nohup npx verdaccio@3.8.2 -c "$root_path"/tasks/verdaccio.yaml &>$tmp_registry_log &)
+# Wait for `verdaccio` to boot
+grep -q 'http address' <(tail -f $tmp_registry_log)
+
+# Set registry to local registry
+npm set registry "$custom_registry_url"
+yarn config set registry "$custom_registry_url"
+
+# Login so we can publish packages
+(cd && npx npm-auth-to-token@1.0.0 -u user -p password -e user@example.com -r "$custom_registry_url")
+
+# Publish the monorepo
+# git clean -df]]===========
+npm version prerelease --force --no-git-tag-version
+"$root_path/tasks/publish.sh" --yes --force-publish=* --skip-git --exact --npm-tag=latest
+
+echo "Tscomp Version: "
+npx tscomp new --version
+
+# ******************************************************************************
+# Test --scripts-version with a distribution tag
+# ******************************************************************************
+
+cd "$temp_app_path"
+npx tscomp new lib --scripts-version=@latest test-app-dist-tag
+cd test-app-dist-tag
+
+# Check corresponding scripts version is installed and no TypeScript is present.
+exists node_modules/tscomp
+exists src/index.ts
+! exists src/index.tsx
+# checkDependencies
+
+# ******************************************************************************
+# Test project folder is deleted on failing package installation
+# ******************************************************************************
+
+cd "$temp_app_path"
+# we will install a non-existing package to simulate a failed installataion.
+npx tscomp new lib --scripts-version=`date +%s` test-app-should-not-exist || true
+# confirm that the project files were deleted
+test ! -e test-app-should-not-exist/package.json
+test ! -d test-app-should-not-exist/node_modules
+
+# ******************************************************************************
+# Test project folder is not deleted when creating app over existing folder
+# ******************************************************************************
+
+cd "$temp_app_path"
+mkdir test-app-should-remain
+echo '## Hello' > ./test-app-should-remain/README.md
+# we will install a non-existing package to simulate a failed installataion.
+npx tscomp new lib --scripts-version=`date +%s` test-app-should-remain || true
+# confirm the file exist
+test -e test-app-should-remain/README.md
+# confirm only README.md and error log are the only files in the directory
+if [ "$(ls -1 ./test-app-should-remain | wc -l | tr -d '[:space:]')" != "2" ]; then
+  false
 fi
-
-# ******************************************************************************
-# First, pack and install tscomp.
-# ******************************************************************************
-
-# Pack CLI
-cd "$root_path"
-cli_path=$PWD/`npm pack`
-
-# Install the CLI in a temporary location
-cd "$temp_cli_path"
-npm init -y
-npm install "$cli_path"
 
 # ******************************************************************************
 # Test nested folder path as the project name
@@ -111,36 +155,58 @@ cd "$temp_app_path"
 mkdir test-app-nested-paths-t1
 cd test-app-nested-paths-t1
 mkdir -p test-app-nested-paths-t1/aa/bb/cc/dd
-tscomp new lib test-app-nested-paths-t1/aa/bb/cc/dd
+npx tscomp new browser test-app-nested-paths-t1/aa/bb/cc/dd
 cd test-app-nested-paths-t1/aa/bb/cc/dd
-CI=true npm test
+yarn start --smoke-test
 
 # Testing a path that does not exist
 cd "$temp_app_path"
-tscomp new lib test-app-nested-paths-t2/aa/bb/cc/dd
+npx tscomp new browser test-app-nested-paths-t2/aa/bb/cc/dd
 cd test-app-nested-paths-t2/aa/bb/cc/dd
-CI=true npm test
+yarn start --smoke-test
 
 # Testing a path that is half exists
 cd "$temp_app_path"
 mkdir -p test-app-nested-paths-t3/aa
-tscomp new lib test-app-nested-paths-t3/aa/bb/cc/dd
+npx tscomp new browser test-app-nested-paths-t3/aa/bb/cc/dd
 cd test-app-nested-paths-t3/aa/bb/cc/dd
-CI=true npm test
+yarn start --smoke-test
 
+# ******************************************************************************
+# Test when PnP is enabled
+# ******************************************************************************
+# cd "$temp_app_path"
+# npx tscomp new browser test-app-pnp --use-pnp
+# cd test-app-pnp
+# ! exists node_modules
+# exists .pnp.js
+# yarn start --smoke-test
+# yarn build
+
+# ******************************************************************************
+# Test variants
+# ******************************************************************************
 # Testing a browser project
 cd "$temp_app_path"
-mkdir -p test-app-nested-paths-t4/aa
-tscomp new browser test-app-nested-paths-t4/aa
-cd test-app-nested-paths-t4/aa/
-CI=true npm test
+npx tscomp new browser test-browser
+cd test-browser
+exists node_modules/react
+exists node_modules/tscomp
+exists src/index.tsx
+! exists src/index.ts
+yarn start --smoke-test
+yarn build
 
 # Testing a server project
 cd "$temp_app_path"
-mkdir -p test-app-nested-paths-t5/aa
-tscomp new server test-app-nested-paths-t5/aa
-cd test-app-nested-paths-t5/aa/
-CI=true npm test
+npx tscomp new server test-server
+cd test-server
+! exists node_modules/react
+exists node_modules/tscomp
+exists src/index.ts
+! exists src/index.tsx
+yarn start --smoke-test
+yarn build
 
 # Cleanup
 cleanup

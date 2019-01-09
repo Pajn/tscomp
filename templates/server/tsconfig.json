@@ -10,17 +10,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "strictNullChecks": true,
+    "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*",
-    "typings/**/*"
-  ],
-  "exclude": [
-    "node_modules/**/*"
-  ]
+  "include": ["src/**/*", "typings/**/*"],
+  "exclude": ["node_modules/**/*"]
 }
