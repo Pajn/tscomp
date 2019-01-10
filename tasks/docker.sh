@@ -141,15 +141,15 @@ case ${test_env} in
 esac
 
 read -r -d '' apply_changes <<- CMD
-cd /var/create-react-app
-git config --global user.name "Create React App"
-git config --global user.email "cra@email.com"
+cd /var/tscomp
+git config --global user.name "tscomp"
+git config --global user.email "tscomp@email.com"
 git stash save -u
 git stash show -p > patch
 git diff 4b825dc642cb6eb9a060e54bf8d69288fbee4904 stash^3 >> patch
 git stash pop
 cd -
-mv /var/create-react-app/patch .
+mv /var/tscomp/patch .
 git apply patch
 rm patch
 CMD
@@ -163,22 +163,31 @@ echo "prefix=~/.npm" > ~/.npmrc
 mkdir ~/.npm
 export PATH=\$PATH:~/.npm/bin
 set -x
-git clone /var/create-react-app create-react-app --branch ${git_branch}
-cd create-react-app
+git clone /var/tscomp tscomp --branch ${git_branch}
+cd tscomp
 ${apply_changes}
 node --version
 npm --version
 set +x
-${test_command} && echo -e "\n\e[1;32m✔ Job passed\e[0m" || echo -e "\n\e[1;31m✘ Job failed\e[0m"
+${test_command}
+result_code=\$?
+if [ \$result_code == 0 ]; then
+  echo -e "\n\e[1;32m✔ Job passed\e[0m"
+else
+  echo -e "\n\e[1;31m✘ Job failed\e[0m"
+fi
 $([[ ${interactive} == 'true' ]] && echo 'bash')
+exit \$result_code
 CMD
 
 docker run \
   --env CI=true \
+  --env NPM_CONFIG_PREFIX=/home/node/.npm \
   --env NPM_CONFIG_QUIET=true \
   --tty \
+  --rm \
   --user node \
-  --volume ${PWD}/..:/var/create-react-app \
+  --volume ${PWD}/..:/var/tscomp \
   --workdir /home/node \
   $([[ ${interactive} == 'true' ]] && echo '--interactive') \
   node:${node_version} \

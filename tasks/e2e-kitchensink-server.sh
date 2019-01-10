@@ -14,17 +14,23 @@ cd "$(dirname "$0")"
 
 # CLI, app, and test module temporary locations
 # http://unix.stackexchange.com/a/84980
-temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
 temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
+custom_registry_url=http://localhost:4873
+original_npm_registry_url=`npm get registry`
+original_yarn_registry_url=`yarn config get registry`
 
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  # ps -ef | grep 'kitchensink' | grep -v grep | grep 'e2e-kitchensink-server.sh' | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'verdaccio' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'tscomp-scripts' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'test-kitchensink' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
+  rm -rf "$temp_app_path" "$temp_module_path" || $CI
+  npm set registry "$original_npm_registry_url"
+  yarn config set registry "$original_yarn_registry_url"
 }
 
 # Error messages are redirected to stderr
@@ -39,10 +45,6 @@ function handle_exit {
   cleanup
   echo 'Exiting without error.' 1>&2;
   exit
-}
-
-function tscomp {
-  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js "$@"
 }
 
 # Check for the existence of one or more files.
@@ -65,67 +67,60 @@ set -x
 cd ..
 root_path=$PWD
 
-# Clear cache to avoid issues with incorrect packages being used
-if hash yarnpkg 2>/dev/null
-then
-  # AppVeyor uses an old version of yarn.
-  # Once updated to 0.24.3 or above, the workaround can be removed
-  # and replaced with `yarnpkg cache clean`
-  # Issues:
-  #    https://github.com/yarnpkg/yarn/issues/2591
-  #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebook/create-react-app/pull/2400
-  # When removing workaround, you may run into
-  #    https://github.com/facebook/create-react-app/issues/2030
-  case "$(uname -s)" in
-    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
-    *) yarn=yarnpkg;;
-  esac
-  $yarn cache clean
-fi
+# if hash npm 2>/dev/null
+# then
+#   npm i -g npm@latest
+# fi
 
+# Bootstrap monorepo
 yarn
 
 # ******************************************************************************
-# First, pack tscomp so we can use it.
+# First, publish the monorepo.
 # ******************************************************************************
 
-# Pack CLI
-cd "$root_path"
-cli_path=$PWD/`npm pack`
+# Start local registry
+tmp_registry_log=`mktemp`
+(cd && nohup npx verdaccio@3.8.2 -c "$root_path"/tasks/verdaccio.yaml &>$tmp_registry_log &)
+# Wait for `verdaccio` to boot
+grep -q 'http address' <(tail -f $tmp_registry_log)
+
+# Set registry to local registry
+npm set registry "$custom_registry_url"
+yarn config set registry "$custom_registry_url"
+
+# Login so we can publish packages
+(cd && npx npm-auth-to-token@1.0.0 -u user -p password -e user@example.com -r "$custom_registry_url")
+
+# Publish the monorepo
+git clean -df
+./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
 
 # ******************************************************************************
-# Now that we have packed them, create a clean app folder and install them.
+# Now that we have published them, create a clean app folder and install them.
 # ******************************************************************************
 
-# Install the CLI in a temporary location
-cd "$temp_cli_path"
-yarn add "$cli_path"
+# Install the app in a temporary location
+cd $temp_app_path
+npx create-tscomp-project server --internal-testing-template="$root_path"/packages/tscomp-scripts/fixtures/kitchensink-server test-kitchensink
 
 # Install the test module
 cd "$temp_module_path"
 yarn add test-integrity@^2.0.1
 
-# Install the app in a temporary location
-cd $temp_app_path
-tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-server server test-kitchensink
-
-# Enter the app directory
-cd $temp_app_path/test-kitchensink
-
-# Still link to tscomp
-yarn add "$root_path"
-
-# In kitchensink, we want to test all transforms
-export BROWSERSLIST='ie 9'
-
-# Link to test module
-npm link "$temp_module_path/node_modules/test-integrity"
-
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
+
+# Enter the app directory
+cd "$temp_app_path/test-kitchensink"
+
+# In kitchensink, we want to test all transforms
+export BROWSERSLIST='maintained node versions'
+
+# Link to test module
+npm link "$temp_module_path/node_modules/test-integrity"
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
@@ -142,28 +137,27 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_ENV=test \
   yarn test --no-cache --runInBand --testPathPattern=src
 
-# # Prepare "development" environment
-# tmp_server_log=`mktemp`
-# PORT=9001 \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   NODE_PATH=src \
-#   nohup yarn start &>$tmp_server_log &
-# grep -q 'Kitchensink is ready' <(tail -f $tmp_server_log)
-
-# # Test "development" environment
-# E2E_URL="http://localhost:9001" \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   CI=true NODE_PATH=src \
-#   NODE_ENV=development \
-#   node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
-
-# Test "production" environment
+# Integration tests
 E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   CI=true \
   NODE_PATH=src \
   NODE_ENV=production \
   PUBLIC_URL=http://www.example.org/spa/ \
   node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
+
+# Test development mode
+echo "setTimeout(() => {}, 60000)" > "$temp_app_path/test-kitchensink/src/index.ts"
+echo "console.log('Server Started')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+
+tmp_server_log=`mktemp`
+nohup yarn start &>$tmp_server_log &
+grep -q 'Server Started' <(tail -f $tmp_server_log)
+
+echo "console.log('Server Updated')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+grep -q 'Server Updated' <(tail -f $tmp_server_log)
+
+echo "console.log('Server Updated Again')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+grep -q 'Server Updated Again' <(tail -f $tmp_server_log)
 
 # Cleanup
 cleanup

@@ -1,3 +1,13 @@
+## 1.0.0-beta.12
+
+- Split project into monorepo.
+  - Dependencies needed for initialization is no longer included after eject
+  - Global installation is much smaller and npx usage is now preffed
+- Skip lib check by default for new projects
+  - Improving compilation speed
+  - Unneccecary errors from @types packages no longer distrub the build
+- Allow building using only babel with `tscomp.babelOnly` option
+
 ## 1.0.0-beta.11
 
 - Fix compilation error if having js files in src while not enabling `allowJs`
