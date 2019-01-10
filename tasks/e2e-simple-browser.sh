@@ -12,18 +12,21 @@
 # Start in tasks/ even if run from root directory
 cd "$(dirname "$0")"
 
-# CLI and app temporary locations
+# App temporary location
 # http://unix.stackexchange.com/a/84980
-temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
+custom_registry_url=http://localhost:4873
+original_npm_registry_url=`npm get registry`
+original_yarn_registry_url=`yarn config get registry`
 
 function cleanup {
   echo 'Cleaning up.'
   cd "$root_path"
-  rm "$cli_path"
   # Uncomment when snapshot testing is enabled by default:
-  # rm ./packages/react-scripts/template/src/__snapshots__/App.test.js.snap
-  rm -rf "$temp_cli_path" $temp_app_path
+  # rm ./packages/tscomp-scripts/template/src/__snapshots__/App.test.js.snap
+  rm -rf "$temp_app_path"
+  npm set registry "$original_npm_registry_url"
+  yarn config set registry "$original_yarn_registry_url"
 }
 
 # Error messages are redirected to stderr
@@ -38,10 +41,6 @@ function handle_exit {
   cleanup
   echo 'Exiting without error.' 1>&2;
   exit
-}
-
-function tscomp {
-  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js "$@"
 }
 
 # Check for the existence of one or more files.
@@ -64,118 +63,46 @@ set -x
 cd ..
 root_path=$PWD
 
-# Clear cache to avoid issues with incorrect packages being used
-if hash yarnpkg 2>/dev/null
+if hash npm 2>/dev/null
 then
-  # AppVeyor uses an old version of yarn.
-  # Once updated to 0.24.3 or above, the workaround can be removed
-  # and replaced with `yarnpkg cache clean`
-  # Issues:
-  #    https://github.com/yarnpkg/yarn/issues/2591
-  #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebook/create-react-app/pull/2400
-  # When removing workaround, you may run into
-  #    https://github.com/facebook/create-react-app/issues/2030
-  case "$(uname -s)" in
-    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
-    *) yarn=yarnpkg;;
-  esac
-  $yarn cache clean
+  npm i -g npm@latest
 fi
 
-#if hash npm 2>/dev/null
-#then
-#  # npm 5 is too buggy right now
-#  if [ $(npm -v | head -c 1) -eq 5 ]; then
-#    npm i -g npm@^4.x
-#  fi;
-#  npm cache clean || npm cache verify
-#fi
+# Bootstrap monorepo
+yarn
 
-# We need to install create-react-app deps to test it
-npm install
+# Start local registry
+tmp_registry_log=`mktemp`
+(cd && nohup npx verdaccio@3.8.2 -c "$root_path"/tasks/verdaccio.yaml &>$tmp_registry_log &)
+# Wait for `verdaccio` to boot
+grep -q 'http address' <(tail -f $tmp_registry_log)
 
-# If the node version is < 6, the script should just give an error.
-nodeVersion=`node --version | cut -d v -f2`
-nodeMajor=`echo $nodeVersion | cut -d. -f1`
-nodeMinor=`echo $nodeVersion | cut -d. -f2`
-if [[ nodeMajor -lt 6 ]]
-then
-  cd $temp_app_path
-  err_output=`node "$root_path"/bin/tscomp.js test-node-version 2>&1 > /dev/null || echo ''`
-  [[ $err_output =~ You\ are\ running\ Node ]] && exit 0 || exit 1
-fi
+# Set registry to local registry
+npm set registry "$custom_registry_url"
+yarn config set registry "$custom_registry_url"
 
-npm install
+# Login so we can publish packages
+(cd && npx npm-auth-to-token@1.0.0 -u user -p password -e user@example.com -r "$custom_registry_url")
 
-if [ "$USE_YARN" = "yes" ]
-then
-  # Install Yarn so that the test can use it to install packages.
-  npm install -g yarn
-  yarn cache clean
-fi
+# Lint own code
+./node_modules/.bin/eslint --max-warnings 0 packages/create-tscomp-project/
+./node_modules/.bin/eslint --max-warnings 0 packages/tscomp-scripts/
+
+git clean -df
+./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
 
 # ******************************************************************************
-# Next, pack tscomp so we can verify that it work.
-# ******************************************************************************
-
-# Pack CLI
-cli_path=$PWD/`npm pack`
-
-# ******************************************************************************
-# Now that we have packed them, create a clean app folder and install them.
-# ******************************************************************************
-
-# Install the CLI in a temporary location
-cd "$temp_cli_path"
-
-# Initialize package.json before installing the CLI because npm will not install
-# the CLI properly in the temporary location if it is missing.
-npm init --yes
-
-# Now we can install the CLI from the local package.
-npm install "$cli_path"
-
-
-# ******************************************************************************
-# Common test utils
-# ******************************************************************************
-
-function test_change_outdir {
-  files_to_check=( "$@" )
-
-  # Backup package.json because we're going to make it dirty
-  cp tsconfig.json tsconfig.json.orig
-
-  sed 's/\"outDir\": \"\w*\"/\"outDir\": \"other\"/' tsconfig.json > tmp && mv tmp tsconfig.json
-
-  yarn build
-
-  for file in "${files_to_check[@]}"
-  do
-    exists "other/$file" || exit 1
-  done
-
-  # Restore tsconfig.json
-  rm tsconfig.json
-  mv tsconfig.json.orig tsconfig.json
-  rm -rf other
-}
-
-# ******************************************************************************
-# ******************************************************************************
-# ******************************************************************************
-# Test the browser template
-# ******************************************************************************
-# ******************************************************************************
+# Install tscomp-scripts prerelease via create-tscomp-project prerelease.
 # ******************************************************************************
 
 # Install the app in a temporary location
 cd $temp_app_path
-tscomp new browser --scripts-version="$cli_path" test-browser-app
+npx create-tscomp-project browser test-app
+
+# TODO: verify we installed prerelease
 
 # ******************************************************************************
-# Now that we used tscomp to create an app,
+# Now that we used create-tscomp-project to create an app depending on tscomp-scripts,
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
 
@@ -228,8 +155,29 @@ function verify_env_url {
   mv package.json.orig package.json
 }
 
+function verify_module_scope {
+  # Create stub json file
+  echo "{}" >> sample.json
+
+  # Save App.tsx, we're going to modify it
+  cp src/App.tsx src/App.tsx.bak
+
+  # Add an out of scope import
+  echo "import sampleJson from '../sample'" | cat - src/App.js > src/App.js.temp && mv src/App.js.temp src/App.js
+
+  # Make sure the build fails
+  yarn build; test $? -eq 1 || exit 1
+  # TODO: check for error message
+
+  rm sample.json
+
+  # Restore App.tsx
+  rm src/App.tsx
+  mv src/App.tsx.bak src/App.tsx
+}
+
 # Enter the app directory
-cd test-browser-app
+cd test-app
 
 # Test the build
 yarn build
@@ -251,18 +199,15 @@ yarn start --smoke-test
 # Test environment handling
 verify_env_url
 
-# Test changing outDir
-test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg favicon.ico
+# Test reliance on webpack internals
+verify_module_scope
 
 # ******************************************************************************
 # Finally, let's check that everything still works after ejecting.
 # ******************************************************************************
 
 # Eject...
-echo yes | yarn eject
-
-# ...but still link to the local packages
-yarn add "$root_path"
+echo yes | npm run eject
 
 # Test the build
 yarn build
@@ -273,8 +218,11 @@ exists build/static/css/*.css
 exists build/static/media/*.svg
 exists build/favicon.ico
 
-# Run tests
-CI=true yarn test
+# Run tests, overriding the watch option to disable it.
+# `CI=true yarn test` won't work here because `yarn test` becomes just `jest`.
+# We should either teach Jest to respect CI env variable, or make
+# `scripts/test.js` survive ejection (right now it doesn't).
+yarn test --watch=no
 # Uncomment when snapshot testing is enabled by default:
 # exists src/__snapshots__/App.test.js.snap
 
@@ -284,5 +232,8 @@ yarn start --smoke-test
 # Test environment handling
 verify_env_url
 
-# Test changing outDir
-test_change_outdir *.html static/js/*.js static/css/*.css static/media/*.svg favicon.ico
+# Test reliance on webpack internals
+verify_module_scope
+
+# Cleanup
+cleanup

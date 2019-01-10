@@ -5,26 +5,26 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-"use strict";
+'use strict';
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
-process.on("unhandledRejection", err => {
+process.on('unhandledRejection', err => {
   throw err;
 });
 
-const fs = require("fs-extra");
-const path = require("path");
-const chalk = require("chalk");
-const execSync = require("child_process").execSync;
-const spawn = require("react-dev-utils/crossSpawn");
-const { defaultBrowsers } = require("react-dev-utils/browsersHelper");
-const os = require("os");
+const fs = require('fs-extra');
+const path = require('path');
+const chalk = require('chalk');
+const execSync = require('child_process').execSync;
+const spawn = require('react-dev-utils/crossSpawn');
+const { defaultBrowsers } = require('react-dev-utils/browsersHelper');
+const os = require('os');
 
 function isInGitRepository() {
   try {
-    execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
     return true;
   } catch (e) {
     return false;
@@ -33,7 +33,7 @@ function isInGitRepository() {
 
 function isInMercurialRepository() {
   try {
-    execSync("hg --cwd . root", { stdio: "ignore" });
+    execSync('hg --cwd . root', { stdio: 'ignore' });
     return true;
   } catch (e) {
     return false;
@@ -43,17 +43,17 @@ function isInMercurialRepository() {
 function tryGitInit(appPath) {
   let didInit = false;
   try {
-    execSync("git --version", { stdio: "ignore" });
+    execSync('git --version', { stdio: 'ignore' });
     if (isInGitRepository() || isInMercurialRepository()) {
       return false;
     }
 
-    execSync("git init", { stdio: "ignore" });
+    execSync('git init', { stdio: 'ignore' });
     didInit = true;
 
-    execSync("git add -A", { stdio: "ignore" });
+    execSync('git add -A', { stdio: 'ignore' });
     execSync('git commit -m "Initial commit from Create React App"', {
-      stdio: "ignore"
+      stdio: 'ignore',
     });
     return true;
   } catch (e) {
@@ -65,7 +65,7 @@ function tryGitInit(appPath) {
       // remove the Git files to avoid a half-done state.
       try {
         // unlinkSync() doesn't work on directories.
-        fs.removeSync(path.join(appPath, ".git"));
+        fs.removeSync(path.join(appPath, '.git'));
       } catch (removeErr) {
         // Ignore.
       }
@@ -82,11 +82,11 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  const ownPackageName = require(path.join(__dirname, "..", "package.json"))
+  const ownPackageName = require(path.join(__dirname, '..', 'package.json'))
     .name;
-  const ownPath = path.join(appPath, "node_modules", ownPackageName);
-  const appPackage = require(path.join(appPath, "package.json"));
-  const useYarn = fs.existsSync(path.join(appPath, "yarn.lock"));
+  const ownPath = path.join(appPath, 'node_modules', ownPackageName);
+  const appPackage = require(path.join(appPath, 'package.json'));
+  const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
 
   // Copy over some of the devDependencies
   appPackage.dependencies = appPackage.dependencies || {};
@@ -94,48 +94,48 @@ module.exports = function(
 
   // Setup tscomp options
   appPackage.tscomp = {
-    mode: projectType
+    mode: projectType,
   };
 
   // Setup the script rules
   appPackage.scripts = {
-    build: "tscomp build",
-    test: "tscomp test",
-    eject: "tscomp eject"
+    build: 'tscomp build',
+    test: 'tscomp test',
+    eject: 'tscomp eject',
   };
-  if (projectType === "browser") {
-    appPackage.scripts.start = "tscomp start";
-    appPackage.scripts.test = "tscomp test --env=jsdom";
+  if (projectType === 'browser') {
+    appPackage.scripts.start = 'tscomp start';
+    appPackage.scripts.test = 'tscomp test --env=jsdom';
     appPackage.browserslist = defaultBrowsers;
-  } else if (projectType === "server") {
-    appPackage.scripts.start = "tscomp start";
-    appPackage.scripts.watch = "tscomp watch";
-  } else if (projectType === "lib") {
-    appPackage.scripts.watch = "tscomp watch";
-    appPackage.scripts.prepack = "tscomp build";
+  } else if (projectType === 'server') {
+    appPackage.scripts.start = 'tscomp start';
+    appPackage.scripts.watch = 'tscomp watch';
+  } else if (projectType === 'lib') {
+    appPackage.scripts.watch = 'tscomp watch';
+    appPackage.scripts.prepack = 'tscomp build';
 
-    appPackage.main = "./cjs/index.js";
-    appPackage.module = "./lib/index.js";
-    appPackage.typings = "./lib/index.d.ts";
+    appPackage.main = './cjs/index.js';
+    appPackage.module = './lib/index.js';
+    appPackage.typings = './lib/index.d.ts';
   }
 
   fs.writeFileSync(
-    path.join(appPath, "package.json"),
+    path.join(appPath, 'package.json'),
     JSON.stringify(appPackage, null, 2) + os.EOL
   );
 
-  const readmeExists = fs.existsSync(path.join(appPath, "README.md"));
+  const readmeExists = fs.existsSync(path.join(appPath, 'README.md'));
   if (readmeExists) {
     fs.renameSync(
-      path.join(appPath, "README.md"),
-      path.join(appPath, "README.old.md")
+      path.join(appPath, 'README.md'),
+      path.join(appPath, 'README.old.md')
     );
   }
 
   // Copy the files for the user
   const templatePath = template
     ? path.resolve(originalDirectory, template)
-    : path.join(ownPath, "templates", projectType);
+    : path.join(ownPath, 'templates', projectType);
   if (fs.existsSync(templatePath)) {
     fs.copySync(templatePath, appPath);
   } else {
@@ -149,34 +149,34 @@ module.exports = function(
   // See: https://github.com/npm/npm/issues/1862
   try {
     fs.moveSync(
-      path.join(appPath, "gitignore"),
-      path.join(appPath, ".gitignore"),
+      path.join(appPath, 'gitignore'),
+      path.join(appPath, '.gitignore'),
       []
     );
   } catch (err) {
     // Append if there's already a `.gitignore` file there
-    if (err.code === "EEXIST") {
-      const data = fs.readFileSync(path.join(appPath, "gitignore"));
-      fs.appendFileSync(path.join(appPath, ".gitignore"), data);
-      fs.unlinkSync(path.join(appPath, "gitignore"));
+    if (err.code === 'EEXIST') {
+      const data = fs.readFileSync(path.join(appPath, 'gitignore'));
+      fs.appendFileSync(path.join(appPath, '.gitignore'), data);
+      fs.unlinkSync(path.join(appPath, 'gitignore'));
     } else {
       throw err;
     }
   }
 
-  if (fs.existsSync(path.join(appPath, "npmignore"))) {
+  if (fs.existsSync(path.join(appPath, 'npmignore'))) {
     try {
       fs.moveSync(
-        path.join(appPath, "npmignore"),
-        path.join(appPath, ".npmignore"),
+        path.join(appPath, 'npmignore'),
+        path.join(appPath, '.npmignore'),
         []
       );
     } catch (err) {
       // Append if there's already a `.npmignore` file there
-      if (err.code === "EEXIST") {
-        const data = fs.readFileSync(path.join(appPath, "npmignore"));
-        fs.appendFileSync(path.join(appPath, ".npmignore"), data);
-        fs.unlinkSync(path.join(appPath, "npmignore"));
+      if (err.code === 'EEXIST') {
+        const data = fs.readFileSync(path.join(appPath, 'npmignore'));
+        fs.appendFileSync(path.join(appPath, '.npmignore'), data);
+        fs.unlinkSync(path.join(appPath, 'npmignore'));
       } else {
         throw err;
       }
@@ -188,18 +188,18 @@ module.exports = function(
   let packages = [];
 
   if (useYarn) {
-    command = "yarnpkg";
-    args = ["add"];
+    command = 'yarnpkg';
+    args = ['add'];
   } else {
-    command = "npm";
-    args = ["install", "--save", verbose && "--verbose"].filter(e => e);
+    command = 'npm';
+    args = ['install', '--save', verbose && '--verbose'].filter(e => e);
   }
-  packages.push("react", "react-dom", "@types/react", "@types/react-dom");
+  packages.push('react', 'react-dom', '@types/react', '@types/react-dom');
 
   // Install additional template dependencies, if present
   const templateDependenciesPath = path.join(
     appPath,
-    ".template.dependencies.json"
+    '.template.dependencies.json'
   );
   if (fs.existsSync(templateDependenciesPath)) {
     const templateDependencies = require(templateDependenciesPath).dependencies;
@@ -215,7 +215,7 @@ module.exports = function(
   // which doesn't install react and react-dom along with tscomp
   // or template is presetend (via --internal-testing-template)
   if (packages.length > 0 && (!isReactInstalled(appPackage) || template)) {
-    if (projectType === "browser") {
+    if (projectType === 'browser') {
       console.log(`Installing react and react-dom using ${command}...`);
     } else {
       console.log(`Installing packages using ${command}...`);
@@ -223,16 +223,16 @@ module.exports = function(
     console.log();
     args = args.concat(packages);
 
-    const proc = spawn.sync(command, args, { stdio: "inherit" });
+    const proc = spawn.sync(command, args, { stdio: 'inherit' });
     if (proc.status !== 0) {
-      console.error(`\`${command} ${args.join(" ")}\` failed`);
+      console.error(`\`${command} ${args.join(' ')}\` failed`);
       return;
     }
   }
 
   if (tryGitInit(appPath)) {
     console.log();
-    console.log("Initialized a git repository.");
+    console.log('Initialized a git repository.');
   }
 
   // Display the most elegant way to cd.
@@ -246,54 +246,67 @@ module.exports = function(
   }
 
   // Change displayed command to yarn instead of yarnpkg
-  const displayedCommand = useYarn ? "yarn" : "npm";
+  const displayedCommand = useYarn ? 'yarn' : 'npm';
 
   console.log();
   console.log(`Success! Created ${appName} at ${appPath}`);
-  console.log("Inside that directory, you can run several commands:");
+  console.log('Inside that directory, you can run several commands:');
   console.log();
-  console.log(chalk.cyan(`  ${displayedCommand} start`));
-  console.log("    Starts the development server.");
-  console.log();
+  if (projectType !== 'lib') {
+    console.log(chalk.cyan(`  ${displayedCommand} start`));
+    console.log('    Starts the development server.');
+    console.log();
+  }
+  if (projectType !== 'browser') {
+    console.log(chalk.cyan(`  ${displayedCommand} watch`));
+    console.log('    Rebuild when a file changes.');
+    console.log();
+  }
   console.log(
-    chalk.cyan(`  ${displayedCommand} ${useYarn ? "" : "run "}build`)
+    chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`)
   );
-  console.log("    Bundles the app into static files for production.");
+  if (projectType === 'lib') {
+    console.log('    Bundles the lib for publishing.');
+  } else {
+    console.log('    Bundles the app into static files for production.');
+  }
   console.log();
   console.log(chalk.cyan(`  ${displayedCommand} test`));
-  console.log("    Starts the test runner.");
+  console.log('    Starts the test runner.');
   console.log();
   console.log(
-    chalk.cyan(`  ${displayedCommand} ${useYarn ? "" : "run "}eject`)
+    chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}eject`)
   );
   console.log(
-    "    Removes this tool and copies build dependencies, configuration files"
+    '    Removes this tool and copies build dependencies, configuration files'
   );
   console.log(
-    "    and scripts into the app directory. If you do this, you can’t go back!"
+    `    and scripts into the ${
+      projectType === 'lib' ? 'project' : 'app'
+    } directory. If you do this, you can’t go back!`
   );
   console.log();
-  console.log("We suggest that you begin by typing:");
+  console.log('We suggest that you begin by typing:');
   console.log();
-  console.log(chalk.cyan("  cd"), cdpath);
+  console.log(chalk.cyan('  cd'), cdpath);
   console.log(`  ${chalk.cyan(`${displayedCommand} start`)}`);
   if (readmeExists) {
     console.log();
     console.log(
       chalk.yellow(
-        "You had a `README.md` file, we renamed it to `README.old.md`"
+        'You had a `README.md` file, we renamed it to `README.old.md`'
       )
     );
   }
   console.log();
-  console.log("Happy hacking!");
+  console.log('Happy hacking!');
 };
 
 function isReactInstalled(appPackage) {
   const dependencies = appPackage.dependencies || {};
 
   return (
-    typeof dependencies.react !== "undefined" &&
-    typeof dependencies["react-dom"] !== "undefined"
+    typeof dependencies.react !== 'undefined' &&
+    typeof dependencies['react-dom'] !== 'undefined'
   );
 }

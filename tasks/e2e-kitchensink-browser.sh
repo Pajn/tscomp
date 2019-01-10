@@ -14,16 +14,21 @@ cd "$(dirname "$0")"
 
 # CLI, app, and test module temporary locations
 # http://unix.stackexchange.com/a/84980
-temp_cli_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_cli_path'`
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
 temp_module_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_module_path'`
+custom_registry_url=http://localhost:4873
+original_npm_registry_url=`npm get registry`
+original_yarn_registry_url=`yarn config get registry`
 
 function cleanup {
   echo 'Cleaning up.'
-  ps -ef | grep 'tscomp' | grep -v grep | awk '{print $2}' | xargs kill -9
+  unset BROWSERSLIST
+  ps -ef | grep 'react-scripts' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
-  rm -rf "$temp_cli_path" $temp_app_path $temp_module_path || $CI
+  rm -rf "$temp_app_path" "$temp_module_path" || $CI
+  npm set registry "$original_npm_registry_url"
+  yarn config set registry "$original_yarn_registry_url"
 }
 
 # Error messages are redirected to stderr
@@ -38,10 +43,6 @@ function handle_exit {
   cleanup
   echo 'Exiting without error.' 1>&2;
   exit
-}
-
-function tscomp {
-  node "$temp_cli_path"/node_modules/tscomp/bin/tscomp.js "$@"
 }
 
 # Check for the existence of one or more files.
@@ -64,62 +65,46 @@ set -x
 cd ..
 root_path=$PWD
 
-# Clear cache to avoid issues with incorrect packages being used
-if hash yarnpkg 2>/dev/null
+if hash npm 2>/dev/null
 then
-  # AppVeyor uses an old version of yarn.
-  # Once updated to 0.24.3 or above, the workaround can be removed
-  # and replaced with `yarnpkg cache clean`
-  # Issues:
-  #    https://github.com/yarnpkg/yarn/issues/2591
-  #    https://github.com/appveyor/ci/issues/1576
-  #    https://github.com/facebook/create-react-app/pull/2400
-  # When removing workaround, you may run into
-  #    https://github.com/facebook/create-react-app/issues/2030
-  case "$(uname -s)" in
-    *CYGWIN*|MSYS*|MINGW*) yarn=yarn.cmd;;
-    *) yarn=yarnpkg;;
-  esac
-  $yarn cache clean
+  npm i -g npm@latest
 fi
 
+# Bootstrap monorepo
 yarn
 
 # ******************************************************************************
-# First, pack tscomp so we can use it.
+# First, publish the monorepo.
 # ******************************************************************************
 
-# Pack CLI
-cd "$root_path"
-cli_path=$PWD/`npm pack`
+# Start local registry
+tmp_registry_log=`mktemp`
+(cd && nohup npx verdaccio@3.8.2 -c "$root_path"/tasks/verdaccio.yaml &>$tmp_registry_log &)
+# Wait for `verdaccio` to boot
+grep -q 'http address' <(tail -f $tmp_registry_log)
+
+# Set registry to local registry
+npm set registry "$custom_registry_url"
+yarn config set registry "$custom_registry_url"
+
+# Login so we can publish packages
+(cd && npx npm-auth-to-token@1.0.0 -u user -p password -e user@example.com -r "$custom_registry_url")
+
+# Publish the monorepo
+git clean -df
+./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
 
 # ******************************************************************************
-# Now that we have packed them, create a clean app folder and install them.
+# Now that we have published them, create a clean app folder and install them.
 # ******************************************************************************
 
-# Install the CLI in a temporary location
-cd "$temp_cli_path"
-yarn add "$cli_path"
+# Install the app in a temporary location
+cd $temp_app_path
+npx create-tscomp-project browser --internal-testing-template="$root_path"/packages/tscomp-scripts/fixtures/kitchensink-browser test-kitchensink
 
 # Install the test module
 cd "$temp_module_path"
 yarn add test-integrity@^2.0.1
-
-# Install the app in a temporary location
-cd $temp_app_path
-tscomp new --scripts-version="$cli_path" --internal-testing-template="$root_path"/fixtures/kitchensink-browser browser test-kitchensink
-
-# Enter the app directory
-cd $temp_app_path/test-kitchensink
-
-# ...but still link to tscomp
-yarn add "$root_path"
-
-# In kitchensink, we want to test all transforms
-export BROWSERSLIST='ie 9'
-
-# Link to test module
-npm link "$temp_module_path/node_modules/test-integrity"
 
 # ******************************************************************************
 # Now that we used tscomp to create an app depending on tscomp,

@@ -14,7 +14,6 @@ const scriptIndex = args.findIndex(
   x =>
     x === 'build' ||
     x === 'eject' ||
-    x === 'new' ||
     x === 'start' ||
     x === 'test' ||
     x === 'watch'
@@ -25,10 +24,9 @@ const nodeArgs = scriptIndex > 0 ? args.slice(0, scriptIndex) : [];
 switch (script) {
   case 'build':
   case 'eject':
-  case 'new':
   case 'start':
   case 'test':
-  case 'watch':
+  case 'watch': {
     const result = spawn.sync(
       'node',
       nodeArgs
@@ -54,6 +52,7 @@ switch (script) {
     }
     process.exit(result.status);
     break;
+  }
   default:
     console.log('Unknown script "' + script + '".');
     console.log('Perhaps you need to update tscomp?');

@@ -64,9 +64,10 @@ function buildTs(mode) {
       .pipe(plumber())
       .pipe(sourcemaps.init())
       .pipe(
-        (tsProject = ts.createProject(
-          Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
-        )())
+        (tsProject ||
+          (tsProject = ts.createProject(
+            Object.assign({}, baseCompilerOptions, appTsConfig.compilerOptions)
+          )))()
       );
 
     const babelPipe = tsStream.js
