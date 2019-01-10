@@ -98,19 +98,18 @@ yarn config set registry "$custom_registry_url"
 (cd && npx npm-auth-to-token@1.0.0 -u user -p password -e user@example.com -r "$custom_registry_url")
 
 # Publish the monorepo
-# git clean -df]]===========
-npm version prerelease --force --no-git-tag-version
-"$root_path/tasks/publish.sh" --yes --force-publish=* --skip-git --exact --npm-tag=latest
+git clean -df
+"$root_path/tasks/publish.sh" --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
 
 echo "Tscomp Version: "
-npx tscomp new --version
+npx create-tscomp-project --version
 
 # ******************************************************************************
 # Test --scripts-version with a distribution tag
 # ******************************************************************************
 
 cd "$temp_app_path"
-npx tscomp new lib --scripts-version=@latest test-app-dist-tag
+npx create-tscomp-project lib --scripts-version=@latest test-app-dist-tag
 cd test-app-dist-tag
 
 # Check corresponding scripts version is installed and no TypeScript is present.
@@ -125,7 +124,7 @@ exists src/index.ts
 
 cd "$temp_app_path"
 # we will install a non-existing package to simulate a failed installataion.
-npx tscomp new lib --scripts-version=`date +%s` test-app-should-not-exist || true
+npx create-tscomp-project lib --scripts-version=`date +%s` test-app-should-not-exist || true
 # confirm that the project files were deleted
 test ! -e test-app-should-not-exist/package.json
 test ! -d test-app-should-not-exist/node_modules
@@ -138,7 +137,7 @@ cd "$temp_app_path"
 mkdir test-app-should-remain
 echo '## Hello' > ./test-app-should-remain/README.md
 # we will install a non-existing package to simulate a failed installataion.
-npx tscomp new lib --scripts-version=`date +%s` test-app-should-remain || true
+npx create-tscomp-project lib --scripts-version=`date +%s` test-app-should-remain || true
 # confirm the file exist
 test -e test-app-should-remain/README.md
 # confirm only README.md and error log are the only files in the directory
@@ -155,20 +154,20 @@ cd "$temp_app_path"
 mkdir test-app-nested-paths-t1
 cd test-app-nested-paths-t1
 mkdir -p test-app-nested-paths-t1/aa/bb/cc/dd
-npx tscomp new browser test-app-nested-paths-t1/aa/bb/cc/dd
+npx create-tscomp-project browser test-app-nested-paths-t1/aa/bb/cc/dd
 cd test-app-nested-paths-t1/aa/bb/cc/dd
 yarn start --smoke-test
 
 # Testing a path that does not exist
 cd "$temp_app_path"
-npx tscomp new browser test-app-nested-paths-t2/aa/bb/cc/dd
+npx create-tscomp-project browser test-app-nested-paths-t2/aa/bb/cc/dd
 cd test-app-nested-paths-t2/aa/bb/cc/dd
 yarn start --smoke-test
 
 # Testing a path that is half exists
 cd "$temp_app_path"
 mkdir -p test-app-nested-paths-t3/aa
-npx tscomp new browser test-app-nested-paths-t3/aa/bb/cc/dd
+npx create-tscomp-project browser test-app-nested-paths-t3/aa/bb/cc/dd
 cd test-app-nested-paths-t3/aa/bb/cc/dd
 yarn start --smoke-test
 
@@ -176,7 +175,7 @@ yarn start --smoke-test
 # Test when PnP is enabled
 # ******************************************************************************
 # cd "$temp_app_path"
-# npx tscomp new browser test-app-pnp --use-pnp
+# npx create-tscomp-project browser test-app-pnp --use-pnp
 # cd test-app-pnp
 # ! exists node_modules
 # exists .pnp.js
@@ -188,7 +187,7 @@ yarn start --smoke-test
 # ******************************************************************************
 # Testing a browser project
 cd "$temp_app_path"
-npx tscomp new browser test-browser
+npx create-tscomp-project browser test-browser
 cd test-browser
 exists node_modules/react
 exists node_modules/tscomp
@@ -199,7 +198,7 @@ yarn build
 
 # Testing a server project
 cd "$temp_app_path"
-npx tscomp new server test-server
+npx create-tscomp-project server test-server
 cd test-server
 ! exists node_modules/react
 exists node_modules/tscomp

@@ -94,7 +94,9 @@ const envUseBabelOnly =
     : undefined);
 
 function getUseBabelOnly(appPackageJson) {
-  if (envUseBabelOnly !== undefined) return envUseBabelOnly;
+  if (envUseBabelOnly !== undefined) {
+    return envUseBabelOnly;
+  }
   return (require(appPackageJson).tscomp || {}).babelOnly || false;
 }
 

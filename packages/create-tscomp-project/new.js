@@ -30,7 +30,7 @@ const hyperquest = require('hyperquest');
 const envinfo = require('envinfo');
 const os = require('os');
 
-const packageJson = require('../package.json');
+const packageJson = require('./package.json');
 
 // These files should be allowed to remain on a failed install,
 // but then silently removed during the next create.
@@ -61,7 +61,7 @@ const program = new commander.Command(packageJson.name)
   .option('--info', 'print environment debug info')
   .option(
     '--scripts-version <alternative-package>',
-    'use a non-standard version of tscomp'
+    'use a non-standard version of tscomp-scripts'
   )
   .option('--use-npm')
   .option('--use-pnp')
@@ -84,21 +84,23 @@ const program = new commander.Command(packageJson.name)
     console.log(`      - a specific npm version: ${chalk.green('0.8.2')}`);
     console.log(`      - a specific npm tag: ${chalk.green('@next')}`);
     console.log(
-      `      - a custom fork published on npm: ${chalk.green('my-tscomp')}`
+      `      - a custom fork published on npm: ${chalk.green(
+        'my-tscomp-scripts'
+      )}`
     );
     console.log(
       `      - a local path relative to the current working directory: ${chalk.green(
-        'file:../my-tscomp'
+        'file:../my-tscomp-scripts'
       )}`
     );
     console.log(
       `      - a .tgz archive: ${chalk.green(
-        'https://mysite.com/my-tscomp-0.8.2.tgz'
+        'https://mysite.com/my-tscomp-scripts-0.8.2.tgz'
       )}`
     );
     console.log(
       `      - a .tar.gz archive: ${chalk.green(
-        'https://mysite.com/my-tscomp-0.8.2.tar.gz'
+        'https://mysite.com/my-tscomp-scripts-0.8.2.tar.gz'
       )}`
     );
     console.log(
@@ -124,7 +126,7 @@ if (program.info) {
         Binaries: ['Node', 'npm', 'Yarn'],
         Browsers: ['Chrome', 'Edge', 'Internet Explorer', 'Firefox', 'Safari'],
         npmPackages: ['react', 'react-dom', 'react-scripts'],
-        npmGlobalPackages: ['tscomp'],
+        npmGlobalPackages: ['create-tscomp-project'],
       },
       {
         clipboard: false,
@@ -284,10 +286,10 @@ function createApp(name, verbose, version, useNpm, usePnp, template) {
   }
 
   if (useYarn) {
-    // fs.copySync(
-    //   require.resolve('./yarn.lock.cached'),
-    //   path.join(root, 'yarn.lock')
-    // );
+    fs.copySync(
+      require.resolve('./yarn.lock.cached'),
+      path.join(root, 'yarn.lock')
+    );
   }
 
   run(
@@ -311,7 +313,14 @@ function shouldUseYarn() {
   }
 }
 
-function install(useYarn, usePnp, dependencies, verbose, { isOnline, isDev }) {
+function install(
+  root,
+  useYarn,
+  usePnp,
+  dependencies,
+  verbose,
+  { isOnline, isDev }
+) {
   return new Promise((resolve, reject) => {
     let command;
     let args;
@@ -421,14 +430,14 @@ function run(
       );
       console.log();
 
-      return install(useYarn, usePnp, [packageToInstall], verbose, {
+      return install(root, useYarn, usePnp, [packageToInstall], verbose, {
         isOnline,
       })
         .then(() =>
-          install(useYarn, usePnp, dependencies, verbose, { isOnline })
+          install(root, useYarn, usePnp, dependencies, verbose, { isOnline })
         )
         .then(() =>
-          install(useYarn, usePnp, devDependencies, verbose, {
+          install(root, useYarn, usePnp, devDependencies, verbose, {
             isOnline,
             isDev: true,
           })
@@ -497,7 +506,7 @@ function run(
 }
 
 function getInstallPackage(version, originalDirectory) {
-  let packageToInstall = 'tscomp';
+  let packageToInstall = 'tscomp-scripts';
   const validSemver = semver.valid(version);
   if (validSemver) {
     packageToInstall += `@${validSemver}`;
@@ -694,7 +703,7 @@ function checkAppName(appName) {
 
   // TODO: there should be a single place that holds the dependencies
   const dependencies = ['react', 'react-dom'];
-  const devDependencies = ['tscomp'];
+  const devDependencies = ['tscomp-scripts'];
   const allDependencies = dependencies.concat(devDependencies).sort();
   if (allDependencies.indexOf(appName) >= 0) {
     console.error(
