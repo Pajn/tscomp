@@ -8,8 +8,8 @@
   "engines": {
     "node": ">=8"
   },
-  "scripts": {
-    "tscomp-scripts": "./bin/tscomp.js"
+  "bin": {
+    "tscomp": "./bin/tscomp.js"
   },
   "files": [
     "babelrc",
