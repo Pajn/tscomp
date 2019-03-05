@@ -25,13 +25,13 @@ const src = appPaths.appSrc;
 const outDir = appPaths.appBuild;
 const projectRelativeOutDir = appPaths.getAppBuildFolder(appPaths.appTsConfig);
 
-const paths = [
-  `${src}/**/*.js`,
-  `${src}/**/*.jsx`,
+const tsPaths = [
   `${src}/**/*.ts`,
   `${src}/**/*.tsx`,
   `${appPaths.appTypings}/**/*.d.ts`,
 ];
+
+const jsPaths = [`${src}/**/*.js`, `${src}/**/*.jsx`];
 
 const baseCompilerOptions = {
   module: 'es2015',
@@ -60,7 +60,9 @@ function buildTs(mode) {
       this.emit('end');
     }
     const tsStream = gulp
-      .src(paths)
+      .src(
+        appTsConfig.compilerOptions.allowJs ? tsPaths.concat(jsPaths) : tsPaths
+      )
       .pipe(plumber())
       .pipe(sourcemaps.init())
       .pipe(
@@ -147,12 +149,16 @@ function buildTs(mode) {
 }
 
 function watch(mode, cb) {
-  gulp.watch(paths, () => {
-    console.info(chalk.blue('changes detected, rebuilding...'));
-    return buildTs(mode)
-      .then(() => cb())
-      .catch(err => cb(err || true));
-  });
+  const appTsConfig = require(appPaths.appTsConfig);
+  gulp.watch(
+    appTsConfig.compilerOptions.allowJs ? tsPaths.concat(jsPaths) : tsPaths,
+    () => {
+      console.info(chalk.blue('changes detected, rebuilding...'));
+      return buildTs(mode)
+        .then(() => cb())
+        .catch(err => cb(err || true));
+    }
+  );
 }
 
 module.exports.build = build;
