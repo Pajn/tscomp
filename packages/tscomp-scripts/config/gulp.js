@@ -80,8 +80,12 @@ function buildTs(mode) {
           filename: path,
           presets: [
             [
-              require.resolve('babel-preset-react-app'),
-              { useESModules: false, absoluteRuntime: false },
+              require.resolve('babel-preset-tscomp'),
+              {
+                useESModules: false,
+                absoluteRuntime: false,
+                target: mode === 'lib' ? 'ie11' : 'node',
+              },
             ],
           ],
           plugins:

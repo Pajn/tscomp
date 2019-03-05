@@ -82,8 +82,13 @@ module.exports = (resolve, rootDir, isEjecting) => {
         babelConfig: {
           presets: [
             [
-              require.resolve('babel-preset-react-app'),
-              { useESModules: false, flow: false, typescript: false },
+              require.resolve('babel-preset-tscomp'),
+              {
+                useESModules: false,
+                flow: false,
+                typescript: false,
+                target: 'node',
+              },
             ],
           ],
           babelrc: false,

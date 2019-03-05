@@ -330,24 +330,26 @@ module.exports = function(webpackEnv) {
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
-                  'babel-preset-react-app/webpack-overrides'
+                  'babel-preset-tscomp/webpack-overrides'
                 ),
                 // @remove-on-eject-begin
                 babelrc: false,
                 configFile: false,
-                presets: [require.resolve('babel-preset-react-app')],
+                presets: [
+                  [require.resolve('babel-preset-tscomp'), { target: 'ie11' }],
+                ],
                 // Make sure we have a unique cache identifier, erring on the
                 // side of caution.
                 // We remove this when the user ejects because the default
                 // is sane and uses Babel options. Instead of options, we use
-                // the react-scripts and babel-preset-react-app versions.
+                // the react-scripts and babel-preset-tscomp versions.
                 cacheIdentifier: getCacheIdentifier(
                   isEnvProduction
                     ? 'production'
                     : isEnvDevelopment && 'development',
                   [
                     'babel-plugin-named-asset-import',
-                    'babel-preset-react-app',
+                    'babel-preset-tscomp',
                     'react-dev-utils',
                     'react-scripts',
                   ]
@@ -383,24 +385,29 @@ module.exports = function(webpackEnv) {
                   loader: require.resolve('babel-loader'),
                   options: {
                     customize: require.resolve(
-                      'babel-preset-react-app/webpack-overrides'
+                      'babel-preset-tscomp/webpack-overrides'
                     ),
                     // @remove-on-eject-begin
                     babelrc: false,
                     configFile: false,
-                    presets: [require.resolve('babel-preset-react-app')],
+                    presets: [
+                      [
+                        require.resolve('babel-preset-tscomp'),
+                        { target: 'ie11' },
+                      ],
+                    ],
                     // Make sure we have a unique cache identifier, erring on the
                     // side of caution.
                     // We remove this when the user ejects because the default
                     // is sane and uses Babel options. Instead of options, we use
-                    // the react-scripts and babel-preset-react-app versions.
+                    // the react-scripts and babel-preset-tscomp versions.
                     cacheIdentifier: getCacheIdentifier(
                       isEnvProduction
                         ? 'production'
                         : isEnvDevelopment && 'development',
                       [
                         'babel-plugin-named-asset-import',
-                        'babel-preset-react-app',
+                        'babel-preset-tscomp',
                         'react-dev-utils',
                         'react-scripts',
                       ]
@@ -459,8 +466,8 @@ module.exports = function(webpackEnv) {
                 compact: false,
                 presets: [
                   [
-                    require.resolve('babel-preset-react-app/dependencies'),
-                    { helpers: true },
+                    require.resolve('babel-preset-tscomp/dependencies'),
+                    { helpers: true, target: 'ie11' },
                   ],
                 ],
                 cacheDirectory: true,
@@ -472,7 +479,7 @@ module.exports = function(webpackEnv) {
                     : isEnvDevelopment && 'development',
                   [
                     'babel-plugin-named-asset-import',
-                    'babel-preset-react-app',
+                    'babel-preset-tscomp',
                     'react-dev-utils',
                     'react-scripts',
                   ]
