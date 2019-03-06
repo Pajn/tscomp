@@ -40,6 +40,7 @@
     "babel-loader": "8.0.5",
     "babel-plugin-dynamic-import-node": "2.2.0",
     "babel-plugin-named-asset-import": "0.3.1",
+    "babel-preset-tscomp": "7.0.1",
     "bfj": "6.1.1",
     "case-sensitive-paths-webpack-plugin": "2.2.0",
     "css-loader": "1.0.1",
