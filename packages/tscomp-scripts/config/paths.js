@@ -64,6 +64,8 @@ function getServedPath(appPackageJson) {
 }
 
 const moduleFileExtensions = [
+  'web.mjs',
+  'mjs',
   'web.js',
   'js',
   'web.ts',
@@ -115,7 +117,7 @@ module.exports = {
   appSrc: resolveApp('src'),
   appTypings: resolveApp('typings'),
   yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveApp('src/setupTests.js'),
+  testsSetup: resolveModule(resolveApp, 'src/setupTests'),
   proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
@@ -126,7 +128,7 @@ module.exports = {
 // @remove-on-eject-begin
 const resolveOwn = relativePath => path.resolve(__dirname, '..', relativePath);
 
-// config before eject: we're in ./node_modules/tscomp/config/
+// config before eject: we're in ./node_modules/tscomp-scripts/config/
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
@@ -141,7 +143,7 @@ module.exports = {
   appSrc: resolveApp('src'),
   appTypings: resolveApp('typings'),
   yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveApp('src/setupTests.js'),
+  testsSetup: resolveModule(resolveApp, 'src/setupTests'),
   proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),

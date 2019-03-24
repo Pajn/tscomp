@@ -16,12 +16,13 @@ const mode = common.getMode(paths.appPackageJson);
 module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
   // an absolute filename into configuration after ejecting.
+  const setupTestsMatches = paths.testsSetup.match(/src[/\\]setupTests\.(.+)/);
+  const setupTestsFileExtension =
+    (setupTestsMatches && setupTestsMatches[1]) || 'js';
   const setupTestsFile = fs.existsSync(paths.testsSetup)
-    ? '<rootDir>/src/setupTests.js'
+    ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
     : undefined;
 
-  // TODO: I don't know if it's safe or not to just use / as path separator
-  // in Jest configs. We need help from somebody with Windows to determine this.
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
 
@@ -32,22 +33,31 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     setupFilesAfterEnv: setupTestsFile ? [setupTestsFile] : [],
     testMatch: [
-      '<rootDir>/src/**/__tests__/**/*.[tj]s?(x)',
-      '<rootDir>/src/**/?(*.)(spec|test).[tj]s?(x)',
+      '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+      '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}',
     ],
-    testEnvironment: 'node',
+    testEnvironment: mode === 'browser' ? 'jsdom' : 'node',
     testURL: 'http://localhost',
-    transform: {
-      '^.+\\.(js|jsx)$': isEjecting
-        ? '<rootDir>/node_modules/babel-jest'
-        : resolve('config/jest/babelTransform.js'),
-      '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js',
-      '^.+\\.css$': resolve('config/jest/cssTransform.js'),
-      '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
-        'config/jest/fileTransform.js'
-      ),
-    },
-    transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
+    transform: Object.assign(
+      {
+        [paths.useBabelOnly
+          ? '^.+\\.(js|jsx|ts|tsx)$'
+          : '^.+\\.(js|jsx)$']: isEjecting
+          ? '<rootDir>/node_modules/babel-jest'
+          : resolve('config/jest/babelTransform.js'),
+        '^.+\\.css$': resolve('config/jest/cssTransform.js'),
+        '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
+          'config/jest/fileTransform.js'
+        ),
+      },
+      paths.useBabelOnly
+        ? undefined
+        : { '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js' }
+    ),
+    transformIgnorePatterns: [
+      '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+      '^.+\\.module\\.(css|sass|scss)$',
+    ],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
@@ -55,6 +65,10 @@ module.exports = (resolve, rootDir, isEjecting) => {
     moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
       ext => !ext.includes('mjs')
     ),
+    watchPlugins: [
+      require.resolve('jest-watch-typeahead/filename'),
+      require.resolve('jest-watch-typeahead/testname'),
+    ],
     globals: {
       'ts-jest': {
         diagnostics: {
@@ -132,7 +146,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
       } else {
         console.error(
           chalk.red(
-            'Out of the box, tscomp only supports overriding ' +
+            '\nOut of the box, tscomp only supports overriding ' +
               'these Jest options:\n\n' +
               supportedKeys
                 .map(key => chalk.bold('  \u2022 ' + key))
@@ -151,8 +165,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
               'mother project Create React App.\n'
           )
         );
-        process.exit(1);
       }
+
+      process.exit(1);
     }
   }
   return config;

@@ -136,7 +136,7 @@ module.exports = function(webpackEnv) {
       ? shouldUseSourceMap
         ? 'source-map'
         : false
-      : isEnvDevelopment && 'eval-source-map',
+      : isEnvDevelopment && 'cheap-eval-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
@@ -166,11 +166,11 @@ module.exports = function(webpackEnv) {
       // There will be one main bundle, and one file per asynchronous chunk.
       // In development, it does not produce real files.
       filename: isEnvProduction
-        ? 'static/js/[name].[chunkhash:8].js'
+        ? 'static/js/[name].[contenthash:8].js'
         : isEnvDevelopment && 'static/js/bundle.js',
       // There are also additional JS chunk files if you use code splitting.
       chunkFilename: isEnvProduction
-        ? 'static/js/[name].[chunkhash:8].chunk.js'
+        ? 'static/js/[name].[contenthash:8].chunk.js'
         : isEnvDevelopment && 'static/js/[name].chunk.js',
       // We inferred the "public path" (such as / or /my-project) from homepage.
       // We use "/" in development.
@@ -382,8 +382,7 @@ module.exports = function(webpackEnv) {
                     {
                       loaderMap: {
                         svg: {
-                          ReactComponent:
-                            '@svgr/webpack?-prettier,-svgo![path]',
+                          ReactComponent: '@svgr/webpack?-svgo,+ref![path]',
                         },
                       },
                     },
@@ -716,8 +715,11 @@ module.exports = function(webpackEnv) {
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
     node: {
+      module: 'empty',
       dgram: 'empty',
+      dns: 'mock',
       fs: 'empty',
+      http2: 'empty',
       net: 'empty',
       tls: 'empty',
       child_process: 'empty',
