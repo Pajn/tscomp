@@ -12,7 +12,8 @@
   "files": [
     "index.js",
     "new.js",
-    "tscomp.js"
+    "tscomp.js",
+    "yarn.lock.cached"
   ],
   "keywords": [
     "create-react-app",
