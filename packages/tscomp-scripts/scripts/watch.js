@@ -25,7 +25,7 @@ process.on('unhandledRejection', err => {
 // https://github.com/motdotla/dotenv
 require('dotenv').config({ silent: true });
 
-const chalk = require('chalk');
+const chalk = require('react-dev-utils/chalk');
 const gulp = require('../config/gulp');
 const paths = require('../config/paths');
 
@@ -46,7 +46,8 @@ if (mode === 'browser') {
   );
   process.exit(1);
 } else {
-  gulp.build(mode)
+  gulp
+    .build(mode)
     .catch(err => {
       printErrors('Failed to compile.', [err]);
       return true;

@@ -1,6 +1,6 @@
 'use strict';
 
-const chalk = require('chalk');
+const chalk = require('react-dev-utils/chalk');
 const utilCheckRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 // Print out errors

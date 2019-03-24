@@ -1,6 +1,6 @@
 'use strict';
 
-const chalk = require('chalk');
+const chalk = require('react-dev-utils/chalk');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const changedInPlace = require('gulp-changed-in-place');
