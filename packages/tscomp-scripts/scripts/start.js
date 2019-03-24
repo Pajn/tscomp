@@ -112,7 +112,7 @@ function startWebpack() {
         devSocket,
         urls,
         useYarn,
-        useTypeScript: true,
+        useTypeScript: paths.useBabelOnly,
         webpack,
       });
       // Load proxy config

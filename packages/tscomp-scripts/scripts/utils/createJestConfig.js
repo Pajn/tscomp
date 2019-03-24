@@ -40,19 +40,22 @@ module.exports = (resolve, rootDir, isEjecting) => {
     testURL: 'http://localhost',
     transform: Object.assign(
       {
-        [paths.useBabelOnly
-          ? '^.+\\.(js|jsx|ts|tsx)$'
-          : '^.+\\.(js|jsx)$']: isEjecting
+        // [paths.useBabelOnly
+        //   ? '^.+\\.(js|jsx|ts|tsx)$'
+        //   : '^.+\\.(js|jsx)$']: isEjecting
+        //   ? '<rootDir>/node_modules/babel-jest'
+        //   : resolve('config/jest/babelTransform.js'),
+        ['^.+\\.(js|jsx|ts|tsx)$']: isEjecting
           ? '<rootDir>/node_modules/babel-jest'
           : resolve('config/jest/babelTransform.js'),
         '^.+\\.css$': resolve('config/jest/cssTransform.js'),
         '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
           'config/jest/fileTransform.js'
         ),
-      },
-      paths.useBabelOnly
-        ? undefined
-        : { '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js' }
+      }
+      // paths.useBabelOnly
+      //   ? undefined
+      //   : { '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js' }
     ),
     transformIgnorePatterns: [
       '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
@@ -86,16 +89,16 @@ module.exports = (resolve, rootDir, isEjecting) => {
             18003, // No inputs were found in config file
           ],
         },
-        babelConfig: {
-          presets: [
-            [
-              require.resolve('babel-preset-react-app'),
-              { useESModules: false, flow: false, typescript: false },
-            ],
-          ],
-          babelrc: false,
-          configFile: false,
-        },
+        // babelConfig: {
+        //   presets: [
+        //     [
+        //       require.resolve('babel-preset-react-app'),
+        //       { useESModules: false, flow: false, typescript: false },
+        //     ],
+        //   ],
+        //   babelrc: false,
+        //   configFile: false,
+        // },
       },
     },
   };
