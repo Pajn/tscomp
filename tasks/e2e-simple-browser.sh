@@ -163,7 +163,7 @@ function verify_module_scope {
   cp src/App.tsx src/App.tsx.bak
 
   # Add an out of scope import
-  echo "import sampleJson from '../sample'" | cat - src/App.js > src/App.js.temp && mv src/App.js.temp src/App.js
+  echo "import sampleJson from '../sample'" | cat - src/App.tsx > src/App.tsx.temp && mv src/App.tsx.temp src/App.tsx
 
   # Make sure the build fails
   yarn build; test $? -eq 1 || exit 1
