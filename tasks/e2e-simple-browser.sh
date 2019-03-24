@@ -63,10 +63,10 @@ set -x
 cd ..
 root_path=$PWD
 
-if hash npm 2>/dev/null
-then
-  npm i -g npm@latest
-fi
+# if hash npm 2>/dev/null
+# then
+#   npm i -g npm@latest
+# fi
 
 # Bootstrap monorepo
 yarn
@@ -87,6 +87,28 @@ yarn config set registry "$custom_registry_url"
 # Lint own code
 ./node_modules/.bin/eslint --max-warnings 0 packages/create-tscomp-project/
 ./node_modules/.bin/eslint --max-warnings 0 packages/tscomp-scripts/
+
+# ******************************************************************************
+# First, test the tscomp development environment.
+# This does not affect our users but makes sure we can develop it.
+# ******************************************************************************
+
+# Test local build command
+yarn build
+# Check for expected output
+exists build/*.html
+exists build/static/js/*.js
+exists build/static/css/*.css
+exists build/static/media/*.svg
+exists build/favicon.ico
+
+# Run tests with CI flag
+CI=true yarn test
+# Uncomment when snapshot testing is enabled by default:
+# exists template/src/__snapshots__/App.test.js.snap
+
+# Test local start command
+yarn start --smoke-test
 
 git clean -df
 ./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
@@ -208,6 +230,9 @@ verify_module_scope
 
 # Eject...
 echo yes | npm run eject
+
+# Test ejected files were staged
+test -n "$(git diff --staged --name-only)"
 
 # Test the build
 yarn build

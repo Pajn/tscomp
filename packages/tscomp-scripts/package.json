@@ -1,6 +1,6 @@
 {
   "name": "tscomp-scripts",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "description": "Effortless buildtool for TypeScript projects",
   "license": "MIT",
   "author": "Rasmus Eneman <rasmus@eneman.eu>",
@@ -8,18 +8,18 @@
   "engines": {
     "node": ">=8.10"
   },
-  "bin": {
-    "tscomp": "./bin/tscomp.js"
-  },
   "files": [
-    "babelrc",
-    "eslintrc",
     "bin",
     "config",
+    "lib",
     "scripts",
     "templates",
     "utils"
   ],
+  "bin": {
+    "tscomp": "./bin/tscomp.js"
+  },
+  "types": "./lib/react-app.d.ts",
   "keywords": [
     "create-react-app",
     "typescript",
@@ -64,8 +64,8 @@
     "gulp-changed-in-place": "2.3.0",
     "gulp-clone": "2.0.1",
     "gulp-plumber": "1.2.1",
-    "gulp-sourcemaps": "2.6.4",
-    "gulp-typescript": "5.0.0",
+    "gulp-sourcemaps": "2.6.5",
+    "gulp-typescript": "5.0.1",
     "html-webpack-plugin": "4.0.0-beta.5",
     "identity-obj-proxy": "3.0.0",
     "jest": "24.5.0",

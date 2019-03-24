@@ -22,8 +22,7 @@ const paths = require('../config/paths');
 const createJestConfig = require('./utils/createJestConfig');
 const inquirer = require('react-dev-utils/inquirer');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
-
-const useYarn = fs.existsSync(paths.yarnLockFile);
+const os = require('os');
 
 const green = chalk.green;
 const cyan = chalk.cyan;
@@ -36,6 +35,22 @@ function getGitStatus() {
     return stdout.trim();
   } catch (e) {
     return '';
+  }
+}
+
+function tryGitAdd(appPath) {
+  try {
+    spawnSync(
+      'git',
+      ['add', path.join(appPath, 'config'), path.join(appPath, 'scripts')],
+      {
+        stdio: 'inherit',
+      }
+    );
+
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
@@ -206,9 +221,21 @@ inquirer
     console.log(`  Adding ${cyan('Jest')} configuration`);
     appPackage.jest = jestConfig;
 
+    // Add Babel config
+    console.log(`  Adding ${cyan('Babel')} preset`);
+    appPackage.babel = {
+      presets: ['react-app'],
+    };
+
+    // Add ESlint config
+    console.log(`  Adding ${cyan('ESLint')} configuration`);
+    appPackage.eslintConfig = {
+      extends: 'react-app',
+    };
+
     fs.writeFileSync(
       path.join(appPath, 'package.json'),
-      JSON.stringify(appPackage, null, 2) + '\n'
+      JSON.stringify(appPackage, null, 2) + os.EOL
     );
     console.log();
 
@@ -225,7 +252,7 @@ inquirer
       }
     }
 
-    if (useYarn) {
+    if (fs.existsSync(paths.yarnLockFile)) {
       const windowsCmdFilePath = path.join(
         appPath,
         'node_modules',
@@ -263,6 +290,11 @@ inquirer
     }
     console.log(green('Ejected successfully!'));
     console.log();
+
+    if (tryGitAdd(appPath)) {
+      console.log(cyan('Staged ejected files for commit.'));
+      console.log();
+    }
 
     console.log();
   });
