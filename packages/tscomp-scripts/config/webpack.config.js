@@ -428,6 +428,7 @@ module.exports = function(webpackEnv) {
                         ? 'production'
                         : isEnvDevelopment && 'development',
                       [
+                        'ts-loader',
                         'babel-plugin-named-asset-import',
                         'babel-preset-react-app',
                         'react-dev-utils',
