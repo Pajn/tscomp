@@ -159,5 +159,48 @@ E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   PUBLIC_URL=http://www.example.org/spa/ \
   node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
 
+# ******************************************************************************
+# Now run all tests in babelOnly mode
+# ******************************************************************************
+rm -rf build
+sed -i 's/tscomp": {/tscomp": {\n"babelOnly": true,/' package.json
+
+# Test the build
+REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  NODE_PATH="$temp_app_path/test-kitchensink/build/" \
+  yarn build
+
+# Check for expected output
+exists build/*.js
+
+# Unit tests
+REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+  CI=true \
+  NODE_PATH="$temp_app_path/test-kitchensink/build/" \
+  NODE_ENV=test \
+  yarn test --no-cache --runInBand --testPathPattern=src
+
+# # Prepare "development" environment
+# tmp_server_log=`mktemp`
+# PORT=9001 \
+#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+#   NODE_PATH=src \
+#   nohup yarn start &>$tmp_server_log &
+# grep -q 'Kitchensink is ready' <(tail -f $tmp_server_log)
+
+# # Test "development" environment
+# E2E_URL="http://localhost:9001" \
+#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
+#   CI=true NODE_PATH=src \
+#   NODE_ENV=development \
+#   node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
+
+# Test "production" environment
+E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
+  CI=true \
+  NODE_PATH=src \
+  NODE_ENV=production \
+  PUBLIC_URL=http://www.example.org/spa/ \
+
 # Cleanup
 cleanup
