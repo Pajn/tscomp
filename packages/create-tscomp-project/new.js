@@ -394,7 +394,7 @@ function run(
 ) {
   const packageToInstall = getInstallPackage(version, originalDirectory);
   let dependencies = [];
-  let devDependencies = ['@types/jest', 'babel-core@7.0.0-bridge.0'];
+  let devDependencies = ['@types/jest'];
   if (projectType === 'browser') {
     dependencies = dependencies.concat([
       'react',
