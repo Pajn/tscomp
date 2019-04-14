@@ -190,21 +190,7 @@ REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_ENV=test \
   yarn test --no-cache --runInBand --testPathPattern=src
 
-# Test "development" environment
-# tmp_server_log=`mktemp`
-# PORT=9002 \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   NODE_PATH=src \
-#   nohup yarn start &>$tmp_server_log &
-# grep -q 'You can now view' <(tail -f $tmp_server_log)
-# E2E_URL="http://localhost:9002" \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   CI=true NODE_PATH=src \
-#   NODE_ENV=development \
-#   BABEL_ENV=test \
-#   node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
-
-# Test "production" environment
+# Integration tests
 E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   CI=true \
   NODE_ENV=production \
