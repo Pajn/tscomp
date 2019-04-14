@@ -23,7 +23,8 @@ original_yarn_registry_url=`yarn config get registry`
 function cleanup {
   echo 'Cleaning up.'
   unset BROWSERSLIST
-  ps -ef | grep 'react-scripts' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'verdaccio' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'tscomp-scripts' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_app_path" "$temp_module_path" || $CI
@@ -65,10 +66,10 @@ set -x
 cd ..
 root_path=$PWD
 
-if hash npm 2>/dev/null
-then
-  npm i -g npm@latest
-fi
+# if hash npm 2>/dev/null
+# then
+#   npm i -g npm@latest
+# fi
 
 # Bootstrap monorepo
 yarn

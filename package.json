@@ -12,13 +12,15 @@
     "node": ">=8"
   },
   "scripts": {
+    "build": "cd packages/tscomp-scripts && node bin/tscomp.js build",
+    "e2e:docker": "tasks/docker.sh",
     "publish": "tasks/publish.sh",
     "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
     "compile:lockfile": "node tasks/compile-lockfile.js"
   },
   "bin": {},
   "devDependencies": {
-    "eslint": "5.12.0",
+    "eslint": "5.15.1",
     "execa": "1.0.0",
     "fs-extra": "^7.0.0",
     "get-port": "^4.0.0",

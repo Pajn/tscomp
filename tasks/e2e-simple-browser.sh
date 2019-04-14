@@ -21,6 +21,7 @@ original_yarn_registry_url=`yarn config get registry`
 
 function cleanup {
   echo 'Cleaning up.'
+  ps -ef | grep 'verdaccio' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # Uncomment when snapshot testing is enabled by default:
   # rm ./packages/tscomp-scripts/template/src/__snapshots__/App.test.js.snap
@@ -94,21 +95,21 @@ yarn config set registry "$custom_registry_url"
 # ******************************************************************************
 
 # Test local build command
-yarn build
-# Check for expected output
-exists build/*.html
-exists build/static/js/*.js
-exists build/static/css/*.css
-exists build/static/media/*.svg
-exists build/favicon.ico
+# yarn build
+# # Check for expected output
+# exists build/*.html
+# exists build/static/js/*.js
+# exists build/static/css/*.css
+# exists build/static/media/*.svg
+# exists build/favicon.ico
 
 # Run tests with CI flag
-CI=true yarn test
+# CI=true yarn test
 # Uncomment when snapshot testing is enabled by default:
 # exists template/src/__snapshots__/App.test.js.snap
 
 # Test local start command
-yarn start --smoke-test
+# yarn start --smoke-test
 
 git clean -df
 ./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
