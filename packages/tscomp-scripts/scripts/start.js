@@ -206,11 +206,13 @@ if (mode === 'browser') {
         nodeArgs: nodeArgs,
         delay: 400,
         watch: [paths.appBuild],
-        ext: 'js jsx json ts tsx',
+        ext: 'js jsx json',
         ignore: ['*.test.js', '*.map'],
         env: { NODE_ENV: process.env.NODE_ENV || 'development' },
         signal: 'SIGINT',
       });
+
+      let isRestarting = false;
 
       ['SIGINT', 'SIGTERM'].forEach(function(sig) {
         process.on(sig, function() {
@@ -220,7 +222,11 @@ if (mode === 'browser') {
 
       nodemon
         .on('exit', function() {
-          process.exit();
+          if (isRestarting) {
+            isRestarting = false;
+          } else {
+            process.exit();
+          }
         })
         .on('crash', function() {
           console.error(
@@ -228,6 +234,7 @@ if (mode === 'browser') {
           );
         })
         .on('restart', function(files) {
+          isRestarting = true;
           if (files) {
             console.log(
               chalk.green(

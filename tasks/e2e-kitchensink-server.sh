@@ -25,6 +25,7 @@ function cleanup {
   unset BROWSERSLIST
   ps -ef | grep 'verdaccio' | grep -v grep | awk '{print $2}' | xargs kill -9
   ps -ef | grep 'tscomp-scripts' | grep -v grep | awk '{print $2}' | xargs kill -9
+  ps -ef | grep 'test-kitchensink' | grep -v grep | awk '{print $2}' | xargs kill -9
   cd "$root_path"
   # TODO: fix "Device or resource busy" and remove ``|| $CI`
   rm -rf "$temp_app_path" "$temp_module_path" || $CI
@@ -116,54 +117,10 @@ yarn add test-integrity@^2.0.1
 cd "$temp_app_path/test-kitchensink"
 
 # In kitchensink, we want to test all transforms
-export BROWSERSLIST='ie 9'
+export BROWSERSLIST='maintained node versions'
 
 # Link to test module
 npm link "$temp_module_path/node_modules/test-integrity"
-
-# Test the build
-REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-  NODE_PATH="$temp_app_path/test-kitchensink/build/" \
-  yarn build
-
-# Check for expected output
-exists build/*.js
-
-# Unit tests
-REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-  CI=true \
-  NODE_PATH="$temp_app_path/test-kitchensink/build/" \
-  NODE_ENV=test \
-  yarn test --no-cache --runInBand --testPathPattern=src
-
-# # Prepare "development" environment
-# tmp_server_log=`mktemp`
-# PORT=9001 \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   NODE_PATH=src \
-#   nohup yarn start &>$tmp_server_log &
-# grep -q 'Kitchensink is ready' <(tail -f $tmp_server_log)
-
-# # Test "development" environment
-# E2E_URL="http://localhost:9001" \
-#   REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-#   CI=true NODE_PATH=src \
-#   NODE_ENV=development \
-#   node_modules/.bin/mocha --timeout 30000 --compilers js:@babel/register --require @babel/polyfill integration/*.test.js
-
-# Test "production" environment
-E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
-  CI=true \
-  NODE_PATH=src \
-  NODE_ENV=production \
-  PUBLIC_URL=http://www.example.org/spa/ \
-  node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
-
-# ******************************************************************************
-# Now run all tests in babelOnly mode
-# ******************************************************************************
-rm -rf build
-sed -i 's/tscomp": {/tscomp": {\n"babelOnly": true,/' package.json
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
@@ -187,6 +144,20 @@ E2E_BIN="$temp_app_path/test-kitchensink/build/index.js" \
   NODE_ENV=production \
   PUBLIC_URL=http://www.example.org/spa/ \
   node_modules/.bin/jest --no-cache --runInBand --config='jest.integration.config.js'
+
+# Test development mode
+echo "setTimeout(() => {}, 60000)" > "$temp_app_path/test-kitchensink/src/index.ts"
+echo "console.log('Server Started')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+
+tmp_server_log=`mktemp`
+nohup yarn start &>$tmp_server_log &
+grep -q 'Server Started' <(tail -f $tmp_server_log)
+
+echo "console.log('Server Updated')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+grep -q 'Server Updated' <(tail -f $tmp_server_log)
+
+echo "console.log('Server Updated Again')" >> "$temp_app_path/test-kitchensink/src/index.ts"
+grep -q 'Server Updated Again' <(tail -f $tmp_server_log)
 
 # Cleanup
 cleanup
