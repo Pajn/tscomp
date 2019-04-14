@@ -12,7 +12,6 @@
   "files": [
     "index.js",
     "new.js",
-    "tscomp.js",
     "yarn.lock.cached"
   ],
   "keywords": [

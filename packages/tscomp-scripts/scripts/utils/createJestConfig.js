@@ -36,27 +36,22 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
       '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}',
     ],
-    testEnvironment: mode === 'browser' ? 'jsdom' : 'node',
-    testURL: 'http://localhost',
-    transform: Object.assign(
-      {
-        // [paths.useBabelOnly
-        //   ? '^.+\\.(js|jsx|ts|tsx)$'
-        //   : '^.+\\.(js|jsx)$']: isEjecting
-        //   ? '<rootDir>/node_modules/babel-jest'
-        //   : resolve('config/jest/babelTransform.js'),
-        ['^.+\\.(js|jsx|ts|tsx)$']: isEjecting
+    testEnvironment:
+      mode === 'browser' ? 'jest-environment-jsdom-fourteen' : 'node',
+    transform: {
+      '^.+\\.(js|jsx)$': isEjecting
+        ? '<rootDir>/node_modules/babel-jest'
+        : resolve('config/jest/babelTransform.js'),
+      '^.+\\.(ts|tsx)$': paths.useBabelOnly
+        ? isEjecting
           ? '<rootDir>/node_modules/babel-jest'
-          : resolve('config/jest/babelTransform.js'),
-        '^.+\\.css$': resolve('config/jest/cssTransform.js'),
-        '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
-          'config/jest/fileTransform.js'
-        ),
-      }
-      // paths.useBabelOnly
-      //   ? undefined
-      //   : { '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js' }
-    ),
+          : resolve('config/jest/babelTransform.js')
+        : '<rootDir>/node_modules/ts-jest/dist/index.js',
+      '^.+\\.css$': resolve('config/jest/cssTransform.js'),
+      '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
+        'config/jest/fileTransform.js'
+      ),
+    },
     transformIgnorePatterns: [
       '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
       '^.+\\.module\\.(css|sass|scss)$',
@@ -69,8 +64,8 @@ module.exports = (resolve, rootDir, isEjecting) => {
       ext => !ext.includes('mjs')
     ),
     watchPlugins: [
-      require.resolve('jest-watch-typeahead/filename'),
-      require.resolve('jest-watch-typeahead/testname'),
+      'jest-watch-typeahead/filename',
+      'jest-watch-typeahead/testname',
     ],
     globals: {
       'ts-jest': {
@@ -89,16 +84,6 @@ module.exports = (resolve, rootDir, isEjecting) => {
             18003, // No inputs were found in config file
           ],
         },
-        // babelConfig: {
-        //   presets: [
-        //     [
-        //       require.resolve('babel-preset-react-app'),
-        //       { useESModules: false, flow: false, typescript: false },
-        //     ],
-        //   ],
-        //   babelrc: false,
-        //   configFile: false,
-        // },
       },
     },
   };

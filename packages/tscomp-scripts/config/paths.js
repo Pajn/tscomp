@@ -113,8 +113,8 @@ module.exports = {
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appBuildIndexJs: resolveApp('build/index.js'),
   appPackageJson: resolveApp('package.json'),
-  appTsConfig: resolveApp('tsconfig.json'),
   appSrc: resolveApp('src'),
+  appTsConfig: resolveApp('tsconfig.json'),
   appTypings: resolveApp('typings'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
@@ -139,8 +139,8 @@ module.exports = {
   appIndexJs: resolveModule(resolveApp, 'src/index'),
   appBuildIndexJs: resolveApp('build/index.js'),
   appPackageJson: resolveApp('package.json'),
-  appTsConfig: resolveApp('tsconfig.json'),
   appSrc: resolveApp('src'),
+  appTsConfig: resolveApp('tsconfig.json'),
   appTypings: resolveApp('typings'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveModule(resolveApp, 'src/setupTests'),
@@ -152,6 +152,8 @@ module.exports = {
   // These properties only exist before ejecting:
   ownPath: resolveOwn('.'),
   ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
+  appTypeDeclarations: resolveApp('src/react-app-env.d.ts'),
+  ownTypeDeclarations: resolveOwn('lib/react-app.d.ts'),
 };
 
 const ownPackageJson = require('../package.json');
@@ -176,11 +178,11 @@ if (
     appBuildIndexJs: resolveOwn('build/index.js'),
     appPackageJson: resolveOwn('package.json'),
     appTsConfig: resolveOwn('template/tsconfig.json'),
-    appSrc: resolveOwn('template/src'),
     appTypings: resolveApp('template/typings'),
+    appSrc: resolveOwn('template/src'),
     yarnLockFile: resolveOwn('template/yarn.lock'),
-    testsSetup: resolveOwn('template/src/setupTests.js'),
-    proxySetup: resolveApp('src/setupProxy.js'),
+    testsSetup: resolveModule(resolveOwn, 'template/src/setupTests'),
+    proxySetup: resolveOwn('template/src/setupProxy.js'),
     appNodeModules: resolveOwn('node_modules'),
     publicUrl: getPublicUrl(resolveOwn('package.json')),
     servedPath: getServedPath(resolveOwn('package.json')),
@@ -188,6 +190,8 @@ if (
     // These properties only exist before ejecting:
     ownPath: resolveOwn('.'),
     ownNodeModules: resolveOwn('node_modules'),
+    appTypeDeclarations: resolveOwn('template/src/react-app-env.d.ts'),
+    ownTypeDeclarations: resolveOwn('lib/react-app.d.ts'),
   };
 }
 // @remove-on-eject-end
