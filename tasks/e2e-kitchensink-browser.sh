@@ -112,6 +112,15 @@ yarn add test-integrity@^2.0.1
 # let's make sure all npm scripts are in the working state.
 # ******************************************************************************
 
+# Enter the app directory
+cd $temp_app_path/test-kitchensink
+
+# In kitchensink, we want to test all transforms
+export BROWSERSLIST='ie 9'
+
+# Link to test module
+npm link "$temp_module_path/node_modules/test-integrity"
+
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   NODE_PATH=src \

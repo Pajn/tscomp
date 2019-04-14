@@ -191,7 +191,7 @@ cd "$temp_app_path"
 npx create-tscomp-project browser test-browser
 cd test-browser
 exists node_modules/react
-exists node_modules/tscomp
+exists node_modules/tscomp-scripts
 exists src/index.tsx
 ! exists src/index.ts
 yarn start --smoke-test
@@ -202,7 +202,7 @@ cd "$temp_app_path"
 npx create-tscomp-project server test-server
 cd test-server
 ! exists node_modules/react
-exists node_modules/tscomp
+exists node_modules/tscomp-scripts
 exists src/index.ts
 ! exists src/index.tsx
 yarn start --smoke-test
