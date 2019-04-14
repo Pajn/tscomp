@@ -114,7 +114,7 @@ npx create-tscomp-project lib --scripts-version=@latest test-app-dist-tag
 cd test-app-dist-tag
 
 # Check corresponding scripts version is installed and no TypeScript is present.
-exists node_modules/tscomp
+exists node_modules/tscomp-scripts
 exists src/index.ts
 ! exists src/index.tsx
 # checkDependencies
