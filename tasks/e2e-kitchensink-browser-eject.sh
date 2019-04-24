@@ -133,7 +133,6 @@ npm link "$temp_module_path/node_modules/test-integrity"
 
 # Test the build
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
-  NODE_PATH=src \
   PUBLIC_URL=http://www.example.org/spa/ \
   yarn build
 
@@ -144,7 +143,6 @@ exists build/static/js/main.*.js
 # Unit tests
 REACT_APP_SHELL_ENV_MESSAGE=fromtheshell \
   CI=true \
-  NODE_PATH=src \
   NODE_ENV=test \
   yarn test --no-cache --runInBand --testPathPattern=src
 
