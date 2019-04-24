@@ -168,9 +168,6 @@ class App extends Component<{}, any> {
           this.setFeature(f.default)
         );
         break;
-      case 'node-path':
-        import('./features/env/NodePath').then(f => this.setFeature(f.default));
-        break;
       case 'no-ext-inclusion':
         import('./features/webpack/NoExtInclusion').then(f =>
           this.setFeature(f.default)
@@ -238,6 +235,11 @@ class App extends Component<{}, any> {
         break;
       case 'expand-env-variables':
         import('./features/env/ExpandEnvVariables').then(f =>
+          this.setFeature(f.default)
+        );
+        break;
+      case 'base-url':
+        import('./features/config/BaseUrl').then(f =>
           this.setFeature(f.default)
         );
         break;
