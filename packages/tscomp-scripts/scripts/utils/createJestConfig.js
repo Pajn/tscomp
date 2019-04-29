@@ -47,7 +47,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
         ? isEjecting
           ? '<rootDir>/node_modules/babel-jest'
           : resolve('config/jest/babelTransform.js')
-        : '<rootDir>/node_modules/ts-jest/dist/index.js',
+        : isEjecting
+        ? '<rootDir>/node_modules/ts-jest/dist/index.js'
+        : resolve('config/jest/tsTransform.js'),
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
         'config/jest/fileTransform.js'
@@ -71,6 +73,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     globals: {
       'ts-jest': {
+        babelConfig: isEjecting,
         diagnostics: {
           ignoreCodes: [
             6059, // rootDir is expected to contain all source files

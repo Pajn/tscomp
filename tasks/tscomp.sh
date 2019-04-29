@@ -51,14 +51,14 @@ root_path=$PWD
 
 # Install all our packages
 
-# Finally, pack react-scripts
+# Finally, pack tscomp-scripts
 scripts_path="$root_path"/`npm pack`
 
 # ******************************************************************************
 # Now that we have packed them, call the global CLI.
 # ******************************************************************************
 
-# If Yarn is installed, clean its cache because it may have cached react-scripts
+# If Yarn is installed, clean its cache because it may have cached tscomp-scripts
 yarn cache clean || true
 
 # Go back to the root directory and run the command from here
