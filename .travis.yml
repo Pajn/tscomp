@@ -1,24 +1,27 @@
-sudo: false
+---
+dist: trusty
 language: node_js
 node_js:
-  - 10
   - 8
-
-before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
-  - export PATH=$HOME/.yarn/bin:$PATH
+  - 10
 cache:
   yarn: true
-install: yarn
+  directories:
+    - .npm
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s
+  - export PATH="$HOME/.yarn/bin:$PATH"
+install: true
 script:
- - 'if [ $TEST_SUITE = "simple-browser" ]; then tasks/e2e-simple-browser.sh; fi'
- - 'if [ $TEST_SUITE = "simple-server" ]; then tasks/e2e-simple-server.sh; fi'
- - 'if [ $TEST_SUITE = "simple-lib" ]; then tasks/e2e-simple-lib.sh; fi'
- - 'if [ $TEST_SUITE = "installs" ]; then tasks/e2e-installs.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink-browser" ]; then tasks/e2e-kitchensink-browser.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink-browser-eject" ]; then tasks/e2e-kitchensink-browser-eject.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink-server" ]; then tasks/e2e-kitchensink-server.sh; fi'
- - 'if [ $TEST_SUITE = "kitchensink-server-eject" ]; then tasks/e2e-kitchensink-server-eject.sh; fi'
+  - 'if [ $TEST_SUITE = "simple-browser" ]; then tasks/e2e-simple-browser.sh; fi'
+  - 'if [ $TEST_SUITE = "simple-server" ]; then tasks/e2e-simple-server.sh; fi'
+  - 'if [ $TEST_SUITE = "simple-lib" ]; then tasks/e2e-simple-lib.sh; fi'
+  - 'if [ $TEST_SUITE = "installs" ]; then tasks/e2e-installs.sh; fi'
+  - 'if [ $TEST_SUITE = "kitchensink-browser" ]; then tasks/e2e-kitchensink-browser.sh; fi'
+  - 'if [ $TEST_SUITE = "kitchensink-browser-eject" ]; then tasks/e2e-kitchensink-browser-eject.sh; fi'
+  - 'if [ $TEST_SUITE = "kitchensink-server" ]; then tasks/e2e-kitchensink-server.sh; fi'
+  - 'if [ $TEST_SUITE = "kitchensink-server-eject" ]; then tasks/e2e-kitchensink-server-eject.sh; fi'
+  - 'if [ $TEST_SUITE = "behavior" ]; then tasks/e2e-behavior.sh; fi'
 env:
   matrix:
     - TEST_SUITE=simple-browser
@@ -29,3 +32,9 @@ env:
     - TEST_SUITE=kitchensink-browser-eject
     - TEST_SUITE=kitchensink-server
     - TEST_SUITE=kitchensink-server-eject
+    - TEST_SUITE=behavior
+matrix:
+  include:
+    - os: osx
+      node_js: 8
+      env: TEST_SUITE=behavior
