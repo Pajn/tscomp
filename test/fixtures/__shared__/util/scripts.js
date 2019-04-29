@@ -84,7 +84,6 @@ module.exports = class ReactScripts {
 
   async serve() {
     const port = await getPort();
-    console.log('port', port);
     const serveProcess = execa(
       'yarnpkg',
       ['serve', '--', '-p', port, '-s', 'build/'],

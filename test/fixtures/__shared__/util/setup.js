@@ -41,9 +41,9 @@ module.exports = class TestSetup {
       });
     }
     packageJson.scripts = Object.assign({}, packageJson.scripts, {
-      start: 'tscomp-scripts start',
-      build: 'tscomp-scripts build',
-      test: 'tscomp-scripts test',
+      start: 'tscomp start',
+      build: 'tscomp build',
+      test: 'tscomp test',
     });
     packageJson.license = packageJson.license || 'UNLICENSED';
     await fs.writeJson(
