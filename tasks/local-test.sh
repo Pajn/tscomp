@@ -195,6 +195,7 @@ docker run \
   --env NPM_CONFIG_QUIET=true \
   --tty \
   --rm \
+  -i \
   --user node \
   --volume ${PWD}/..:/var/tscomp \
   --workdir /home/node \
