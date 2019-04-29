@@ -14,7 +14,6 @@
   "scripts": {
     "build": "cd packages/tscomp-scripts && node bin/tscomp.js build",
     "e2e:docker": "tasks/local-test.sh",
-    "publish": "tasks/publish.sh",
     "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
     "compile:lockfile": "node tasks/compile-lockfile.js"
   },
