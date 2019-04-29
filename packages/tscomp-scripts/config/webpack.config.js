@@ -45,10 +45,11 @@ const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
 
 const typescript = (() => {
   try {
-    require(path.join(paths.appNodeModules, 'typescript'));
-    return path.join(paths.appNodeModules, 'typescript');
+    return resolve.sync('typescript', {
+      basedir: paths.appNodeModules,
+    });
   } catch (_) {
-    return 'typescript';
+    return require.resolve('typescript');
   }
 })();
 
@@ -89,10 +90,7 @@ module.exports = function(webpackEnv) {
       isEnvDevelopment && require.resolve('style-loader'),
       isEnvProduction && {
         loader: MiniCssExtractPlugin.loader,
-        options: Object.assign(
-          {},
-          shouldUseRelativeAssetPaths ? { publicPath: '../../' } : undefined
-        ),
+        options: shouldUseRelativeAssetPaths ? { publicPath: '../../' } : {},
       },
       {
         loader: require.resolve('css-loader'),
@@ -373,7 +371,7 @@ module.exports = function(webpackEnv) {
                 // side of caution.
                 // We remove this when the user ejects because the default
                 // is sane and uses Babel options. Instead of options, we use
-                // the react-scripts and babel-preset-react-app versions.
+                // the tscomp-scripts and babel-preset-react-app versions.
                 cacheIdentifier: getCacheIdentifier(
                   isEnvProduction
                     ? 'production'
@@ -382,7 +380,7 @@ module.exports = function(webpackEnv) {
                     'babel-plugin-named-asset-import',
                     'babel-preset-react-app',
                     'react-dev-utils',
-                    'react-scripts',
+                    'tscomp-scripts',
                   ]
                 ),
                 // @remove-on-eject-end
@@ -425,7 +423,7 @@ module.exports = function(webpackEnv) {
                     // side of caution.
                     // We remove this when the user ejects because the default
                     // is sane and uses Babel options. Instead of options, we use
-                    // the react-scripts and babel-preset-react-app versions.
+                    // the tscomp-scripts and babel-preset-react-app versions.
                     cacheIdentifier: getCacheIdentifier(
                       isEnvProduction
                         ? 'production'
@@ -507,7 +505,7 @@ module.exports = function(webpackEnv) {
                     'babel-plugin-named-asset-import',
                     'babel-preset-react-app',
                     'react-dev-utils',
-                    'react-scripts',
+                    'tscomp-scripts',
                   ]
                 ),
                 // @remove-on-eject-end
@@ -713,9 +711,7 @@ module.exports = function(webpackEnv) {
       // TypeScript type checking
       paths.useBabelOnly &&
         new ForkTsCheckerWebpackPlugin({
-          typescript: resolve.sync('typescript', {
-            basedir: paths.appNodeModules,
-          }),
+          typescript: typescript,
           async: isEnvDevelopment,
           useTypescriptIncrementalApi: true,
           checkSyntacticErrors: true,

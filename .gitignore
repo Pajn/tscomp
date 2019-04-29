@@ -4,3 +4,4 @@ node_modules/
 tscomp-*.tgz
 package-lock.json
 yarn.lock
+tasks/storage

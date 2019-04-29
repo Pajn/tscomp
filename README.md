@@ -22,11 +22,11 @@ First you must choose what kind of project you want to create, tscomp supports
 Now run
 
 ```
-npx create-tscomp-project <project-type> my-app
+yarn create tscomp-project <project-type> my-app
 cd my-app
 ```
 
-for example `npx create-tscomp-project browser my-app`.
+for example `yarn create tscomp-project browser my-app`.
 
 It will create a directory called `my-app` inside the dcurrent folder.
 Inside that directory, it will generate the initial project structure and

@@ -125,7 +125,7 @@ if (program.info) {
         System: ['OS', 'CPU'],
         Binaries: ['Node', 'npm', 'Yarn'],
         Browsers: ['Chrome', 'Edge', 'Internet Explorer', 'Firefox', 'Safari'],
-        npmPackages: ['react', 'react-dom', 'react-scripts'],
+        npmPackages: ['react', 'react-dom', 'tscomp-scripts'],
         npmGlobalPackages: ['create-tscomp-project'],
       },
       {
@@ -432,6 +432,7 @@ function run(
 
       return install(root, useYarn, usePnp, [packageToInstall], verbose, {
         isOnline,
+        isDev: true,
       })
         .then(() =>
           install(root, useYarn, usePnp, dependencies, verbose, { isOnline })
@@ -750,8 +751,12 @@ function setCaretRangeForRuntimeDeps(packageName) {
     console.error(chalk.red('Missing dependencies in package.json'));
     process.exit(1);
   }
+  if (typeof packageJson.devDependencies === 'undefined') {
+    console.error(chalk.red('Missing devDependencies in package.json'));
+    process.exit(1);
+  }
 
-  const packageVersion = packageJson.dependencies[packageName];
+  const packageVersion = packageJson.devDependencies[packageName];
   if (typeof packageVersion === 'undefined') {
     console.error(chalk.red(`Unable to find ${packageName} in package.json`));
     process.exit(1);

@@ -167,12 +167,14 @@ function startWebpack() {
 if (mode === 'browser') {
   startWebpack();
 } else if (mode === 'server') {
+  // @remove-on-eject-begin
   const isSmokeTest = process.argv.some(
     arg => arg.indexOf('--smoke-test') > -1
   );
   if (isSmokeTest) {
     argv = argv.filter(arg => arg.indexOf('--smoke-test') === -1);
   }
+  // @remove-on-eject-end
 
   console.log(chalk.blue('Building app...'));
   gulp
@@ -198,6 +200,7 @@ if (mode === 'browser') {
       });
       argv = argv.filter(arg => arg !== undefined);
 
+      // @remove-on-eject-begin
       if (isSmokeTest) {
         const spawn = require('nodemon/lib/spawn');
         const command = ['node']
@@ -210,6 +213,7 @@ if (mode === 'browser') {
           []
         );
       }
+      // @remove-on-eject-end
 
       const nodemon = require('nodemon');
 
@@ -260,15 +264,18 @@ if (mode === 'browser') {
           }
         });
 
-      if (!isSmokeTest) {
-        gulp.watch(paths.appPath, mode, err => {
-          if (err) {
-            printErrors('Failed to compile.', [err]);
-          } else {
-            console.log(chalk.green('Compiled successfully.'));
-          }
-        });
+      // @remove-on-eject-begin
+      if (isSmokeTest) {
+        return;
       }
+      // @remove-on-eject-end
+      gulp.watch(mode, err => {
+        if (err) {
+          printErrors('Failed to compile.', [err]);
+        } else {
+          console.log(chalk.green('Compiled successfully.'));
+        }
+      });
     });
 } else {
   console.log(chalk.red(`Can only start a browser or a server app project`));

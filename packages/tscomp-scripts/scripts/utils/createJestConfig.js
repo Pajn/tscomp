@@ -39,25 +39,22 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     testEnvironment: mode === 'browser' ? 'jsdom' : 'node',
     testURL: 'http://localhost',
-    transform: Object.assign(
-      {
-        // [paths.useBabelOnly
-        //   ? '^.+\\.(js|jsx|ts|tsx)$'
-        //   : '^.+\\.(js|jsx)$']: isEjecting
-        //   ? '<rootDir>/node_modules/babel-jest'
-        //   : resolve('config/jest/babelTransform.js'),
-        ['^.+\\.(js|jsx|ts|tsx)$']: isEjecting
+    transform: {
+      '^.+\\.(js|jsx)$': isEjecting
+        ? '<rootDir>/node_modules/babel-jest'
+        : resolve('config/jest/babelTransform.js'),
+      '^.+\\.(ts|tsx)$': paths.useBabelOnly
+        ? isEjecting
           ? '<rootDir>/node_modules/babel-jest'
-          : resolve('config/jest/babelTransform.js'),
-        '^.+\\.css$': resolve('config/jest/cssTransform.js'),
-        '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
-          'config/jest/fileTransform.js'
-        ),
-      }
-      // paths.useBabelOnly
-      //   ? undefined
-      //   : { '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/dist/index.js' }
-    ),
+          : resolve('config/jest/babelTransform.js')
+        : isEjecting
+        ? '<rootDir>/node_modules/ts-jest/dist/index.js'
+        : resolve('config/jest/tsTransform.js'),
+      '^.+\\.css$': resolve('config/jest/cssTransform.js'),
+      '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': resolve(
+        'config/jest/fileTransform.js'
+      ),
+    },
     transformIgnorePatterns: [
       '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
       '^.+\\.module\\.(css|sass|scss)$',
@@ -76,6 +73,11 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     globals: {
       'ts-jest': {
+        babelConfig: isEjecting
+          ? {
+              presets: ['react-app'],
+            }
+          : false,
         diagnostics: {
           ignoreCodes: [
             6059, // rootDir is expected to contain all source files
@@ -110,15 +112,25 @@ module.exports = (resolve, rootDir, isEjecting) => {
     'extraGlobals',
     'globalSetup',
     'globalTeardown',
+    'moduleNameMapper',
     'resetMocks',
     'resetModules',
     'snapshotSerializers',
+    'transform',
+    'transformIgnorePatterns',
     'watchPathIgnorePatterns',
   ];
   if (overrides) {
     supportedKeys.forEach(key => {
       if (overrides.hasOwnProperty(key)) {
-        config[key] = overrides[key];
+        if (Array.isArray(config[key]) || typeof config[key] !== 'object') {
+          // for arrays or primitive types, directly override the config key
+          config[key] = overrides[key];
+        } else {
+          // for object types, extend gracefully
+          config[key] = Object.assign({}, config[key], overrides[key]);
+        }
+
         delete overrides[key];
       }
     });

@@ -178,6 +178,10 @@ inquirer
       delete appPackage.dependencies[ownPackageName];
     }
     Object.keys(ownPackage.dependencies).forEach(key => {
+      // We install @babel/runtime on project initialization
+      if (key === '@babel/runtime') {
+        return;
+      }
       // For some reason optionalDependencies end up in dependencies after install
       if (ownPackage.optionalDependencies[key]) {
         return;
@@ -227,11 +231,16 @@ inquirer
       presets: ['react-app'],
     };
 
-    // Add ESlint config
-    console.log(`  Adding ${cyan('ESLint')} configuration`);
-    appPackage.eslintConfig = {
-      extends: 'react-app',
-    };
+    if (fs.existsSync(paths.yarnLockFile)) {
+      // Yarn has a problem where it does not reevaluate the position of transitive dependencies
+      // after it (tscomp-scripts in this case) has been removed. So as a workaround we first
+      // remove it explicity before writing the updated package.json.
+      spawnSync(
+        'yarnpkg',
+        ['--cwd', process.cwd(), 'remove', ownPackage.name],
+        { stdio: 'inherit' }
+      );
+    }
 
     fs.writeFileSync(
       path.join(appPath, 'package.json'),
@@ -273,6 +282,7 @@ inquirer
       }
 
       console.log(cyan('Running yarn...'));
+
       spawnSync('yarnpkg', ['--cwd', process.cwd()], { stdio: 'inherit' });
 
       if (windowsCmdFileContent && !fs.existsSync(windowsCmdFilePath)) {

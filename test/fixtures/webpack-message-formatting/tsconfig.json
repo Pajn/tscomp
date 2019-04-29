@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": "src",
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "outDir": "build"
+  },
+  "include": ["src/**/*"]
+}

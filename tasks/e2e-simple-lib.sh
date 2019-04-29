@@ -15,9 +15,9 @@ cd "$(dirname "$0")"
 # App temporary location
 # http://unix.stackexchange.com/a/84980
 temp_app_path=`mktemp -d 2>/dev/null || mktemp -d -t 'temp_app_path'`
-custom_registry_url=http://localhost:4873
-original_npm_registry_url=`npm get registry`
-original_yarn_registry_url=`yarn config get registry`
+
+# Load functions for working with local NPM registry (Verdaccio)
+source local-registry.sh
 
 function cleanup {
   echo 'Cleaning up.'
@@ -26,8 +26,9 @@ function cleanup {
   # Uncomment when snapshot testing is enabled by default:
   # rm ./packages/tscomp-scripts/template/src/__snapshots__/App.test.js.snap
   rm -rf "$temp_app_path"
-  npm set registry "$original_npm_registry_url"
-  yarn config set registry "$original_yarn_registry_url"
+
+  # Restore the original NPM and Yarn registry URLs and stop Verdaccio
+  stopLocalRegistry
 }
 
 # Error messages are redirected to stderr
@@ -64,10 +65,10 @@ set -x
 cd ..
 root_path=$PWD
 
-# if hash npm 2>/dev/null
-# then
-#   npm i -g npm@latest
-# fi
+if hash npm 2>/dev/null
+then
+  npm i -g npm@latest || true
+fi
 
 # Bootstrap monorepo
 yarn
@@ -90,12 +91,17 @@ yarn config set registry "$custom_registry_url"
 ./node_modules/.bin/eslint --max-warnings 0 packages/tscomp-scripts/
 
 # ******************************************************************************
-# First, test the tscomp development environment.
-# This does not affect our users but makes sure we can develop it.
+# First, publish tscomp.
 # ******************************************************************************
 
-git clean -df
-./tasks/publish.sh --yes --force-publish=* --skip-git --cd-version=prerelease --exact --npm-tag=latest
+# Start the local NPM registry
+startLocalRegistry "$root_path"/tasks/verdaccio.yaml
+
+# Publish the monorepo
+publishToLocalRegistry
+
+echo "Tscomp Version: "
+npx create-tscomp-project --version
 
 # ******************************************************************************
 # Install tscomp-scripts prerelease via create-tscomp-project prerelease.

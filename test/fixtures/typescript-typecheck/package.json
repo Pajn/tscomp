@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "react": "*",
+    "react-dom": "*"
+  },
+  "tscomp": {
+    "mode": "browser"
+  }
+}

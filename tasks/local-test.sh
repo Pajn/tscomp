@@ -11,7 +11,7 @@ function print_help {
   echo "  --node-version <version>  the node version to use while testing [8]"
   echo "  --git-branch <branch>     the git branch to checkout for testing [the current one]"
   echo "  --test-env <env>          which environment to test ('browser', server', 'lib', 'all') ['all']"
-  echo "  --test-suite <suite>      which test suite to use ('simple', installs', 'kitchensink', 'kitchensink-eject', 'all') ['all']"
+  echo "  --test-suite <suite>      which test suite to use ('simple', installs', 'kitchensink', 'kitchensink-eject', 'behavior', 'all') ['all']"
   echo "  --interactive             gain a bash shell after the test run"
   echo "  --help                    print this message and exit"
   echo ""
@@ -63,7 +63,7 @@ case ${test_env} in
   "all")
     case ${test_suite} in
       "all")
-        test_command="./tasks/e2e-simple-browser.sh && ./tasks/e2e-simple-server.sh && ./tasks/e2e-simple-lib.sh && ./tasks/e2e-kitchensink-browser.sh && ./tasks/e2e-kitchensink-server.sh && ./tasks/e2e-kitchensink-browser-eject.sh && ./tasks/e2e-kitchensink-server-eject.sh && ./tasks/e2e-installs.sh"
+        test_command="./tasks/e2e-simple-browser.sh && ./tasks/e2e-simple-server.sh && ./tasks/e2e-simple-lib.sh && ./tasks/e2e-kitchensink-browser.sh && ./tasks/e2e-kitchensink-server.sh && ./tasks/e2e-kitchensink-browser-eject.sh && ./tasks/e2e-kitchensink-server-eject.sh && ./tasks/e2e-installs.sh && ./tasks/e2e-behavior.sh"
         ;;
       "simple")
         test_command="./tasks/e2e-simple-browser.sh && ./tasks/e2e-simple-server.sh && ./tasks/e2e-simple-lib.sh"
@@ -77,6 +77,9 @@ case ${test_env} in
       "installs")
         test_command="./tasks/e2e-installs.sh"
         ;;
+      "behavior")
+        test_command="./tasks/e2e-behavior.sh"
+        ;;
       *)
         ;;
     esac
@@ -84,7 +87,7 @@ case ${test_env} in
   "browser")
     case ${test_suite} in
       "all")
-        test_command="./tasks/e2e-simple-browser.sh && ./tasks/e2e-kitchensink-browser.sh && ./tasks/e2e-kitchensink-browser-eject.sh && ./tasks/e2e-installs.sh"
+        test_command="./tasks/e2e-simple-browser.sh && ./tasks/e2e-kitchensink-browser.sh && ./tasks/e2e-kitchensink-browser-eject.sh && ./tasks/e2e-installs.sh && ./tasks/e2e-behavior.sh"
         ;;
       "simple")
         test_command="./tasks/e2e-simple-browser.sh"
@@ -105,7 +108,7 @@ case ${test_env} in
   "server")
     case ${test_suite} in
       "all")
-        test_command="./tasks/e2e-simple-server.sh && ./tasks/e2e-kitchensink-server.sh && ./tasks/e2e-kitchensink-server-eject.sh && ./tasks/e2e-installs.sh"
+        test_command="./tasks/e2e-simple-server.sh && ./tasks/e2e-kitchensink-server.sh && ./tasks/e2e-kitchensink-server-eject.sh && ./tasks/e2e-installs.sh && ./tasks/e2e-behavior.sh"
         ;;
       "simple")
         test_command="./tasks/e2e-simple-server.sh"
@@ -119,6 +122,9 @@ case ${test_env} in
       "installs")
         test_command="./tasks/e2e-installs.sh"
         ;;
+      "behavior")
+        test_command="./tasks/e2e-behavior.sh"
+        ;;
       *)
         ;;
     esac
@@ -126,13 +132,16 @@ case ${test_env} in
   "lib")
     case ${test_suite} in
       "all")
-        test_command="./tasks/e2e-simple-lib.sh ./tasks/e2e-installs.sh"
+        test_command="./tasks/e2e-simple-lib.sh && ./tasks/e2e-installs.sh && ./tasks/e2e-behavior.sh"
         ;;
       "simple")
         test_command="./tasks/e2e-simple-lib.sh"
         ;;
       "installs")
         test_command="./tasks/e2e-installs.sh"
+        ;;
+      "behavior")
+        test_command="./tasks/e2e-behavior.sh"
         ;;
       *)
         ;;
@@ -154,9 +163,9 @@ git apply patch
 rm patch
 CMD
 
-if [ ${git_branch} != ${current_git_branch} ]; then
-  apply_changes=''
-fi
+# if [ ${git_branch} != ${current_git_branch} ]; then
+#   apply_changes=''
+# fi
 
 read -r -d '' command <<- CMD
 echo "prefix=~/.npm" > ~/.npmrc
@@ -186,6 +195,7 @@ docker run \
   --env NPM_CONFIG_QUIET=true \
   --tty \
   --rm \
+  -i \
   --user node \
   --volume ${PWD}/..:/var/tscomp \
   --workdir /home/node \
