@@ -751,8 +751,12 @@ function setCaretRangeForRuntimeDeps(packageName) {
     console.error(chalk.red('Missing dependencies in package.json'));
     process.exit(1);
   }
+  if (typeof packageJson.devDependencies === 'undefined') {
+    console.error(chalk.red('Missing devDependencies in package.json'));
+    process.exit(1);
+  }
 
-  const packageVersion = packageJson.dependencies[packageName];
+  const packageVersion = packageJson.devDependencies[packageName];
   if (typeof packageVersion === 'undefined') {
     console.error(chalk.red(`Unable to find ${packageName} in package.json`));
     process.exit(1);
