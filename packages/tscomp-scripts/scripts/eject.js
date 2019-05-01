@@ -237,6 +237,17 @@ inquirer
       extends: 'react-app',
     };
 
+    if (fs.existsSync(paths.yarnLockFile)) {
+      // Yarn has a problem where it does not reevaluate the position of transitive dependencies
+      // after it (tscomp-scripts in this case) has been removed. So as a workaround we first
+      // remove it explicity before writing the updated package.json.
+      spawnSync(
+        'yarnpkg',
+        ['--cwd', process.cwd(), 'remove', ownPackage.name],
+        { stdio: 'inherit' }
+      );
+    }
+
     fs.writeFileSync(
       path.join(appPath, 'package.json'),
       JSON.stringify(appPackage, null, 2) + os.EOL
@@ -276,19 +287,8 @@ inquirer
         }
       }
 
-      // Yarn has a problem where it does not reevaluate the position of transitive dependencies
-      // after a package have been remove (tscomp-scripts) in this case. So as a workaround we
-      // run npm first and let it relocate these packages.
-      console.log(cyan('Running npm install...'));
-      spawnSync(
-        'npm',
-        ['install', '--loglevel', 'error', '--no-package-lock'],
-        {
-          stdio: 'inherit',
-        }
-      );
-
       console.log(cyan('Running yarn...'));
+
       spawnSync('yarnpkg', ['--cwd', process.cwd()], { stdio: 'inherit' });
 
       if (windowsCmdFileContent && !fs.existsSync(windowsCmdFilePath)) {
