@@ -178,6 +178,10 @@ inquirer
       delete appPackage.dependencies[ownPackageName];
     }
     Object.keys(ownPackage.dependencies).forEach(key => {
+      // We install @babel/runtime on project initialization
+      if (key === '@babel/runtime') {
+        return;
+      }
       // For some reason optionalDependencies end up in dependencies after install
       if (ownPackage.optionalDependencies[key]) {
         return;
