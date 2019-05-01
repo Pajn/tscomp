@@ -432,6 +432,7 @@ function run(
 
       return install(root, useYarn, usePnp, [packageToInstall], verbose, {
         isOnline,
+        isDev: true,
       })
         .then(() =>
           install(root, useYarn, usePnp, dependencies, verbose, { isOnline })

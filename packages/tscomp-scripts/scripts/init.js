@@ -194,7 +194,9 @@ module.exports = function(
     command = 'npm';
     args = ['install', '--save', verbose && '--verbose'].filter(e => e);
   }
-  packages.push('react', 'react-dom', '@types/react', '@types/react-dom');
+  if (projectType === 'browser') {
+    packages.push('react', 'react-dom', '@types/react', '@types/react-dom');
+  }
 
   // Install additional template dependencies, if present
   const templateDependenciesPath = path.join(
