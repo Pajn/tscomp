@@ -73,7 +73,11 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     globals: {
       'ts-jest': {
-        babelConfig: isEjecting,
+        babelConfig: isEjecting
+          ? {
+              presets: ['react-app'],
+            }
+          : false,
         diagnostics: {
           ignoreCodes: [
             6059, // rootDir is expected to contain all source files

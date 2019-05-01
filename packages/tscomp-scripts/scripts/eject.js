@@ -276,6 +276,18 @@ inquirer
         }
       }
 
+      // Yarn has a problem where it does not reevaluate the position of transitive dependencies
+      // after a package have been remove (tscomp-scripts) in this case. So as a workaround we
+      // run npm first and let it relocate these packages.
+      console.log(cyan('Running npm install...'));
+      spawnSync(
+        'npm',
+        ['install', '--loglevel', 'error', '--no-package-lock'],
+        {
+          stdio: 'inherit',
+        }
+      );
+
       console.log(cyan('Running yarn...'));
       spawnSync('yarnpkg', ['--cwd', process.cwd()], { stdio: 'inherit' });
 
