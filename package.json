@@ -34,7 +34,6 @@
     "prettier": "1.16.4",
     "puppeteer": "^1.13.0",
     "strip-ansi": "^5.1.0",
-    "svg-term-cli": "^2.1.1",
     "tempy": "^0.2.1",
     "wait-for-localhost": "^3.1.0"
   },

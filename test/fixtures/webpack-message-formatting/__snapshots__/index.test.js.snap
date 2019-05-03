@@ -109,7 +109,7 @@ Failed to compile.
 ./src/App.js
 Cannot find module: 'unknown-package'. Make sure this package is installed.
 
-You can install this package by running: yarn add unknown-package.
+You can install this package by running: npm install unknown-package.
 
 
 ",

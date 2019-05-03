@@ -51,18 +51,18 @@ module.exports = class TestSetup {
       packageJson
     );
 
-    await execa(
-      'yarnpkg',
-      [
-        'install',
-        this.settings.pnp ? '--enable-pnp' : null,
-        '--mutex',
-        'network',
-      ].filter(Boolean),
-      {
+    if (this.settings.pnp) {
+      await execa(
+        'yarnpkg',
+        ['install', '--enable-pnp', '--mutex', 'network'],
+        { cwd: this.testDirectory }
+      );
+    } else {
+      // yarn is unfotunately to buggy right now without pnp
+      await execa('npm', ['install', '--no-package-lock'], {
         cwd: this.testDirectory,
-      }
-    );
+      });
+    }
 
     if (!shouldInstallScripts) {
       await fs.ensureSymlink(
