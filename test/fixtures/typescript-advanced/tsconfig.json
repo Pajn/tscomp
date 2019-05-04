@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   }
 }
