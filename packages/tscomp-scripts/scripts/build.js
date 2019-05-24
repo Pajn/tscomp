@@ -116,17 +116,6 @@ function buildBrowser() {
       ({ stats, previousFileSizes, warnings }) => {
         if (warnings.length) {
           console.error(chalk.yellow('Compiled with warnings.\n'));
-          console.error(warnings.join('\n\n'));
-          console.error(
-            '\nSearch for the ' +
-              chalk.underline(chalk.yellow('keywords')) +
-              ' to learn more about each warning.'
-          );
-          console.error(
-            'To ignore, add ' +
-              chalk.cyan('// eslint-disable-next-line') +
-              ' to the line before.\n'
-          );
         } else {
           console.log(chalk.green('Compiled successfully.\n'));
         }

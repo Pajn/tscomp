@@ -231,12 +231,6 @@ inquirer
       presets: ['react-app'],
     };
 
-    // Add ESlint config
-    console.log(`  Adding ${cyan('ESLint')} configuration`);
-    appPackage.eslintConfig = {
-      extends: 'react-app',
-    };
-
     if (fs.existsSync(paths.yarnLockFile)) {
       // Yarn has a problem where it does not reevaluate the position of transitive dependencies
       // after it (tscomp-scripts in this case) has been removed. So as a workaround we first

@@ -1,6 +1,11 @@
-## 1.0.0-beta.12
+## 1.0.0-rc.2
 
-- Split project into monorepo.
+- Remove eslint
+  - Its plugin loading behavior is far to fragile and unstable
+
+## 1.0.0-rc.1
+
+- Split project into monorepo
   - Dependencies needed for initialization is no longer included after eject
   - Global installation is much smaller and npx usage is now preffed
 - Skip lib check by default for new projects

@@ -63,30 +63,6 @@ test('formats missing package', async () => {
   expect({ stdout, stderr }).toMatchSnapshot();
 });
 
-test('formats eslint warning', async () => {
-  fs.copySync(
-    path.join(__dirname, 'src', 'AppLintWarning.js'),
-    path.join(testSetup.testDirectory, 'src', 'App.js')
-  );
-
-  let { stdout, stderr } = await testSetup.scripts.build();
-  const sizeIndex = stdout.indexOf('File sizes after gzip');
-  if (sizeIndex !== -1) {
-    stdout = stdout.substring(0, sizeIndex);
-  }
-  expect({ stdout, stderr }).toMatchSnapshot();
-});
-
-test('formats eslint error', async () => {
-  fs.copySync(
-    path.join(__dirname, 'src', 'AppLintError.js'),
-    path.join(testSetup.testDirectory, 'src', 'App.js')
-  );
-
-  const { stdout, stderr } = await testSetup.scripts.build();
-  expect({ stdout, stderr }).toMatchSnapshot();
-});
-
 test('helps when users tries to use sass', async () => {
   fs.copySync(
     path.join(__dirname, 'src', 'AppSass.js'),
