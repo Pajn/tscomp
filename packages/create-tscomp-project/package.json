@@ -1,6 +1,6 @@
 {
   "name": "create-tscomp-project",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.2",
   "description": "Effortless buildtool for TypeScript projects",
   "license": "MIT",
   "author": "Rasmus Eneman <rasmus@eneman.eu>",
