@@ -27,11 +27,14 @@ module.exports = (resolve, rootDir, isEjecting) => {
   const config = {
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
 
-    setupFiles: [
-      isEjecting
-        ? 'react-app-polyfill/jsdom'
-        : require.resolve('react-app-polyfill/jsdom'),
-    ],
+    setupFiles:
+      mode === 'browser'
+        ? [
+            isEjecting
+              ? 'react-app-polyfill/jsdom'
+              : require.resolve('react-app-polyfill/jsdom'),
+          ]
+        : [],
     setupFilesAfterEnv: setupTestsFile ? [setupTestsFile] : [],
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
