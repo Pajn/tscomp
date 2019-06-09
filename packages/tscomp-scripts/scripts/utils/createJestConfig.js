@@ -64,9 +64,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '^react-native$': 'react-native-web',
       '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     },
-    moduleFileExtensions: [...paths.moduleFileExtensions, 'node'].filter(
-      ext => !ext.includes('mjs')
-    ),
+    moduleFileExtensions: [...paths.moduleFileExtensions, 'node']
+      .filter(ext => !ext.includes('mjs'))
+      .filter(ext => (mode === 'browser' ? true : !ext.includes('web'))),
     watchPlugins: [
       require.resolve('jest-watch-typeahead/filename'),
       require.resolve('jest-watch-typeahead/testname'),
